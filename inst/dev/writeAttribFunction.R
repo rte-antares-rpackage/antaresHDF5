@@ -33,12 +33,29 @@ writeList  <- function(Y, group = NULL){
         if(!is.null(names(X))){
           #X <- data.table("Namvect", t(X))
           isWrited = TRUE
+          if(is.null(dim(X)))
+          {
+
+            if(is.na(X[1])){
+              X <- "NA"
+            }
+          }
           h5write(X, "testWriteattrib.h5", paste0(objectGroupName), write.attributes = TRUE)
           h5writeAttribute(names(X), H5Dopen(H5Fopen("testWriteattrib.h5"), objectGroupName), "names")
-
+          H5close()
         }
       }
       if(!isWrited){
+
+        if(is.null(dim(X)))
+        {
+
+          if(is.na(X[1])){
+            X <- "NA"
+          }
+
+        }
+
         h5write(X, "testWriteattrib.h5", paste0(objectGroupName), write.attributes = TRUE)
         H5close()
       }
@@ -60,6 +77,16 @@ giveFormat <- function(attribList){
             Y <- as.POSIXlt(as.numeric(Y[2]), origin = "1970-01-01", tz = "UTC")
           }
         }
+
+
+        if(!"POSIXlt" %in%class(Y))
+        {
+          if(Y[1] == "NA"){
+            print(Y)
+            Y <- NA
+          }
+        }
+
         Y
       }else if(is.data.frame(Y)){
         Y <- data.table::data.table(Y)
@@ -83,6 +110,10 @@ giveFormat <- function(attribList){
           }
 
         }
+        if(Y[1] == "NA"){
+          Y <- NA
+        }
+
         Y
       }
     }

@@ -1,6 +1,7 @@
 source("inst/dev/writeAttribFunction.R")
 library(data.table)
-
+library(antaresRead)
+library(rhdf5)
 setSimulationPath("D:/exemple_test", "SimulForH5")
 res <- readAntares(areas = "all", links = "all", clusters = "all", districts = "all", mcYears = "all")
 
