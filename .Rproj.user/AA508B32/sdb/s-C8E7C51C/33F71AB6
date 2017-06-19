@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "#Copyright © 2016 RTE Réseau de transport d’électricité\n\n# When doing some simple modifications\n#' @export\n\"[.antaresDataTable\" <- function(x, ...) {\n  attrs <- attributes(x)\n  idVars <- .idCols(x)\n  \n  x <- NextMethod(\"[\", x)\n  \n  if (all(idVars%in% names(x))) {\n    .addClassAndAttributes(x, attrs$synthesis, attrs$timeStep, attrs$opts, \n                           type = attrs$type)\n  }\n  \n  x\n}\n\n#' @export\nmerge.antaresDataTable <- function(x, ...) {\n  attrs <- attributes(x)\n  idVars <- .idCols(x)\n  \n  x <- NextMethod(merge, x)\n  \n  .addClassAndAttributes(x, attrs$synthesis, attrs$timeStep, attrs$opts, \n                         type = attrs$type)\n  \n  .reorderCols(x)\n}\n",
+    "created" : 1497613059086.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3154188779",
+    "id" : "33F71AB6",
+    "lastKnownWriteTime" : 1491206643,
+    "last_content_update" : 1491206643,
+    "path" : "D:/Users/titorobe/Desktop/antares-rpackageRead-develop/R/antaresDataTableMethods.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 9,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

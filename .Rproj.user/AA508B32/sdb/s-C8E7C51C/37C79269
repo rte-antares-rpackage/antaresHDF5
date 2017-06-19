@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "\nwriteList  <- function(Y, group = NULL){\n  sapply(names(Y), function(X){\n    nam <- X\n    X <- Y[[X]]\n    isWrited <- FALSE\n    if(class(X)[1] %in% c(\"list\", \"simOptions\")){\n      nam <- paste(group, nam, sep = \"/\")\n      h5createGroup(\"testWriteattrib.h5\", nam)\n      writeList(X, group = nam)\n    }else{\n      classOrigin <- class(X)\n      objectGroupName <- paste(group, nam, sep = \"/\")\n      if(class(X)[1]  == \"POSIXlt\"){\n        X <- as.numeric(X)\n        X <- c(\"posictClass\", X)\n      }\n\n      if(class(X)[1]  == \"factor\"){\n\n        X <- as.character(X)\n        # h5write(as.integer(X), \"testWriteattrib.h5\", \"v\")\n        # h5writeAttribute(attr(X, \"levels\"), H5Dopen(H5Fopen(\"testWriteattrib.h5\"), objectGroupName), \"levels\")\n        # h5writeAttribute(attr(X, \"class\"), H5Dopen(H5Fopen(\"testWriteattrib.h5\"), objectGroupName), \"class\")\n        # H5close()\n      }else if ( is.data.table(X)){\n        colFactors <- names(which(lapply(X, class) == \"factor\"))\n        if(length(colFactors)>0){\n          X[,c(colFactors) := lapply(.SD, as.character), .SDcols = colFactors]\n        }\n        X <- data.frame(X)\n      }else{\n        if(!is.null(names(X))){\n          #X <- data.table(\"Namvect\", t(X))\n          isWrited = TRUE\n          h5write(X, \"testWriteattrib.h5\", paste0(objectGroupName), write.attributes = TRUE)\n          h5writeAttribute(names(X), H5Dopen(H5Fopen(\"testWriteattrib.h5\"), objectGroupName), \"names\")\n\n        }\n      }\n      if(!isWrited){\n        h5write(X, \"testWriteattrib.h5\", paste0(objectGroupName), write.attributes = TRUE)\n        H5close()\n      }\n    }\n  })\n  NULL\n}\n\ngiveFormat <- function(attribList){\n  sapply(names(attribList) , function(X){\n    Y <- attribList[[X]]\n    if(is.list(Y) & ! is.data.frame(Y)){\n      giveFormat(Y)\n    }else{\n      if(class(Y) == \"array\"){\n        Y <-  c(Y)\n        if(length(Y) > 1){\n          if(Y[1] == \"posictClass\"){\n            Y <- as.POSIXlt(as.numeric(Y[2]), origin = \"1970-01-01\", tz = \"UTC\")\n          }\n        }\n        Y\n      }else if(is.data.frame(Y)){\n        Y <- data.table::data.table(Y)\n\n        # if(unlist(Y[1,.SD, .SDcols = 1]) == \"Namvect\"){\n        #   Y <- unlist(Y[,.SD, .SDcols = 2:ncol(Y)])\n        # }\n\n        # colFactors <- names(which(lapply(Y, class) == \"character\"))\n        # if(length(colFactors)>0){\n        #\n        #   Y[,c(colFactors) := lapply(.SD, as.factor), .SDcols = colFactors]\n        # }\n        Y\n\n      }else{\n        if(length(Y) > 1){\n\n          if(Y[1] == \"posictClass\"){\n            Y <- as.POSIXct(as.numeric(Y[2]), origin = \"1970-01-01\", tz = \"UTC\")\n          }\n\n        }\n        Y\n      }\n    }\n  }, simplify = FALSE)\n}\n\n\ntestIdentical <- function(X, Y){\n  sapply(names(X), function(Z){\n    T1 <- X[[Z]]\n    T2 <- Y[[Z]]\n    if(class(T1)[1] %in% c(\"list\", \"simOptions\", \"data.table\")){\n      testIdentical(T1, T2)\n    }else{\n      identical(T1, T2)\n    }\n  })\n}\n",
+    "created" : 1497873269047.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1451496435",
+    "id" : "37C79269",
+    "lastKnownWriteTime" : 1497882498,
+    "last_content_update" : 1497882498735,
+    "path" : "D:/Users/titorobe/Desktop/Antares/antaresHdf5/inst/dev/writeAttribFunction.R",
+    "project_path" : "inst/dev/writeAttribFunction.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 12,
+    "source_on_save" : true,
+    "source_window" : "",
+    "type" : "r_source"
+}

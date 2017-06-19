@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "\nH5close()\nfile.remove(\"attributes.h5\")\nh5createFile(\"attributes.h5\")\n\nh5createGroup(\"attributes.h5\", \"gr\")\nv <- c(\"A\", \"B\", \"A\")\nv <- as.factor(v)\nattributes(v)\n\nh5write(as.integer(v), \"attributes.h5\", \"gr/v\")\nh5writeAttribute(attr(v, \"levels\"), H5Dopen(H5Fopen(\"attributes.h5\"), \"gr/v\"), \"levels\")\nh5writeAttribute(attr(v, \"class\"), H5Dopen(H5Fopen(\"attributes.h5\"), \"gr/v\"), \"class\")\nH5close()\n\nh5read(\"attributes.h5\", \"gr/v\")\nh5read(\"attributes.h5\", \"gr/v\", read.attributes = T)\n\nh5read(\"attributes.h5\", \"gr\")\nh5read(\"attributes.h5\", \"gr\", read.attributes = T)\n\n\nh5dump(H5Gopen(H5Fopen(\"attributes.h5\"), \"gr\"), all = T, read.attributes = TRUE)\n",
+    "created" : 1497879729263.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2676712980",
+    "id" : "50020CFA",
+    "lastKnownWriteTime" : 1497879760,
+    "last_content_update" : 1497879760110,
+    "path" : "D:/Users/titorobe/Desktop/Antares/antaresHdf5/inst/dev/h5dumpAllAttributs.R",
+    "project_path" : "inst/dev/h5dumpAllAttributs.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 15,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

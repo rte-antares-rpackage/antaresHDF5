@@ -1,0 +1,9 @@
+memory profiling: GC profiling: line profiling: sample.interval=10000
+#File 1: D:/Users/titorobe/Desktop/antares-rpackageRead-develop/R/antaresDataTableMethods.R
+#File 2: D:/Users/titorobe/Desktop/Antares/antaresHdf5/inst/dev/transformAntaresFunction.R
+#File 3: <expr>
+:1340537:17079822:68602744:225:"[.data.table" "NextMethod" 1#9 "[.antaresDataTable" 2#14 "[" 2#14 "transformH5" 3#1 "force" "doTryCatch" "tryCatchOne" "tryCatchList" "doTryCatch" "tryCatchOne" "tryCatchList" "tryCatch" "profvis::profvis" 
+:1453685:18670023:72409400:463:"forderv" "[.data.table" "NextMethod" 1#9 "[.antaresDataTable" 2#23 "[" 2#23 "transformH5" 3#1 "force" "doTryCatch" "tryCatchOne" "tryCatchList" "doTryCatch" "tryCatchOne" "tryCatchList" "tryCatch" "profvis::profvis" 
+:1453686:18670863:72409624:0:"forderv" "[.data.table" "NextMethod" 1#9 "[.antaresDataTable" 2#23 "[" 2#23 "transformH5" 3#1 "force" "doTryCatch" "tryCatchOne" "tryCatchList" "doTryCatch" "tryCatchOne" "tryCatchList" "tryCatch" "profvis::profvis" 
+:1767536:20056599:81872224:777:"[.data.table" "NextMethod" 1#9 "[.antaresDataTable" 2#23 "[" 2#23 "transformH5" 3#1 "force" "doTryCatch" "tryCatchOne" "tryCatchList" "doTryCatch" "tryCatchOne" "tryCatchList" "tryCatch" "profvis::profvis" 
+:2097492:21499170:91784224:801:"[.data.table" "NextMethod" 1#9 "[.antaresDataTable" 2#23 "[" 2#23 "transformH5" 3#1 "force" "doTryCatch" "tryCatchOne" "tryCatchList" "doTryCatch" "tryCatchOne" "tryCatchList" "tryCatch" "profvis::profvis" 

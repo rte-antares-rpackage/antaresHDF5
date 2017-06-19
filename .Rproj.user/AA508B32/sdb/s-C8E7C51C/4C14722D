@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "h5createFile(\"write_full_datatable.h5\")\nh5write(DTAB, \"write_full_datatable.h5\",\"B\")\nH5close()\nfile.remove(\"write_full_datatable.h5\")\n",
+    "created" : 1497519331365.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1820816743",
+    "id" : "4C14722D",
+    "lastKnownWriteTime" : 1497518071,
+    "last_content_update" : 1497518071,
+    "path" : "D:/Users/titorobe/Desktop/Antares/antaresHdf5/inst/dev/writeDataFrame.R",
+    "project_path" : "inst/dev/writeDataFrame.R",
+    "properties" : {
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

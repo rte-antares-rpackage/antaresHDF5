@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "#' Transform a \\code{antaresDataList} object to be writable by \\link{writeAntaresH5}\n#'\n#' @param data \\code{antaresDataList}\n#' @param areasKey \\code{character} organization key for areas, define h5 group and subgroup\n#' @param linksKey \\code{character} organization key for links, define h5 group and subgroup\n#' @param clustersKey \\code{character} organization key for clusters, define h5 group and subgroup\n#'\ntransformH5 <- function(data,\n                        areasKey = c(\"area\"),\n                        linksKey = c(\"link\"),\n                        clustersKey = c(\"area\", \"cluster\")){\n\n  if(\"areas\"%in%names(data))\n  {\n    data$areas <- data$areas[, list(list(.SD)), by = areasKey]\n  }\n  if(\"links\"%in%names(data))\n  {\n    data$links <- data$links[, list(list(.SD)), by = linksKey]\n  }\n  if(\"clusters\"%in%names(data))\n  {\n    data$clusters <- data$clusters[, list(list(.SD)), by = clustersKey]\n  }\n  data\n}\n\n\n#' Write a h5 file from an object load with \\link{readAntares}\n#'\n#' @param data \\code{antaresDataList}\n#' @param path \\code{character} patch of h5 file\n#' @param rootGroup \\code{character} group will contain all h5 organization\n#'\nwriteAntaresH5 <- function(data, path, rootGroup = NULL){\n  H5close()\n  sapply(names(data), function(X){\n    tpData <- data[[X]]\n    nameGroup <- paste(rootGroup, X, sep = \"/\")\n\n    if(ncol(tpData)>1)\n    {\n      if(ncol(tpData)>2){\n        groupData <- tpData[, .SD, .SDcols = 1:(ncol(tpData)-2)]\n      }else{\n        groupData <- data.frame()\n      }\n\n      creatGroup(nameGroup,\n                groupData,\n                 path)\n    }\n    sapply(1:nrow(tpData), function(Y){\n      rowSel <- tpData[Y]\n      nameGroup <- paste(rootGroup, X,\n\n                         paste(unlist(rowSel[,lapply(.SD, as.character), .SDcols = 1:(ncol(rowSel)-1)]), collapse = \"/\"),\n\n                         sep = \"/\")\n\n      h5createDataset(path,\n                      dim = dim(rowSel$V1[[1]]),\n                      chunk=c(1,ncol(rowSel$V1[[1]])),\n                      dataset = nameGroup)\n      h5write(as.matrix(rowSel$V1[[1]]), path, nameGroup)\n    })\n  })\n  TRUE\n}\n\n\n#' Create a group organization which subgroup.\n#'\n#' @param groupIn \\code{character} name of main group (who will contain all organization)\n#' @param groupData \\code{data.table} organization\n#' @param path \\code{character} patch of h5 file\n#'\ncreatGroup <- function(groupIn = NULL, groupData, path){\n  if(!is.null(groupIn))\n  {\n    h5createGroup(path, groupIn)\n  }\n\n    if(ncol(groupData)>0){\n      sapply(1:ncol(groupData), function(X){\n        colummSel <- 1:X\n        dataForGroupCreation <- groupData[, .SD, .SDcols = colummSel]\n        dataForGroupCreation <- unique(dataForGroupCreation)\n        dataForGroupCreation <- apply(dataForGroupCreation, 1, function(X){\n          paste(X, sep = \"/\", collapse = \"/\")\n        })\n        dataForGroupCreation <- paste0(groupIn, \"/\", dataForGroupCreation)\n        dataForGroupCreation <- unique(dataForGroupCreation)\n        sapply(dataForGroupCreation, function(X){\n          h5createGroup(path, X)\n\n        })\n\n      })\n    }\n}\n",
+    "created" : 1497613381498.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2796776493",
+    "id" : "4886A9E1",
+    "lastKnownWriteTime" : 1497613684,
+    "last_content_update" : 1497613684780,
+    "path" : "D:/Users/titorobe/Desktop/Antares/antaresHdf5/inst/dev/transformAntaresFunction.R",
+    "project_path" : "inst/dev/transformAntaresFunction.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 8,
+    "source_on_save" : true,
+    "source_window" : "",
+    "type" : "r_source"
+}

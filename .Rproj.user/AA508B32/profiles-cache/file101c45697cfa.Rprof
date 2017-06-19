@@ -1,0 +1,4 @@
+memory profiling: GC profiling: line profiling: sample.interval=10000
+#File 1: <expr>
+:1289104:16110495:66588200:2:"file.remove" 1#2 "force" "doTryCatch" "tryCatchOne" "tryCatchList" "doTryCatch" "tryCatchOne" "tryCatchList" "tryCatch" "profvis::profvis" 
+:1293776:16110969:67388328:344:"h5const2Factor" "H5Iget_type" "h5checktype" "H5Gcreate" "h5createGroup" 1#4 "force" "doTryCatch" "tryCatchOne" "tryCatchList" "doTryCatch" "tryCatchOne" "tryCatchList" "tryCatch" "profvis::profvis" 
