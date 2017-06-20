@@ -26,11 +26,10 @@ h5write(dt_date, "date.h5", "date")
 # recuperation
 datetime_data <- data.table(h5read("date.h5", "date"))
 
+
 # affectation des classes
 class(datetime_data$idate) <- c("IDate", "Date")
 class(datetime_data$itime) <- c("ITime")
-
-
 # recuperation de la locale actuelle du pc
 current_locale <- Sys.getlocale(category = "LC_TIME")
 # mise en locale english pour le time (extraction des mois)

@@ -1,14 +1,12 @@
-setSimulationPath("D:/exemple_test", "SimulForH5")
+setSimulationPath("D:/Users/titorobe/Desktop/test_case", 1)
 res <- readAntares(areas = "all", links = "all", clusters = "all", districts = "all", mcYears = "all")
-
-
-class(attributes(res)$opts)
 
 
 res2 <- transformH5(res)
 
 res3 <- transformH5(res,areasKey = c("area", "mcYear"),
                     linksKey = c("link", "mcYear"),
+                    districtKey = c("district", "mcYear"),
                     clustersKey = c("area", "cluster", "mcYear"))
 
 

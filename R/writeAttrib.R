@@ -3,6 +3,23 @@
 #' @param Y \code{list}, list of study attributes
 #' @param group \code{character} group where attributes will be write
 #'
+#' @export
+writeAttribAndCreatGroup <- function(path, Y, group = NULL){
+
+  group <- paste0(group, "/attributes")
+  h5createGroup(path, group)
+  writeList(path, Y, group)
+
+}
+
+
+
+
+#' Write list from attributes in h5.
+#'
+#' @param Y \code{list}, list of study attributes
+#' @param group \code{character} group where attributes will be write
+#'
 writeList  <- function(path, Y, group = NULL){
   sapply(names(Y), function(X){
     nam <- X
@@ -39,9 +56,11 @@ writeList  <- function(path, Y, group = NULL){
           isWrited = TRUE
           if(is.null(dim(X)))
           {
-
-            if(is.na(X[1])){
-              X <- "NA"
+            if(length(X) > 1 )
+            {
+              if(is.na(X[1])){
+                X <- "NA"
+              }
             }
           }
           h5write(X, path, paste0(objectGroupName), write.attributes = TRUE)
@@ -53,9 +72,11 @@ writeList  <- function(path, Y, group = NULL){
 
         if(is.null(dim(X)))
         {
-
-          if(is.na(X[1])){
-            X <- "NA"
+          if(length(X) > 1 )
+          {
+            if(is.na(X[1])){
+              X <- "NA"
+            }
           }
 
         }

@@ -9,4 +9,8 @@ Description: More about what it does (maybe more than one line)
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
+Imports:
+  data.table (>= 1.10.4),
+  antaresRead (>= 1.1.1),
+  rhdf5 (>= 2.20.0)
 RoxygenNote: 6.0.1

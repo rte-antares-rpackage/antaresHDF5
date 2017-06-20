@@ -6,8 +6,15 @@
 #' @param rootGroup \code{character} group will contain all h5 organization
 #'
 #' @export
-writeAntaresH5 <- function(data, path, rootGroup = NULL){
+writeAntaresData <- function(data, path, rootGroup = NULL, writeStructure = TRUE){
   H5close()
+  rootGroup <- paste0(rootGroup, "/data")
+  h5createGroup(path, rootGroup)
+
+
+
+
+
   sapply(names(data), function(X){
     tpData <- data[[X]]
     nameGroup <- paste(rootGroup, X, sep = "/")
@@ -20,10 +27,21 @@ writeAntaresH5 <- function(data, path, rootGroup = NULL){
         groupData <- data.frame()
       }
 
-      creatGroup(nameGroup,
-                 groupData,
-                 path)
+      if(writeStructure)
+      {
+        creatGroup(nameGroup,
+                   groupData,
+                   path)
+      }
     }
+
+    nams <- c(names(tpData[, .SD, .SDcols = 1:(ncol(tpData)-1)]),
+              names(tpData$V1[[1]]))
+    h5writeAttribute(nams,
+                     H5Gopen(H5Fopen(path),
+                             nameGroup), "structure")
+    H5close()
+
     sapply(1:nrow(tpData), function(Y){
       rowSel <- tpData[Y]
       nameGroup <- paste(rootGroup, X,

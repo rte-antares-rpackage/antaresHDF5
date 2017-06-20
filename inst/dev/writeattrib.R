@@ -5,7 +5,7 @@ library(rhdf5)
 library(pipeR)
 
 setSimulationPath("D:/exemple_test", "SimulForH5")
-res <- readAntares(areas = "all", links = "all", clusters = "all", districts = "all", mcYears = "all")
+res <- readAntares(links = "all", clusters = "all", districts = "all", mcYears = "all")
 
 
 attrib <- attributes(res)
@@ -20,7 +20,6 @@ writeList("testWriteattrib.h5" ,Y = attrib, groupAttribs)
 attribList <- h5dump(H5Gopen(H5Fopen("testWriteattrib.h5"), groupAttribs), all = T, read.attributes = TRUE)
 attribList2 <- giveFormat(attribList)
 class(attribList2$opts) <- "simOptions"
-
 
 
 Errors <- testIdentical(attribList2,attrib )

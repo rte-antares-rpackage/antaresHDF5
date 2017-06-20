@@ -5,7 +5,7 @@
 \title{Transform a \code{antaresDataList} object to be writable by \link{writeAntaresH5}}
 \usage{
 transformH5(data, areasKey = c("area"), linksKey = c("link"),
-  clustersKey = c("area", "cluster"))
+  districtKey = c("district"), clustersKey = c("area", "cluster"))
 }
 \arguments{
 \item{data}{\code{antaresDataList}}
@@ -13,6 +13,8 @@ transformH5(data, areasKey = c("area"), linksKey = c("link"),
 \item{areasKey}{\code{character} organization key for areas, define h5 group and subgroup}
 
 \item{linksKey}{\code{character} organization key for links, define h5 group and subgroup}
+
+\item{districtKey}{\code{character} organization key for districts, define h5 group and subgroup}
 
 \item{clustersKey}{\code{character} organization key for clusters, define h5 group and subgroup}
 }
