@@ -12,6 +12,8 @@ res3 <- transformH5(res,areasKey = c("area", "mcYear"),
                     clustersKey = c("area", "cluster", "mcYear"))
 
 
+
+
 H5close()
 file.remove("testWrite22.h5")
 h5createFile("testWrite22.h5")
