@@ -23,7 +23,13 @@ writeAttribAndCreatGroup <- function(path, Y, group = NULL){
 writeList  <- function(path, Y, group = NULL){
   sapply(names(Y), function(X){
     nam <- X
-    X <- Y[[X]]
+    if(nam == ""){
+      nam <- "Noname"
+      X <- Y[[1]]
+    }else{
+      X <- Y[[X]]
+    }
+
     isWrited <- FALSE
     if(class(X)[1] %in% c("list", "simOptions")){
       nam <- paste(group, nam, sep = "/")
@@ -54,10 +60,11 @@ writeList  <- function(path, Y, group = NULL){
         if(!is.null(names(X))){
           #X <- data.table("Namvect", t(X))
           isWrited = TRUE
-          if(is.null(dim(X)))
+          if(length(X)>0)
           {
-            if(length(X) > 1 )
+            if(is.null(dim(X)))
             {
+
               if(is.na(X[1])){
                 X <- "NA"
               }
@@ -69,16 +76,16 @@ writeList  <- function(path, Y, group = NULL){
         }
       }
       if(!isWrited){
-
-        if(is.null(dim(X)))
+        if(length(X)>0)
         {
-          if(length(X) > 1 )
+          if(is.null(dim(X)))
           {
+
             if(is.na(X[1])){
               X <- "NA"
             }
-          }
 
+          }
         }
 
         h5write(X, path, paste0(objectGroupName), write.attributes = TRUE)
@@ -88,6 +95,7 @@ writeList  <- function(path, Y, group = NULL){
   })
   NULL
 }
+
 
 #' Rescover format after read attributes from h5 file.
 #'
@@ -111,7 +119,6 @@ giveFormat <- function(attribList){
         if(!"POSIXlt" %in%class(Y))
         {
           if(Y[1] == "NA"){
-            print(Y)
             Y <- NA
           }
         }

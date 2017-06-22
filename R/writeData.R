@@ -7,10 +7,14 @@
 #'
 #' @export
 writeAntaresData <- function(data, path, rootGroup = NULL, writeStructure = TRUE){
-  H5close()
-  rootGroup <- paste0(rootGroup, "/data")
-  h5createGroup(path, rootGroup)
 
+
+  rootGroup <- paste0(rootGroup, "/data")
+  if(writeStructure){
+    H5close()
+    h5createGroup(path, rootGroup)
+
+  }
 
 
 
@@ -37,9 +41,12 @@ writeAntaresData <- function(data, path, rootGroup = NULL, writeStructure = TRUE
 
     nams <- c(names(tpData[, .SD, .SDcols = 1:(ncol(tpData)-1)]),
               names(tpData$V1[[1]]))
+    if(writeStructure)
+    {
     h5writeAttribute(nams,
                      H5Gopen(H5Fopen(path),
                              nameGroup), "structure")
+    }
     H5close()
 
     sapply(1:nrow(tpData), function(Y){
@@ -52,8 +59,10 @@ writeAntaresData <- function(data, path, rootGroup = NULL, writeStructure = TRUE
 
       h5createDataset(path,
                       dim = dim(rowSel$V1[[1]]),
-                      chunk=c(1,ncol(rowSel$V1[[1]])),
-                      dataset = nameGroup)
+                      chunk=c(nrow(rowSel$V1[[1]]),1),#ncol(rowSel$V1[[1]])
+                      dataset = nameGroup, level = 1)
+
+
       h5write(as.matrix(rowSel$V1[[1]]), path, nameGroup)
     })
   })

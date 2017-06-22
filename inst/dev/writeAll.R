@@ -3,58 +3,104 @@ library(antaresRead)
 library(rhdf5)
 library(pipeR)
 library(stringr)
-setSimulationPath("D:/Users/titorobe/Desktop/test_case", 1)
+library(ggplot2)
+
+
+
+
+
+setSimulationPath("D:/Users/titorobe/Desktop/antaresStudy", 1)
 
 path <- "bleble.h5"
 #path <- "testWriteattrib.h5"
 H5close()
 file.remove(path)
 h5createFile(path)
-timeStepS <- c("hourly", "daily", "weekly", "monthly", "annual")
+timeStepS <- c("hourly")
+
+Rprof(tmp <- tempfile())
 sapply(timeStepS, function(timeStep){
   print(timeStep)
   writeAntaresH5(path, timeStep)
 })
+summaryRprof(tmp)
+unlink(tmp)
+
+##Probleme dans le script dans la gestion de chunk, Temps normal : 19 sec pour 13 Mo
+
+
+## 70 secondes pour 9 ans
+## 424Mo -> 68Mo
+
+
 
 organi <- data.table(h5ls(path))
 fwrite(organi, "organi.csv", sep = ";")
 
 writeAntaresH5 <- function(path, timeStep = "hourly", opts = antaresRead::simOptions()){
 
-  res <- readAntares(areas = "all" ,
-                     links = "all",
-                     clusters = "all",
-                     districts = "all",
-                     mcYears = "all",
-                     timeStep = timeStep, opts = opts)
+  allMcYears <- opts$mcYears
+  print(allMcYears)
+  sapply(allMcYears, function(mcY)
+  {
+
+    if(allMcYears[1] == mcY){
+      writeStructure = TRUE
+    }else{
+      writeStructure = FALSE
+    }
+
+    res <- readAntares(areas = "all" ,
+                       links = "all",
+                       clusters = "all",
+                       districts = "all",
+                       mcYears = mcY,
+                       timeStep = timeStep, opts = opts)
 
 
-  attrib <- attributes(res)
-  # Create group
-  h5createGroup(path, timeStep)
+    if(writeStructure){
 
-  #Write time
-  writeTime(res, path, timeStep)
+      attrib <- attributes(res)
+      # Create group
+      h5createGroup(path, timeStep)
 
-  #Write attributes
-  writeAttribAndCreatGroup(path ,Y = attrib, timeStep)
+      #Write time
+      writeTime(res, path, timeStep)
 
-  #Remove useless data
-  sapply(1:length(res), function(i){
-    res[[i]][, day := NULL]
-    res[[i]][, month := NULL]
-    res[[i]][, hour := NULL]
-    res[[i]][, time := NULL]
-  }) %>>% invisible()
+      #Write attributes
+      writeAttribAndCreatGroup(path ,Y = attrib, timeStep)
 
-  #Transform for write
-  res <- transformH5(res,areasKey = c("area", "mcYear"),
-                     linksKey = c("link", "mcYear"),
-                     districtKey = c("district", "mcYear"),
-                     clustersKey = c("area", "cluster", "mcYear"))
+    }
 
-  writeAntaresData(res, path, timeStep)
+
+    #Remove useless data
+    sapply(1:length(res), function(i){
+      if("day" %in% names(res[[i]])){
+        res[[i]][, day := NULL]
+      }
+      if("month" %in% names(res[[i]])){
+        res[[i]][, month := NULL]
+      }
+      if("hour" %in% names(res[[i]])){
+        res[[i]][, hour := NULL]
+      }
+      if("time" %in% names(res[[i]])){
+        res[[i]][, time := NULL]
+      }
+    }) %>>% invisible()
+
+    #Transform for write
+    res <- transformH5(res,areasKey = c("area", "mcYear"),
+                       linksKey = c("link", "mcYear"),
+                       districtKey = c("district", "mcYear"),
+                       clustersKey = c("area", "cluster", "mcYear"))
+
+    writeAntaresData(res, path, timeStep, writeStructure)
+  })
+
 }
+
+
 
 
 

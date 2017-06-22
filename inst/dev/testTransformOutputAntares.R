@@ -19,14 +19,14 @@ h5createGroup("testWrite22.h5", "blo")
 h5createGroup("testWrite22.h5", "bli")
 
 
-system.time(writeAntaresH5(res2, "testWrite22.h5", "blo"))
+system.time(writeAntaresData(res2, "testWrite22.h5", "blo"))
 
 #23 secondes sans groupe / MCyears
 
 
 
 Rprof(tmp <- tempfile())
-system.time(writeAntaresH5(res3, "testWrite22.h5", "bli"))#58 secondes sans groupe / MCyears
+system.time(writeAntaresData(res3, "testWrite22.h5", "bli"))#58 secondes sans groupe / MCyears
 summaryRprof(tmp)
 
 
@@ -43,7 +43,7 @@ system.time(dt3 <- lapply(1:30, function(i){
 }))
 
 Rprof(tmp <- tempfile())
-writeAntaresH5(res3, "testWrite22.h5", "bli")#61 secondes sans groupe / MCyears
+writeAntaresData(res3, "testWrite22.h5", "bli")#61 secondes sans groupe / MCyears
 summaryRprof(tmp)
 
 
