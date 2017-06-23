@@ -101,6 +101,7 @@ writeList  <- function(path, Y, group = NULL){
 #'
 #' @param attribList \code{list}, list of study attributes read from h5.
 #'
+#'@export
 giveFormat <- function(attribList){
   sapply(names(attribList) , function(X){
     Y <- attribList[[X]]
@@ -118,8 +119,11 @@ giveFormat <- function(attribList){
 
         if(!"POSIXlt" %in%class(Y))
         {
+          if(length(Y)>0)
+          {
           if(Y[1] == "NA"){
             Y <- NA
+          }
           }
         }
 
@@ -146,8 +150,11 @@ giveFormat <- function(attribList){
           }
 
         }
+        if(length(Y)>0)
+        {
         if(Y[1] == "NA"){
           Y <- NA
+        }
         }
 
         Y

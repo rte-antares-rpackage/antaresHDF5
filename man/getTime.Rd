@@ -4,10 +4,12 @@
 \alias{getTime}
 \title{Get timeId from antares study}
 \usage{
-getTime(data)
+getTime(data, timeStep)
 }
 \arguments{
 \item{data}{\code{antaresDataList} see \link{readAntares}}
+
+\item{timeStep}{\code{character} timeStep}
 }
 \description{
 Get timeId from antares study

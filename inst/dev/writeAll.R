@@ -4,7 +4,7 @@ library(rhdf5)
 library(pipeR)
 library(stringr)
 library(ggplot2)
-
+library(antaresHdf5)
 
 
 
@@ -16,16 +16,17 @@ path <- "bleble.h5"
 H5close()
 file.remove(path)
 h5createFile(path)
-timeStepS <- c("hourly")
+timeStepS <- c("hourly", "daily", "weekly",
+               "monthly", "annual")
 
-Rprof(tmp <- tempfile())
-sapply(timeStepS, function(timeStep){
-  print(timeStep)
-  writeAntaresH5(path, timeStep)
-})
-summaryRprof(tmp)
-unlink(tmp)
+system.time(
+  sapply(timeStepS, function(timeStep){
+    print(timeStep)
+    writeAntaresH5(path, timeStep)
+  })
+)
 
+##57 sec pour tout le mcYears d'un coup
 ##Probleme dans le script dans la gestion de chunk, Temps normal : 19 sec pour 13 Mo
 
 
@@ -35,76 +36,46 @@ unlink(tmp)
 
 
 organi <- data.table(h5ls(path))
+h5C
 fwrite(organi, "organi.csv", sep = ";")
 
-writeAntaresH5 <- function(path, timeStep = "hourly", opts = antaresRead::simOptions()){
-
-  allMcYears <- opts$mcYears
-  print(allMcYears)
-  sapply(allMcYears, function(mcY)
-  {
-
-    if(allMcYears[1] == mcY){
-      writeStructure = TRUE
-    }else{
-      writeStructure = FALSE
-    }
-
-    res <- readAntares(areas = "all" ,
-                       links = "all",
-                       clusters = "all",
-                       districts = "all",
-                       mcYears = mcY,
-                       timeStep = timeStep, opts = opts)
 
 
-    if(writeStructure){
-
-      attrib <- attributes(res)
-      # Create group
-      h5createGroup(path, timeStep)
-
-      #Write time
-      writeTime(res, path, timeStep)
-
-      #Write attributes
-      writeAttribAndCreatGroup(path ,Y = attrib, timeStep)
-
-    }
 
 
-    #Remove useless data
-    sapply(1:length(res), function(i){
-      if("day" %in% names(res[[i]])){
-        res[[i]][, day := NULL]
-      }
-      if("month" %in% names(res[[i]])){
-        res[[i]][, month := NULL]
-      }
-      if("hour" %in% names(res[[i]])){
-        res[[i]][, hour := NULL]
-      }
-      if("time" %in% names(res[[i]])){
-        res[[i]][, time := NULL]
-      }
-    }) %>>% invisible()
+output1 <- h5read(path, "hourly")
 
-    #Transform for write
-    res <- transformH5(res,areasKey = c("area", "mcYear"),
-                       linksKey = c("link", "mcYear"),
-                       districtKey = c("district", "mcYear"),
-                       clustersKey = c("area", "cluster", "mcYear"))
 
-    writeAntaresData(res, path, timeStep, writeStructure)
-  })
+# library(parallel)
+#
+# cl <- makeCluster(4)
+#
+# res <- parLapplyLB(cl, 1:4, function(X){
+#   library(rhdf5)
+#
+#   output <- h5dump(H5Gopen(H5Fopen("bleble.h5"), "hourly/data"), all = T, read.attributes = TRUE)
+#   NULL
+# })
+# stopCluster(cl)
 
-}
+# system.time(output <- h5dump(H5Gopen(H5Fopen("bleble.h5"), "hourly/data")))
+
+##Temps de lecture : Quand on coupe par mcYears 8 sec, sinon 4 sec.
+
+system.time(rev <- readAntaresH5(path, select = "OV. COST"))#2.8
+
+system.time(re2 <- readAntares(mcYears = "all", select = "OV. COST"))#4.3
 
 
 
 
 
-output <- h5dump(H5Gopen(H5Fopen(path), "weekly"), all = T, read.attributes = TRUE)
+
+
+
+
+
+
 struct <- h5readAttributes(path, "weekly/data/areas")$structure
 tim <- getAllDateInfoFromDate(path, "weekly")
 data.table(tim, cbindRecusive(output$data$areas, struct))
