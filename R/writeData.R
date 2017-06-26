@@ -4,9 +4,11 @@
 #' @param data \code{antaresDataList}
 #' @param path \code{character} patch of h5 file
 #' @param rootGroup \code{character} group will contain all h5 organization
+#' @param writeStructure \code{boolean}, write group and subgroup (only for first MCyear)
+#' @param writeMCallName \code{character}, write mc-all names
 #'
 #' @export
-writeAntaresData <- function(data, path, rootGroup = NULL, writeStructure = TRUE){
+writeAntaresData <- function(data, path, rootGroup = NULL, writeStructure = TRUE, writeMCallName = FALSE){
 
   rootGroup <- paste0(rootGroup, "/data")
   if(writeStructure){
@@ -42,6 +44,13 @@ writeAntaresData <- function(data, path, rootGroup = NULL, writeStructure = TRUE
     h5writeAttribute(nams,
                      H5Gopen(H5Fopen(path),
                              nameGroup), "structure")
+    }
+
+    if(writeMCallName)
+    {
+      h5writeAttribute(nams,
+                       H5Gopen(H5Fopen(path),
+                               nameGroup), "structureMcall")
     }
     H5close()
 

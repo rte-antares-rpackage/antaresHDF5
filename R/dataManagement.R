@@ -1,6 +1,7 @@
 #' Recursively rbind a named list
 #'
 #' @param Y \code{list}, list
+#' @param struct \code{character}, variables names
 #'
 #' @export
 cbindRecusive <- function(Y, struct){

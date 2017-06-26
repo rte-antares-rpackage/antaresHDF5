@@ -6,18 +6,15 @@ library(stringr)
 library(ggplot2)
 library(antaresHdf5)
 
+setSimulationPath("D:/Users/titorobe/Desktop/Antares/antaresHdf5/inst/testdata/test_case", 1)
 
 
-
-setSimulationPath("D:/Users/titorobe/Desktop/antaresStudy", 1)
-
-path <- "bleble.h5"
+path <- "inst/testdata/testStudy.h5"
 #path <- "testWriteattrib.h5"
 H5close()
 file.remove(path)
 h5createFile(path)
-timeStepS <- c("hourly", "daily", "weekly",
-               "monthly", "annual")
+timeStepS <- c( "hourly" , "daily", "weekly", "monthly", "annual")
 
 system.time(
   sapply(timeStepS, function(timeStep){
@@ -64,7 +61,7 @@ output1 <- h5read(path, "hourly")
 
 system.time(rev <- readAntaresH5(path, select = "OV. COST"))#2.8
 
-system.time(re2 <- readAntares(mcYears = "all", select = "OV. COST"))#4.3
+system.time(re2 <- readAntares(areas = "all", links = "all", clusters = "all", mcYears = "all"))#4.3
 
 
 

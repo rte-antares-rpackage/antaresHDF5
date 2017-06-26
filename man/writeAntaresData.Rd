@@ -4,7 +4,8 @@
 \alias{writeAntaresData}
 \title{Write a h5 file from an object load with \link{readAntares}}
 \usage{
-writeAntaresData(data, path, rootGroup = NULL, writeStructure = TRUE)
+writeAntaresData(data, path, rootGroup = NULL, writeStructure = TRUE,
+  writeMCallName = FALSE)
 }
 \arguments{
 \item{data}{\code{antaresDataList}}
@@ -12,6 +13,10 @@ writeAntaresData(data, path, rootGroup = NULL, writeStructure = TRUE)
 \item{path}{\code{character} patch of h5 file}
 
 \item{rootGroup}{\code{character} group will contain all h5 organization}
+
+\item{writeStructure}{\code{boolean}, write group and subgroup (only for first MCyear)}
+
+\item{writeMCallName}{\code{character}, write mc-all names}
 }
 \description{
 Write a h5 file from an object load with \link{readAntares}

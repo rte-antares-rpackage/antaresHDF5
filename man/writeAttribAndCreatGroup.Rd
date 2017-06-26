@@ -7,6 +7,8 @@
 writeAttribAndCreatGroup(path, Y, group = NULL)
 }
 \arguments{
+\item{path}{\code{character} patch of h5 file}
+
 \item{Y}{\code{list}, list of study attributes}
 
 \item{group}{\code{character} group where attributes will be write}

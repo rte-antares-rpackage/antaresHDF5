@@ -8,6 +8,8 @@ cbindRecusive(Y, struct)
 }
 \arguments{
 \item{Y}{\code{list}, list}
+
+\item{struct}{\code{character}, variables names}
 }
 \description{
 Recursively rbind a named list

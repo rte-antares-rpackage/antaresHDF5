@@ -2,7 +2,9 @@
 #'
 #' @param Y \code{list}, list of study attributes
 #' @param group \code{character} group where attributes will be write
+#' @param path \code{character} patch of h5 file
 #'
+#' @import pipeR stringr testthat
 #' @export
 writeAttribAndCreatGroup <- function(path, Y, group = NULL){
 
@@ -19,6 +21,7 @@ writeAttribAndCreatGroup <- function(path, Y, group = NULL){
 #'
 #' @param Y \code{list}, list of study attributes
 #' @param group \code{character} group where attributes will be write
+#' @param path \code{character} patch of h5 file
 #'
 writeList  <- function(path, Y, group = NULL){
   sapply(names(Y), function(X){

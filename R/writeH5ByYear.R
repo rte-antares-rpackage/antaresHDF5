@@ -2,11 +2,18 @@
 #'
 #' @param path \code{character} path of h5 file to write
 #' @param timeStep \code{character} timeStep
+#' @param opts \code{list} of simulation parameters returned by the function \link{setSimulationPath}. Defaut to \code{antaresRead::simOptions()}
+#' @param writeMcAll \code{boolean} write mc-all
 #'
 #' @export
-writeAntaresH5 <- function(path, timeStep = "hourly", opts = antaresRead::simOptions()){
+writeAntaresH5 <- function(path, timeStep = "hourly", opts = antaresRead::simOptions(),
+                           writeMcAll = TRUE){
 
   allMcYears <- opts$mcYears
+  if(writeMcAll){
+    allMcYears <- c(allMcYears, -1)
+  }
+
   print(allMcYears)
   sapply(allMcYears, function(mcY)
   {
@@ -14,6 +21,11 @@ writeAntaresH5 <- function(path, timeStep = "hourly", opts = antaresRead::simOpt
       writeStructure = TRUE
     }else{
       writeStructure = FALSE
+    }
+    writeMCallName <- FALSE
+    if(mcY == -1){
+      mcY <- NULL
+      writeMCallName <- TRUE
     }
 
     res <- readAntares(areas = "all" ,
@@ -54,12 +66,20 @@ writeAntaresH5 <- function(path, timeStep = "hourly", opts = antaresRead::simOpt
     }) %>>% invisible()
 
     #Transform for write
+
+    if(is.null(mcY)){
+
+      lapply(res, function(X){
+        X[, mcYear := "mcAll"]
+
+      })
+    }
     res <- transformH5(res,areasKey = c("area", "mcYear"),
                        linksKey = c("link",  "mcYear"),
                        districtKey = c("district",  "mcYear"),
                        clustersKey = c("area", "cluster",  "mcYear"))
 
-    writeAntaresData(res, path, timeStep, writeStructure)
+    writeAntaresData(res, path, timeStep, writeStructure, writeMCallName)
   })
 
 }

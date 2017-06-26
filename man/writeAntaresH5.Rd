@@ -4,12 +4,17 @@
 \alias{writeAntaresH5}
 \title{Convert antares output to h5 file}
 \usage{
-writeAntaresH5(path, timeStep = "hourly", opts = antaresRead::simOptions())
+writeAntaresH5(path, timeStep = "hourly", opts = antaresRead::simOptions(),
+  writeMcAll = TRUE)
 }
 \arguments{
 \item{path}{\code{character} path of h5 file to write}
 
 \item{timeStep}{\code{character} timeStep}
+
+\item{opts}{\code{list} of simulation parameters returned by the function \link{setSimulationPath}. Defaut to \code{antaresRead::simOptions()}}
+
+\item{writeMcAll}{\code{boolean} write mc-all}
 }
 \description{
 Convert antares output to h5 file
