@@ -1,23 +1,64 @@
-# path = "bleble.h5"
-# clusters = "all"
-# areas = "all"
-# links = "all"
-# timeStep = "hourly"
-# districts = "all"
-# select = "all"
-# mcYears = NULL
 
-
+#' Read the data of an Antares simulation
+#'
+#' @description
+#' \code{\link{readAntaresH5}} Has the same behavior than \code{\link{antaresRead::readAntares}} but it based on h5 file.
+#'
+#' @param path \code{character}, path of h5 file to read.
+#' @param areas
+#'   Vector containing the names of the areas to import. If
+#'   \code{NULL} no area is imported. The special value \code{"all"} tells the
+#'   function to import all areas. By default, the value is "all" when no other argument is enter and "NULL" when other arguments are enter.
+#' @param links
+#'   Vector containing the name of links to import. If \code{NULL} no
+#'   area is imported. The special value \code{"all"} tells the function to
+#'   import all areas. Use function \code{\link{antaresRead::getLinks}} to import all links
+#'   connected to some areas.
+#' @param clusters
+#'   Vector containing the name of the areas for which you want to
+#'   import results at cluster level. If \code{NULL} no cluster is imported. The
+#'   special value \code{"all"} tells the function to import clusters from all
+#'   areas.
+#' @param districts
+#'   Vector containing the names of the districts to import. If \code{NULL},
+#'   no district is imported. The special value \code{"all"} tells the function to import all
+#'   districts.
+#' @param select
+#'   Character vector containing the name of the columns to import. If this
+#'   argument is \code{NULL}, all variables are imported. Special names
+#'   \code{"allAreas"} and \code{"allLinks"} indicate to the function to import
+#'   all variables for areas or for links.
+#' @param mcYears
+#'   Index of the Monte-Carlo years to import. If \code{NULL}, synthetic results
+#'   are read, else the specified Monte-Carlo simulations are imported. The
+#'   special value \code{all} tells the function to import all Monte-Carlo
+#'   simulations.
+#' @param timeStep
+#'   Resolution of the data to import: hourly (default), daily,
+#'   weekly, monthly or annual.
+#' @param showProgress
+#'   If TRUE the function displays information about the progress of the
+#'   importation.
+#'
+#'
+#' @return An object of class "antaresDataList" is returned. It is a list of
+#' data.tables, each element representing one type of element (areas, links,
+#' clusters)
+#'
+#' @export
+#'
 readAntaresH5 <- function(path, areas = NULL, links = NULL, clusters = NULL,
                           districts = NULL, mcYears = NULL,
-                          timeStep = "hourly", select = "all"){
+                          timeStep = "hourly", select = "all", showProgress = TRUE){
 
 
+  ##Controle input before reading
+  progressBar <- ifelse(showProgress, "text", "none")
   if(is.null(areas) & is.null(links) & is.null(clusters) & is.null(districts)){
     areas <- "all"
   }
 
-
+  ##Read dataSet function
   .readH5File <- function(VV,
            allGroup,
            expandRequest,
@@ -29,6 +70,10 @@ readAntaresH5 <- function(path, areas = NULL, links = NULL, clusters = NULL,
     # library(data.table)
     GP <- allGroup[VV]
     infoReq <- expandRequest[VV,]
+
+
+    ##Use .call function directly, (faster)
+
     h5loc <- .Call("_H5Fopen", path, flags, PACKAGE = "rhdf5")
     dfLoc <- .Call("_H5Dopen", h5loc, GP, NULL, PACKAGE = "rhdf5")
     h5group = new("H5IdComponent", ID = dfLoc)
@@ -73,7 +118,7 @@ readAntaresH5 <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
 
   #Select MCyears
-  if(mcYears == "all"){
+  if(mcYears[1] == "all"){
     mcYears <- attib$opts$mcYears
   }
 
@@ -112,13 +157,16 @@ readAntaresH5 <- function(path, areas = NULL, links = NULL, clusters = NULL,
     # nodes <- detectCores() - 1
     # cl <- makeCluster(nodes)
     # registerDoParallel(cl)
-    cat("Importing areas\n")
+    if(showProgress){
+      cat("Importing areas\n")
+    }
+
     areasData <- rbindlist(plyr::llply(1:length(allGroup), .readH5File, allGroup = allGroup,
     expandRequest = expandRequest,
     flags = flags,
     path = path,
     index = index
-    , .progress = "text", .parallel = FALSE))
+    , .progress = progressBar, .parallel = FALSE))
 
 
     ##Give names
@@ -127,6 +175,7 @@ readAntaresH5 <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
     #Add time
     areasData <- data.table(tim, areasData)
+    areasData[,timeId := as.integer(timeId)]
     # setattr(areasData, "class", c("antaresDataTable", "antaresData", "data.table", "data.frame"))
     # sapply(names(attib), function(X){
     #   setattr(areasData, X, attib[[X]])
@@ -170,13 +219,15 @@ readAntaresH5 <- function(path, areas = NULL, links = NULL, clusters = NULL,
       allGroup <- apply(expandRequest, 1, function(X){
         paste(timeStep, "data/links",paste(X, collapse = "/"),sep = "/")
       })
-      cat("Importing links\n")
+      if(showProgress){
+        cat("Importing links\n")
+      }
       linksData <- rbindlist(plyr::llply(1:length(allGroup), .readH5File, allGroup = allGroup,
                                          expandRequest = expandRequest,
                                          flags = flags,
                                          path = path,
                                          index = index
-                                         , .progress = "text", .parallel = FALSE))
+                                         , .progress = progressBar, .parallel = FALSE))
 
       ##Give names
       setnames(linksData, names(linksData), struct)
@@ -205,7 +256,7 @@ readAntaresH5 <- function(path, areas = NULL, links = NULL, clusters = NULL,
   #Districts
 
 
-  #Links
+  #districts
   if(!is.null(districts)){
     if(districts == "all"){
       districts <- attib$opts$districtList
@@ -219,6 +270,8 @@ readAntaresH5 <- function(path, areas = NULL, links = NULL, clusters = NULL,
     H5close()
     struct
 
+
+    #No use select for districts (?antaresRead -> select)
     if(!select[1] == "all"){
       index <- c(1, which(struct[3:length(struct)]%in%select))
       struct <- struct[c(1:2, index+2)]
@@ -228,14 +281,16 @@ readAntaresH5 <- function(path, areas = NULL, links = NULL, clusters = NULL,
     allGroup <- apply(expandRequest, 1, function(X){
       paste(timeStep, "data/districts",paste(X, collapse = "/"),sep = "/")
     })
+    if(showProgress){
     cat("Importing districts\n")
+    }
 
     districtsData <- rbindlist(plyr::llply(1:length(allGroup), .readH5File, allGroup = allGroup,
                                        expandRequest = expandRequest,
                                        flags = flags,
                                        path = path,
                                        index = index
-                                       , .progress = "text", .parallel = FALSE))
+                                       , .progress = progressBar, .parallel = FALSE))
 
     ##Give names
     setnames(districtsData, names(districtsData), struct)
@@ -259,16 +314,6 @@ readAntaresH5 <- function(path, areas = NULL, links = NULL, clusters = NULL,
     districtsData
   }
 
-
-
-
-
-
-
-
-
-
-
   #Clusters
   if(!is.null(clusters)){
     if(clusters == "all"){
@@ -291,11 +336,11 @@ readAntaresH5 <- function(path, areas = NULL, links = NULL, clusters = NULL,
     clusterName <- unique(clusterName)
     clusterName <- gsub("^/", "", clusterName)
 
-
-    if(!select[1] == "all"){
-      index <- c(1, which(struct[3:length(struct)]%in%select))
-      struct <- struct[c(1:2, index+2)]
-    }
+    #No use select for cluster (antaresRead)
+    # if(!select[1] == "all"){
+    #   index <- c(1, which(struct[4:length(struct)]%in%select))
+    #   struct <- struct[c(1:3, index+3)]
+    # }
 
     expandRequest <- expand.grid(clusterName, mcYears)
     allGroup <- apply(expandRequest, 1, function(X){
@@ -308,13 +353,15 @@ readAntaresH5 <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
     expandRequest$Var1 <- NULL
     expandRequest <- cbind(req, expandRequest)
+    if(showProgress){
     cat("Importing clusters\n")
+    }
     clustersData <- rbindlist(plyr::llply(1:length(allGroup), .readH5File, allGroup = allGroup,
                                        expandRequest = expandRequest,
                                        flags = flags,
                                        path = path,
                                        index = index
-                                       , .progress = "text", .parallel = FALSE))
+                                       , .progress = progressBar, .parallel = FALSE))
 
     ##Give names
     setnames(clustersData, names(clustersData), struct)

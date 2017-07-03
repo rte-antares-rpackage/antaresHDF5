@@ -6,22 +6,33 @@ library(stringr)
 library(ggplot2)
 library(antaresHdf5)
 
-setSimulationPath("D:/Users/titorobe/Desktop/Antares/antaresHdf5/inst/testdata/test_case", 1)
-
-
-path <- "inst/testdata/testStudy.h5"
-#path <- "testWriteattrib.h5"
+setSimulationPath("D:/Users/titorobe/Desktop/antaresStudy", 1)
+path <- "bigStud.h5"
 H5close()
 file.remove(path)
 h5createFile(path)
-timeStepS <- c( "hourly" , "daily", "weekly", "monthly", "annual")
+writeAntaresH5(path)
 
-system.time(
-  sapply(timeStepS, function(timeStep){
-    print(timeStep)
-    writeAntaresH5(path, timeStep)
-  })
-)
+
+
+setSimulationPath("D:/Users/titorobe/Desktop/test_case", 1)
+path <- "smallStud.h5"
+H5close()
+file.remove(path)
+h5createFile(path)
+writeAntaresH5(path)
+
+
+
+
+
+
+# system.time(
+#   sapply(timeStepS, function(timeStep){
+#     print(timeStep)
+#     writeAntaresH5(path, timeStep)
+#   })
+# )
 
 ##57 sec pour tout le mcYears d'un coup
 ##Probleme dans le script dans la gestion de chunk, Temps normal : 19 sec pour 13 Mo
