@@ -10,10 +10,16 @@
 #' @export
 writeAntaresData <- function(data, path, rootGroup = NULL, writeStructure = TRUE, writeMCallName = FALSE){
 
+
+
+  #Transdorm path to id
+  fid <- H5Fopen(path)
+
+
   rootGroup <- paste0(rootGroup, "/data")
   if(writeStructure){
-    H5close()
-    h5createGroup(path, rootGroup)
+
+    H5Gcreate(fid, rootGroup)
 
   }
 
@@ -33,7 +39,7 @@ writeAntaresData <- function(data, path, rootGroup = NULL, writeStructure = TRUE
       {
         creatGroup(nameGroup,
                    groupData,
-                   path)
+                   fid)
       }
     }
 
@@ -52,7 +58,6 @@ writeAntaresData <- function(data, path, rootGroup = NULL, writeStructure = TRUE
                        H5Gopen(H5Fopen(path),
                                nameGroup), "structureMcall")
     }
-    H5close()
 
     sapply(1:nrow(tpData), function(Y){
       rowSel <- tpData[Y]
@@ -62,15 +67,34 @@ writeAntaresData <- function(data, path, rootGroup = NULL, writeStructure = TRUE
 
                          sep = "/")
 
-      h5createDataset(path,
-                      dim = dim(rowSel$V1[[1]]),
-                      chunk=c(nrow(rowSel$V1[[1]]), 1),###ncol(rowSel$V1[[1]])
-                      dataset = nameGroup, level = 7)
+      # h5createDataset(path,
+      #                 dim = dim(rowSel$V1[[1]]),
+      #                 chunk=c(nrow(rowSel$V1[[1]]), 1),###ncol(rowSel$V1[[1]])
+      #                 dataset = nameGroup, level = 7)
+      #
+      #
+      # h5write(as.matrix(rowSel$V1[[1]]), path, nameGroup)
+      #
+
+      GP <- nameGroup
 
 
-      h5write(as.matrix(rowSel$V1[[1]]), path, nameGroup)
+      sid <- H5Screate_simple(c(dim(rowSel$V1[[1]])))
+
+      did <- H5Dcreate(fid, GP, rhdf5:::h5constants$H5T["H5T_NATIVE_DOUBLE"], sid)
+
+      H5Dwrite(did, as.matrix(rowSel$V1[[1]]), h5spaceMem = sid, h5spaceFile = sid)
+      H5Dclose(did)
+      H5Sclose(sid)
+
+
+
+
+
+
     })
   })
+  H5Fclose(fid)
   TRUE
 }
 
@@ -79,13 +103,13 @@ writeAntaresData <- function(data, path, rootGroup = NULL, writeStructure = TRUE
 #'
 #' @param groupIn \code{character} name of main group (who will contain all organization)
 #' @param groupData \code{data.table} organization
-#' @param path \code{character} patch of h5 file
+#' @param fid \code{numeric} id of hdf5 file
 #'
 #' @export
-creatGroup <- function(groupIn = NULL, groupData, path){
+creatGroup <- function(groupIn = NULL, groupData, fid){
   if(!is.null(groupIn))
   {
-    h5createGroup(path, groupIn)
+    H5Gcreate(fid, groupIn)
   }
 
   if(ncol(groupData)>0){
@@ -99,7 +123,7 @@ creatGroup <- function(groupIn = NULL, groupData, path){
       dataForGroupCreation <- paste0(groupIn, "/", dataForGroupCreation)
       dataForGroupCreation <- unique(dataForGroupCreation)
       sapply(dataForGroupCreation, function(X){
-        h5createGroup(path, X)
+        H5Gcreate(fid, X)
 
       })
 

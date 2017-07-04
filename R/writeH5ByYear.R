@@ -8,7 +8,21 @@
 #' @export
 writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "monthly", "annual"), opts = antaresRead::simOptions(),
                            writeMcAll = TRUE){
-
+  # cl <- makeCluster(4)
+  # clusterEvalQ(cl, {
+  #   library(data.table)
+  #   library(antaresRead)
+  #   library(rhdf5)
+  #   library(pipeR)
+  #   library(stringr)
+  #   library(ggplot2)
+  #   library(antaresHdf5)
+  #   library(parallel)
+  #
+  #
+  # })
+  # clusterExport(cl,c("path", "timeSteps", "opts", "writeMcAll"), envir = environment())
+  fid <- H5Fopen(path)
   sapply(timeSteps, function(timeStep){
 
     allMcYears <- opts$mcYears
@@ -35,7 +49,7 @@ writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "mon
                          clusters = "all",
                          districts = "all",
                          mcYears = mcY,
-                         timeStep = timeStep, opts = opts)
+                         timeStep = timeStep, opts = opts, showProgress = FALSE)
 
       if(writeStructure){
 
@@ -46,6 +60,7 @@ writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "mon
         #Write time
         writeTime(res, path, timeStep)
 
+        fid <- H5Fopen(path)
         #Write attributes
         writeAttribAndCreatGroup(path ,Y = attrib, timeStep)
 

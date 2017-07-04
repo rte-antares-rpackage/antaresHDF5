@@ -34,14 +34,14 @@ testIdentical <- function(X, Y){
 }
 
 
-
-setSimulationPath("D:/Users/titorobe/Desktop/test_case", 1)
+#
+# setSimulationPath("D:/Users/titorobe/Desktop/test_case", 1)
 
 
 VV <- readAntares(areas = "all", links = "all", clusters = "all", districts = "all",  mcYears = 1:2, timeStep = "hourly")
-WW <- readAntaresH5("smallStud.h5", areas = "all", links = "all", clusters = "all", districts = "all",  mcYears = 1:2, timeStep = "hourly")
+WW <- readAntaresH5("bigStud.h5", areas = "all", links = "all", clusters = "all", districts = "all",  mcYears = 1:2, timeStep = "hourly")
 
-
+WW
 
 
 

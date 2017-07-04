@@ -5,14 +5,19 @@ library(pipeR)
 library(stringr)
 library(ggplot2)
 library(antaresHdf5)
+library(parallel)
 
-setSimulationPath("D:/Users/titorobe/Desktop/antaresStudy", 1)
+# setSimulationPath("D:/Users/titorobe/Desktop/antaresStudy", 1)
+setSimulationPath("C:/Users/Titouan/Desktop/test_case", 1)
+
+
 path <- "bigStud.h5"
 H5close()
 file.remove(path)
 h5createFile(path)
+Rprof(tmp <- tempfile())
 writeAntaresH5(path)
-
+summaryRprof(tmp)
 
 
 setSimulationPath("D:/Users/titorobe/Desktop/test_case", 1)
