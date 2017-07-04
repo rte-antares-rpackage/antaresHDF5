@@ -42,7 +42,6 @@ getAllDateInfoFromDate <- function(path, group){
   Sys.setlocale("LC_TIME", "C")
   if(group == c("monthly")){
 
-
     timCop <- datetime_data$time
     timCop <- paste0(timCop, "-01")
     timCop <- as.Date(timCop)
@@ -52,8 +51,6 @@ getAllDateInfoFromDate <- function(path, group){
     return(datetime_data)
   }
 
-
-  H5close()
   class(datetime_data$idate) <- c("IDate", "Date")
   class(datetime_data$itime) <- c("ITime")
   # recuperation de la locale actuelle du pc

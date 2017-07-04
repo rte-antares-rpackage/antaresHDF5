@@ -10,7 +10,8 @@ writeAttribAndCreatGroup <- function(path, Y, group = NULL){
 
   group <- paste0(group, "/attributes")
   h5createGroup(path, group)
-  writeList(path, Y, group)
+  fid <- H5Fopen(path)
+  writeList(path, fid, Y, group)
 
 }
 
@@ -22,9 +23,11 @@ writeAttribAndCreatGroup <- function(path, Y, group = NULL){
 #' @param Y \code{list}, list of study attributes
 #' @param group \code{character} group where attributes will be write
 #' @param path \code{character} patch of h5 file
+#' @param fid \code{numeric} id of h5 file
 #'
-writeList  <- function(path, Y, group = NULL){
-  sapply(names(Y), function(X){
+writeList  <- function(path, fid, Y, group = NULL){
+  sapply(names(Y), function(X, Y){
+    #fid <- H5Fopen(path)
     nam <- X
     if(nam == ""){
       nam <- "Noname"
@@ -36,8 +39,8 @@ writeList  <- function(path, Y, group = NULL){
     isWrited <- FALSE
     if(class(X)[1] %in% c("list", "simOptions")){
       nam <- paste(group, nam, sep = "/")
-      h5createGroup(path, nam)
-      writeList(path, X, group = nam)
+      H5Gcreate(fid, nam)
+      writeList(path, fid, X, group = nam)
     }else{
       classOrigin <- class(X)
       objectGroupName <- paste(group, nam, sep = "/")
@@ -74,8 +77,8 @@ writeList  <- function(path, Y, group = NULL){
             }
           }
           h5write(X, path, paste0(objectGroupName), write.attributes = TRUE)
-          h5writeAttribute(names(X), H5Dopen(H5Fopen(path), objectGroupName), "names")
-          H5close()
+          h5writeAttribute(names(X), H5Dopen(fid, objectGroupName), "names")
+          #H5close()
         }
       }
       if(!isWrited){
@@ -91,11 +94,38 @@ writeList  <- function(path, Y, group = NULL){
           }
         }
 
-        h5write(X, path, paste0(objectGroupName), write.attributes = TRUE)
-        H5close()
-      }
+
+        if(class(X) == "data.frame")
+        {
+          h5write(X, path, paste0(objectGroupName), write.attributes = TRUE)
+        }else{
+        size <- length(X)
+          tid <- switch(storage.mode(X)[1], double = rhdf5:::h5constants$H5T["H5T_NATIVE_DOUBLE"],
+                        integer = rhdf5:::h5constants$H5T["H5T_NATIVE_INT32"],
+                        logical = rhdf5:::h5constants$H5T["H5T_NATIVE_INT32"],
+                        character = {
+                          tid <- H5Tcopy("H5T_C_S1")
+                          if (!is.numeric(size)) {
+                            stop("parameter 'size' has to be defined for storage.mode character.")
+                          }
+                          H5Tset_size(tid, size)
+                          tid
+                        }, {
+                          stop("datatype ", storage.mode, " not yet implemented. Try 'double', 'integer', or 'character'.")
+                        })
+
+
+        sid <- H5Screate_simple(size)
+        did <- H5Dcreate(fid, objectGroupName, tid, sid)
+        H5Dwrite(did, X, h5spaceMem = sid, h5spaceFile = sid)
+        H5Dclose(did)
+        H5Sclose(sid)
+
+        #h5write(X, path, paste0(objectGroupName), write.attributes = TRUE)
+        #H5close()
+      }}
     }
-  })
+  }, Y = Y)
   NULL
 }
 

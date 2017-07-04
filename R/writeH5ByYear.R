@@ -6,7 +6,8 @@
 #' @param writeMcAll \code{boolean} write mc-all
 #'
 #' @export
-writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "monthly", "annual"), opts = antaresRead::simOptions(),
+writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "monthly", "annual"),
+                           opts = antaresRead::simOptions(),
                            writeMcAll = TRUE){
   # cl <- makeCluster(4)
   # clusterEvalQ(cl, {

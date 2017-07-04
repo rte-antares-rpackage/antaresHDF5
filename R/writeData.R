@@ -8,7 +8,11 @@
 #' @param writeMCallName \code{character}, write mc-all names
 #'
 #' @export
-writeAntaresData <- function(data, path, rootGroup = NULL, writeStructure = TRUE, writeMCallName = FALSE){
+writeAntaresData <- function(data,
+                             path,
+                             rootGroup = NULL,
+                             writeStructure = TRUE,
+                             writeMCallName = FALSE){
 
 
 
@@ -42,20 +46,20 @@ writeAntaresData <- function(data, path, rootGroup = NULL, writeStructure = TRUE
                    fid)
       }
     }
-
+    fid <- H5Fopen(path)
     nams <- c(names(tpData[, .SD, .SDcols = 1:(ncol(tpData)-1)]),
               names(tpData$V1[[1]]))
     if(writeStructure)
     {
     h5writeAttribute(nams,
-                     H5Gopen(H5Fopen(path),
+                     H5Gopen(fid,
                              nameGroup), "structure")
     }
 
     if(writeMCallName)
     {
       h5writeAttribute(nams,
-                       H5Gopen(H5Fopen(path),
+                       H5Gopen(fid,
                                nameGroup), "structureMcall")
     }
 
