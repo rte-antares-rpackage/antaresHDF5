@@ -22,10 +22,10 @@ writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "mon
   #
   #
   # })
-  # clusterExport(cl,c("path", "timeSteps", "opts", "writeMcAll"), envir = environment())
   fid <- H5Fopen(path)
-  sapply(timeSteps, function(timeStep){
+  # clusterExport(cl,c("path", "timeSteps", "opts", "writeMcAll", "fid"), envir = environment())
 
+  sapply(timeSteps, function(timeStep){
     allMcYears <- opts$mcYears
     if(writeMcAll){
       allMcYears <- c(allMcYears, -1)
