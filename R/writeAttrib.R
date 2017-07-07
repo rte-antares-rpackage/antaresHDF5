@@ -10,8 +10,8 @@ writeAttribAndCreatGroup <- function(path, Y, group = NULL){
 
   group <- paste0(group, "/attributes")
   h5createGroup(path, group)
-  fid <- H5Fopen(path)
-  writeList(path, fid, Y, group)
+  H5close()
+  writeList(path, Y, group)
 
 }
 
@@ -25,22 +25,33 @@ writeAttribAndCreatGroup <- function(path, Y, group = NULL){
 #' @param path \code{character} patch of h5 file
 #' @param fid \code{numeric} id of h5 file
 #'
-writeList  <- function(path, fid, Y, group = NULL){
+writeList  <- function(path, Y, group = NULL){
+
   sapply(names(Y), function(X, Y){
+
     #fid <- H5Fopen(path)
     nam <- X
-    if(nam == ""){
-      nam <- "Noname"
-      X <- Y[[1]]
+    ##Gestion des noms similaires
+    if(X == "playlist"){
+      Y <- unlist(Y)
     }else{
-      X <- Y[[X]]
+      if(nam == ""){
+        nam <- "Noname"
+        X <- Y[[1]]
+      }else{
+        X <- Y[[X]]
+      }
     }
+
+
+    print(X)
 
     isWrited <- FALSE
     if(class(X)[1] %in% c("list", "simOptions")){
       nam <- paste(group, nam, sep = "/")
-      H5Gcreate(fid, nam)
-      writeList(path, fid, X, group = nam)
+      h5createGroup(path, nam)
+      H5close()
+      writeList(path , X, group = nam)
     }else{
       classOrigin <- class(X)
       objectGroupName <- paste(group, nam, sep = "/")
@@ -77,8 +88,9 @@ writeList  <- function(path, fid, Y, group = NULL){
             }
           }
           h5write(X, path, paste0(objectGroupName), write.attributes = TRUE)
-          h5writeAttribute(names(X), H5Dopen(fid, objectGroupName), "names")
-          #H5close()
+          H5close()
+          h5writeAttribute(names(X), H5Dopen(H5Fopen(path), objectGroupName), "names")
+          H5close()
         }
       }
       if(!isWrited){
@@ -98,8 +110,9 @@ writeList  <- function(path, fid, Y, group = NULL){
         if(class(X) == "data.frame")
         {
           h5write(X, path, paste0(objectGroupName), write.attributes = TRUE)
+          H5close()
         }else{
-        size <- length(X)
+          size <- length(X)
           tid <- switch(storage.mode(X)[1], double = rhdf5:::h5constants$H5T["H5T_NATIVE_DOUBLE"],
                         integer = rhdf5:::h5constants$H5T["H5T_NATIVE_INT32"],
                         logical = rhdf5:::h5constants$H5T["H5T_NATIVE_INT32"],
@@ -114,16 +127,19 @@ writeList  <- function(path, fid, Y, group = NULL){
                           stop("datatype ", storage.mode, " not yet implemented. Try 'double', 'integer', or 'character'.")
                         })
 
-
-        sid <- H5Screate_simple(size)
-        did <- H5Dcreate(fid, objectGroupName, tid, sid)
-        H5Dwrite(did, X, h5spaceMem = sid, h5spaceFile = sid)
-        H5Dclose(did)
-        H5Sclose(sid)
-
-        #h5write(X, path, paste0(objectGroupName), write.attributes = TRUE)
-        #H5close()
-      }}
+            print("ici")
+            fid <- H5Fopen(path)
+            print(objectGroupName)
+            sid <- H5Screate_simple(size)
+            did <- H5Dcreate(fid, objectGroupName, tid, sid)
+            H5Dwrite(did, X, h5spaceMem = sid, h5spaceFile = sid)
+            H5Dclose(did)
+            H5Sclose(sid)
+            H5Fclose(fid)
+            print('la')
+           # h5write(X, path, paste0(objectGroupName), write.attributes = TRUE)
+           #  H5close()
+        }}
     }
   }, Y = Y)
   NULL
@@ -154,9 +170,9 @@ giveFormat <- function(attribList){
         {
           if(length(Y)>0)
           {
-          if(Y[1] == "NA"){
-            Y <- NA
-          }
+            if(Y[1] == "NA"){
+              Y <- NA
+            }
           }
         }
 
@@ -185,9 +201,9 @@ giveFormat <- function(attribList){
         }
         if(length(Y)>0)
         {
-        if(Y[1] == "NA"){
-          Y <- NA
-        }
+          if(Y[1] == "NA"){
+            Y <- NA
+          }
         }
 
         Y

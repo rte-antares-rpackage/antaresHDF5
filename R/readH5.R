@@ -64,28 +64,45 @@ readAntaresH5 <- function(path, areas = NULL, links = NULL, clusters = NULL,
            expandRequest,
            flags,
            path,
-           index
+           index,
+           h5loc
   ){
+
+    #    h5loc <- .Call("_H5Fopen", path, flags, PACKAGE = "rhdf5")
+
     # library(rhdf5)
     # library(data.table)
     GP <- allGroup[VV]
     infoReq <- expandRequest[VV,]
 
-
     ##Use .call function directly, (faster)
 
-    h5loc <- .Call("_H5Fopen", path, flags, PACKAGE = "rhdf5")
     dfLoc <- .Call("_H5Dopen", h5loc, GP, NULL, PACKAGE = "rhdf5")
     h5group = new("H5IdComponent", ID = dfLoc)
+
+
     #
     # H5Dget_space(dfLoc)
     #
     # out <- .Call("_H5Dread", dfLoc, NULL, NULL, NULL,
     #       FALSE, FALSE, PACKAGE = "rhdf5")
     #
-    out <- rhdf5:::h5readDataset(h5group, list(NULL,index))
-    out <- data.table(infoReq, out)
-    H5close()
+
+    #h5spaceFile <- H5Dget_space(h5group)
+
+    out <- .Call("_H5Dread", h5group@ID, NULL, NULL, NULL,
+          TRUE, TRUE, PACKAGE = "rhdf5")
+
+    #H5Dread(h5group)
+
+    # out <- rhdf5:::h5readDataset(h5group, list(NULL,index))
+#infoReq,
+    #out <- data.table:::as.data.table.matrix(out)
+    out <- as.data.table.matrix.fast(out)
+   # nAm <- paste0("Stru", 1:length(infoReq))
+    #infoReq <- as.list(infoReq)
+    #out[,c(nAm) := infoReq]
+    out[,Mer := VV]
     out
   }
 
@@ -160,21 +177,29 @@ readAntaresH5 <- function(path, areas = NULL, links = NULL, clusters = NULL,
     if(showProgress){
       cat("Importing areas\n")
     }
-
+    h5loc <- .Call("_H5Fopen", path, flags, PACKAGE = "rhdf5")
     areasData <- rbindlist(plyr::llply(1:length(allGroup), .readH5File, allGroup = allGroup,
     expandRequest = expandRequest,
     flags = flags,
     path = path,
-    index = index
+    index = index,
+    h5loc = h5loc
     , .progress = progressBar, .parallel = FALSE))
+    #names(areasData)[1] <- "Mer"
 
-
+    expandRequest$Mer <- 1:nrow(expandRequest)
+    expandRequest <- data.table(expandRequest)
+    areasData <- merge(expandRequest, areasData, by = "Mer")
+    areasData[,Mer := NULL]
+    # ordeR <- c((ncol(areasData)+1-ncol(expandRequest)):ncol(areasData), 1:(ncol(areasData)-ncol(expandRequest)))
+    # setcolorder(areasData, names(areasData)[ordeR])
     ##Give names
     setnames(areasData, names(areasData), struct)
     tim <- getAllDateInfoFromDate(path, timeStep)
 
     #Add time
-    areasData <- data.table(tim, areasData)
+    #areasData <- data.table(tim, areasData)
+    areasData[,c(names(tim)):=tim]
     areasData[,timeId := as.integer(timeId)]
     # setattr(areasData, "class", c("antaresDataTable", "antaresData", "data.table", "data.frame"))
     # sapply(names(attib), function(X){

@@ -8,7 +8,8 @@
 #' @export
 writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "monthly", "annual"),
                            opts = antaresRead::simOptions(),
-                           writeMcAll = TRUE){
+                           writeMcAll = TRUE,
+                           compress = 0){
   # cl <- makeCluster(4)
   # clusterEvalQ(cl, {
   #   library(data.table)
@@ -22,7 +23,7 @@ writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "mon
   #
   #
   # })
-  fid <- H5Fopen(path)
+ # fid <- H5Fopen(path)
   # clusterExport(cl,c("path", "timeSteps", "opts", "writeMcAll", "fid"), envir = environment())
 
   sapply(timeSteps, function(timeStep){
@@ -56,12 +57,12 @@ writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "mon
 
         attrib <- attributes(res)
         # Create group
+        H5close()
         h5createGroup(path, timeStep)
-
+        H5close()
         #Write time
         writeTime(res, path, timeStep)
-
-        fid <- H5Fopen(path)
+        H5close()
         #Write attributes
         writeAttribAndCreatGroup(path ,Y = attrib, timeStep)
 
@@ -82,7 +83,7 @@ writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "mon
           res[[i]][, time := NULL]
         }
       }) %>>% invisible()
-
+      gc()
       #Transform for write
 
       if(is.null(mcY)){
@@ -97,7 +98,7 @@ writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "mon
                          districtKey = c("district",  "mcYear"),
                          clustersKey = c("area", "cluster",  "mcYear"))
 
-      writeAntaresData(res, path, timeStep, writeStructure, writeMCallName)
+      writeAntaresData(res, path, timeStep, writeStructure, writeMCallName, compress)
     })
   })
 }

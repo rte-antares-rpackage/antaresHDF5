@@ -5,7 +5,8 @@
 \title{Convert antares output to h5 file}
 \usage{
 writeAntaresH5(path, timeSteps = c("hourly", "daily", "weekly", "monthly",
-  "annual"), opts = antaresRead::simOptions(), writeMcAll = TRUE)
+  "annual"), opts = antaresRead::simOptions(), writeMcAll = TRUE,
+  compress = 0)
 }
 \arguments{
 \item{path}{\code{character} path of h5 file to write}

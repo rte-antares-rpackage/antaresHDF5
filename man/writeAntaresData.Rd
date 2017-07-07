@@ -5,7 +5,7 @@
 \title{Write a h5 file from an object load with \link{readAntares}}
 \usage{
 writeAntaresData(data, path, rootGroup = NULL, writeStructure = TRUE,
-  writeMCallName = FALSE)
+  writeMCallName = FALSE, compress = 0)
 }
 \arguments{
 \item{data}{\code{antaresDataList}}

@@ -12,10 +12,13 @@ writeAntaresData <- function(data,
                              path,
                              rootGroup = NULL,
                              writeStructure = TRUE,
-                             writeMCallName = FALSE){
+                             writeMCallName = FALSE,
+                             compress = 0){
 
 
-
+  dcpl = H5Pcreate("H5P_DATASET_CREATE")
+  H5Pset_fill_time(dcpl, "H5D_FILL_TIME_ALLOC")
+  H5Pset_deflate(dcpl, compress)
   #Transdorm path to id
   fid <- H5Fopen(path)
 
@@ -62,13 +65,14 @@ writeAntaresData <- function(data,
                        H5Gopen(fid,
                                nameGroup), "structureMcall")
     }
+    H5Pset_chunk(dcpl, c(nrow(tpData[1]$V1[[1]]), 1))
+    sid <- H5Screate_simple(dim(tpData[1]$V1[[1]]))
 
-    sapply(1:nrow(tpData), function(Y){
+
+    sapply(1:nrow(tpData), function(Y, sid){
       rowSel <- tpData[Y]
       nameGroup <- paste(rootGroup, X,
-
                          paste(unlist(rowSel[,lapply(.SD, as.character), .SDcols = 1:(ncol(rowSel)-1)]), collapse = "/"),
-
                          sep = "/")
 
       # h5createDataset(path,
@@ -80,25 +84,24 @@ writeAntaresData <- function(data,
       # h5write(as.matrix(rowSel$V1[[1]]), path, nameGroup)
       #
 
-      GP <- nameGroup
+
+    #   dcpl = H5Pcreate("H5P_DATASET_CREATE")
+    # }
+    # H5Pset_fill_time(dcpl, "H5D_FILL_TIME_ALLOC")
+    # H5Pset_chunk(dcpl, chunk)
+    # if (level > 0) {
+    #   H5Pset_deflate(dcpl, level)
 
 
-      sid <- H5Screate_simple(c(dim(rowSel$V1[[1]])))
-
-      did <- H5Dcreate(fid, GP, rhdf5:::h5constants$H5T["H5T_NATIVE_DOUBLE"], sid)
-
+      did <- H5Dcreate(fid, nameGroup, rhdf5:::h5constants$H5T["H5T_NATIVE_DOUBLE"], sid ,dcpl = dcpl)
       H5Dwrite(did, as.matrix(rowSel$V1[[1]]), h5spaceMem = sid, h5spaceFile = sid)
-      H5Dclose(did)
-      H5Sclose(sid)
+      .Call("_H5Dclose", did@ID, PACKAGE = "rhdf5")
 
-
-
-
-
-
-    })
+    }, sid = sid)
+    H5Sclose(sid)
+    H5Fclose(fid)
   })
-  H5Fclose(fid)
+
   TRUE
 }
 

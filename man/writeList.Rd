@@ -12,6 +12,8 @@ writeList(path, Y, group = NULL)
 \item{Y}{\code{list}, list of study attributes}
 
 \item{group}{\code{character} group where attributes will be write}
+
+\item{fid}{\code{numeric} id of h5 file}
 }
 \description{
 Write list from attributes in h5.

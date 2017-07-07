@@ -4,14 +4,14 @@
 \alias{creatGroup}
 \title{Create a group organization which subgroup.}
 \usage{
-creatGroup(groupIn = NULL, groupData, path)
+creatGroup(groupIn = NULL, groupData, fid)
 }
 \arguments{
 \item{groupIn}{\code{character} name of main group (who will contain all organization)}
 
 \item{groupData}{\code{data.table} organization}
 
-\item{path}{\code{character} patch of h5 file}
+\item{fid}{\code{numeric} id of hdf5 file}
 }
 \description{
 Create a group organization which subgroup.
