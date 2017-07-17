@@ -4,6 +4,7 @@ opts <- setSimulationPath("D:/Users/titorobe/Desktop/antaresStudy")
 
 
 
+
 path <- "testNewFormat2.h5"
 timeSteps = c("hourly", "daily", "weekly", "monthly", "annual")
 writeMcAll = TRUE
