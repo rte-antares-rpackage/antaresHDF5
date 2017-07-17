@@ -54,9 +54,9 @@ writeAntaresData <- function(data,
               names(tpData$V1[[1]]))
     if(writeStructure)
     {
-    h5writeAttribute(nams,
-                     H5Gopen(fid,
-                             nameGroup), "structure")
+      h5writeAttribute(nams,
+                       H5Gopen(fid,
+                               nameGroup), "structure")
     }
 
     if(writeMCallName)
@@ -85,12 +85,12 @@ writeAntaresData <- function(data,
       #
 
 
-    #   dcpl = H5Pcreate("H5P_DATASET_CREATE")
-    # }
-    # H5Pset_fill_time(dcpl, "H5D_FILL_TIME_ALLOC")
-    # H5Pset_chunk(dcpl, chunk)
-    # if (level > 0) {
-    #   H5Pset_deflate(dcpl, level)
+      #   dcpl = H5Pcreate("H5P_DATASET_CREATE")
+      # }
+      # H5Pset_fill_time(dcpl, "H5D_FILL_TIME_ALLOC")
+      # H5Pset_chunk(dcpl, chunk)
+      # if (level > 0) {
+      #   H5Pset_deflate(dcpl, level)
 
 
       did <- H5Dcreate(fid, nameGroup, rhdf5:::h5constants$H5T["H5T_NATIVE_DOUBLE"], sid ,dcpl = dcpl)
@@ -136,4 +136,51 @@ creatGroup <- function(groupIn = NULL, groupData, fid){
 
     })
   }
+}
+
+
+
+
+
+#' Write a h5 file from an object load with \link{readAntares}
+#'
+#' @param data \code{antaresDataList}
+#' @param path \code{character} patch of h5 file
+#' @param rootGroup \code{character} group will contain all h5 organization
+#' @param writeStructure \code{boolean}, write group and subgroup (only for first MCyear)
+#' @param writeMCallName \code{character}, write mc-all names
+#'
+#' @export
+writeAntaresDataNew <- function(data,
+                                path,
+                                rootGroup = NULL,
+                                writeStructure = TRUE,
+                                writeMCallName = FALSE,
+                                compress = 0){
+  #Write areas
+  if(!is.null(data$areas)){
+    areasGroup <- paste0(rootGroup, "/areas")
+    areasDatasetmcInd <- paste0(areasGroup, "/mcInd")
+    mcY <- attr(data, "opts")$mcYears
+    nbAreas <- nrow(data$areas)
+    dimFile <- dim(data$areas$V1[[1]])
+
+    if(writeStructure){
+      h5createGroup(path, areasGroup)
+      h5createDataset(path, areasDatasetmcInd, dims = c(dimFile, nbAreas, length(mcY)), chunk = c(dimFile[2], 1, 1, 1),
+                      level = compress)
+    }
+
+    arrayDatatowrite <- array(dim = c(dimFile, nbAreas))
+    for(i in 1:nrow(data$areas)){
+      arrayDatatowrite[, , i] <- as.matrix(data$areas$V1[[i]])
+    }
+
+    fid <- H5Fopen(path)
+    h5writeDataset.array(obj = arrayDatatowrite, fid, areasDatasetmcInd, index = list(NULL, NULL, NULL, which(data$areas$mcYear[1] == mcY)))
+    H5Fclose(fid)
+
+  }
+
+
 }

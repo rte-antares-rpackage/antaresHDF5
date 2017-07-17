@@ -25,6 +25,7 @@ writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "mon
   # })
  # fid <- H5Fopen(path)
   # clusterExport(cl,c("path", "timeSteps", "opts", "writeMcAll", "fid"), envir = environment())
+  h5createFile(path)
 
   sapply(timeSteps, function(timeStep){
     allMcYears <- opts$mcYears
@@ -98,7 +99,7 @@ writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "mon
                          districtKey = c("district",  "mcYear"),
                          clustersKey = c("area", "cluster",  "mcYear"))
 
-      writeAntaresData(res, path, timeStep, writeStructure, writeMCallName, compress)
+      writeAntaresDataNew(res, path, timeStep, writeStructure, writeMCallName, compress)
     })
   })
 }
