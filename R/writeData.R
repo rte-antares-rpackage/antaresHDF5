@@ -1,186 +1,140 @@
-
-#' Write a h5 file from an object load with \link{readAntares}
+#' Write data
 #'
 #' @param data \code{antaresDataList}
 #' @param path \code{character} patch of h5 file
 #' @param rootGroup \code{character} group will contain all h5 organization
 #' @param writeStructure \code{boolean}, write group and subgroup (only for first MCyear)
-#' @param writeMCallName \code{character}, write mc-all names
+#' @param writeMCallName \code{character}, write mcAll
 #'
 #' @export
 writeAntaresData <- function(data,
-                             path,
-                             rootGroup = NULL,
-                             writeStructure = TRUE,
-                             writeMCallName = FALSE,
-                             compress = 0){
-
-
-  dcpl = H5Pcreate("H5P_DATASET_CREATE")
-  H5Pset_fill_time(dcpl, "H5D_FILL_TIME_ALLOC")
-  H5Pset_deflate(dcpl, compress)
-  #Transdorm path to id
-  fid <- H5Fopen(path)
-
-
-  rootGroup <- paste0(rootGroup, "/data")
-  if(writeStructure){
-
-    H5Gcreate(fid, rootGroup)
-
-  }
-
-  sapply(names(data), function(X){
-    tpData <- data[[X]]
-    nameGroup <- paste(rootGroup, X, sep = "/")
-
-    if(ncol(tpData)>1)
-    {
-      if(ncol(tpData)>2){
-        groupData <- tpData[, .SD, .SDcols = 1:(ncol(tpData)-2)]
-      }else{
-        groupData <- data.frame()
-      }
-
-      if(writeStructure)
-      {
-        creatGroup(nameGroup,
-                   groupData,
-                   fid)
-      }
-    }
-    fid <- H5Fopen(path)
-    nams <- c(names(tpData[, .SD, .SDcols = 1:(ncol(tpData)-1)]),
-              names(tpData$V1[[1]]))
-    if(writeStructure)
-    {
-      h5writeAttribute(nams,
-                       H5Gopen(fid,
-                               nameGroup), "structure")
-    }
-
-    if(writeMCallName)
-    {
-      h5writeAttribute(nams,
-                       H5Gopen(fid,
-                               nameGroup), "structureMcall")
-    }
-    H5Pset_chunk(dcpl, c(nrow(tpData[1]$V1[[1]]), 1))
-    sid <- H5Screate_simple(dim(tpData[1]$V1[[1]]))
-
-
-    sapply(1:nrow(tpData), function(Y, sid){
-      rowSel <- tpData[Y]
-      nameGroup <- paste(rootGroup, X,
-                         paste(unlist(rowSel[,lapply(.SD, as.character), .SDcols = 1:(ncol(rowSel)-1)]), collapse = "/"),
-                         sep = "/")
-
-      # h5createDataset(path,
-      #                 dim = dim(rowSel$V1[[1]]),
-      #                 chunk=c(nrow(rowSel$V1[[1]]), 1),###ncol(rowSel$V1[[1]])
-      #                 dataset = nameGroup, level = 7)
-      #
-      #
-      # h5write(as.matrix(rowSel$V1[[1]]), path, nameGroup)
-      #
-
-
-      #   dcpl = H5Pcreate("H5P_DATASET_CREATE")
-      # }
-      # H5Pset_fill_time(dcpl, "H5D_FILL_TIME_ALLOC")
-      # H5Pset_chunk(dcpl, chunk)
-      # if (level > 0) {
-      #   H5Pset_deflate(dcpl, level)
-
-
-      did <- H5Dcreate(fid, nameGroup, rhdf5:::h5constants$H5T["H5T_NATIVE_DOUBLE"], sid ,dcpl = dcpl)
-      H5Dwrite(did, as.matrix(rowSel$V1[[1]]), h5spaceMem = sid, h5spaceFile = sid)
-      .Call("_H5Dclose", did@ID, PACKAGE = "rhdf5")
-
-    }, sid = sid)
-    H5Sclose(sid)
-    H5Fclose(fid)
-  })
-
-  TRUE
-}
-
-
-#' Create a group organization which subgroup.
-#'
-#' @param groupIn \code{character} name of main group (who will contain all organization)
-#' @param groupData \code{data.table} organization
-#' @param fid \code{numeric} id of hdf5 file
-#'
-#' @export
-creatGroup <- function(groupIn = NULL, groupData, fid){
-  if(!is.null(groupIn))
-  {
-    H5Gcreate(fid, groupIn)
-  }
-
-  if(ncol(groupData)>0){
-    sapply(1:ncol(groupData), function(X){
-      colummSel <- 1:X
-      dataForGroupCreation <- groupData[, .SD, .SDcols = colummSel]
-      dataForGroupCreation <- unique(dataForGroupCreation)
-      dataForGroupCreation <- apply(dataForGroupCreation, 1, function(X){
-        paste(X, sep = "/", collapse = "/")
-      })
-      dataForGroupCreation <- paste0(groupIn, "/", dataForGroupCreation)
-      dataForGroupCreation <- unique(dataForGroupCreation)
-      sapply(dataForGroupCreation, function(X){
-        H5Gcreate(fid, X)
-
-      })
-
-    })
-  }
-}
-
-
-
-
-
-#' Write a h5 file from an object load with \link{readAntares}
-#'
-#' @param data \code{antaresDataList}
-#' @param path \code{character} patch of h5 file
-#' @param rootGroup \code{character} group will contain all h5 organization
-#' @param writeStructure \code{boolean}, write group and subgroup (only for first MCyear)
-#' @param writeMCallName \code{character}, write mc-all names
-#'
-#' @export
-writeAntaresDataNew <- function(data,
                                 path,
                                 rootGroup = NULL,
                                 writeStructure = TRUE,
-                                writeMCallName = FALSE,
+                                mcAll = FALSE,
                                 compress = 0){
-  #Write areas
+
   if(!is.null(data$areas)){
-    areasGroup <- paste0(rootGroup, "/areas")
-    areasDatasetmcInd <- paste0(areasGroup, "/mcInd")
-    mcY <- attr(data, "opts")$mcYears
-    nbAreas <- nrow(data$areas)
-    dimFile <- dim(data$areas$V1[[1]])
+    writeDataType(data = data, path = path,  type = "areas", rootGroup = rootGroup, writeStructure = writeStructure,
+                  mcAll = mcAll, compress = compress)
+  }
 
-    if(writeStructure){
-      h5createGroup(path, areasGroup)
-      h5createDataset(path, areasDatasetmcInd, dims = c(dimFile, nbAreas, length(mcY)), chunk = c(dimFile[2], 1, 1, 1),
-                      level = compress)
-    }
+  if(!is.null(data$links)){
+    writeDataType(data = data, path = path,  type = "links", rootGroup = rootGroup, writeStructure = writeStructure,
+                  mcAll = mcAll, compress = compress)
+  }
+  if(!is.null(data$districts)){
+    writeDataType(data = data, path = path,  type = "districts", rootGroup = rootGroup, writeStructure = writeStructure,
+                  mcAll = mcAll, compress = compress)
+  }
 
-    arrayDatatowrite <- array(dim = c(dimFile, nbAreas))
-    for(i in 1:nrow(data$areas)){
-      arrayDatatowrite[, , i] <- as.matrix(data$areas$V1[[i]])
-    }
+  if(!is.null(data$clusters)){
+    writeDataType(data = data, path = path,  type = "clusters", rootGroup = rootGroup, writeStructure = writeStructure,
+                  mcAll = mcAll, compress = compress)
+  }
 
-    fid <- H5Fopen(path)
-    h5writeDataset.array(obj = arrayDatatowrite, fid, areasDatasetmcInd, index = list(NULL, NULL, NULL, which(data$areas$mcYear[1] == mcY)))
-    H5Fclose(fid)
+}
+
+#' Write data by type
+#'
+#' @param data \code{antaresDataList}
+#' @param path \code{character} patch of h5 file
+#' @param type \code{character} type of data to write, must be areas, links, districts or clusters
+#' @param rootGroup \code{character} group will contain all h5 organization
+#' @param writeStructure \code{boolean}, write group and subgroup (only for first MCyear)
+#' @param writeMCallName \code{character}, write mcAll
+#'
+#' @export
+writeDataType <- function(data,
+                      path,
+                      type,
+                      rootGroup = NULL,
+                      writeStructure = TRUE,
+                      mcAll = FALSE,
+                      compress = 0){
+
+  if(!mcAll)
+  {
+    mcYears <- attr(data, "opts")$mcYears
+  }else{
+    mcYears <- "all"
+  }
+
+  data <- data[[type]]
+  if(type == "clusters"){
+    data$cluster <- paste0(data$area, "/", data$cluster)
+    data[,area := NULL]
+  }
+
+  print(data)
+
+  Group <- paste0(rootGroup, "/", type)
+  print(rootGroup)
+  print(paste0("Mcall : ", mcAll))
+  #Create group by type of data
+  if(writeStructure & !mcAll){
+    h5createGroup(path, Group)
+  }
+
+  #Control if we write mcAll or mcInd
+  if(mcAll){
+    Group <- paste0(Group, "/", "mcAll")
+  }else{
+    Group <- paste0(Group, "/", "mcInd")
 
   }
 
+  #Create group for mc-ind or mc-all
+  if(writeStructure){
+    h5createGroup(path, Group)
+  }
 
+  #Give structure for data
+  dimPreBuild <- names(data)[!names(data)%in%c("mcYear", "V1")]
+
+  dimStructure <- list()
+  dimStructure$variable <- names(data$V1[[1]])
+  dimStructure <- c(dimStructure, sapply(dimPreBuild, function(X){
+    as.character(unique(unlist(data[, .SD, .SDcols = X])))
+  }, simplify = FALSE))
+  dimStructure$mcYear <- mcYears
+
+  #Give dim length
+  nbDim <- length(dimStructure) + 1
+  nbTimeId <- nrow(data$V1[[1]])
+  dimData <- unlist(c(nbTimeId, lapply(dimStructure, length)))
+
+
+  #Create array
+  groupData <- paste0(Group, "/data")
+  structData <- paste0(Group, "/structure")
+  if(writeStructure){
+    h5createDataset(path, groupData, dims = dimData, chunk = c(dimData[1], 1, 1, 1),
+                    level = compress)
+    fid <- H5Fopen(path)
+    h5writeDataset.list(dimStructure, fid, structData, level = compress)
+    H5Fclose(fid)
+  }
+
+  #Convert my data to an array
+  arrayDatatowrite <- array(dim = dimData[1:(length(dimData)-1)])
+  for(i in 1:nrow(data)){
+    arrayDatatowrite[, , i] <- as.matrix(data$V1[[i]])
+  }
+
+  #Control index for write
+  index <- lapply(1:length(dim(arrayDatatowrite)), function(X)NULL)
+
+  if(!mcAll)
+  {
+    index$LastDim <- which(data$mcYear[1] == mcYears)
+  }else{
+    index$LastDim  <- 1
+  }
+
+  #Write data
+  fid <- H5Fopen(path)
+  h5writeDataset.array(obj = arrayDatatowrite, fid, groupData, index = index)
+  H5Fclose(fid)
+  NULL
 }

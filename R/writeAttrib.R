@@ -44,7 +44,6 @@ writeList  <- function(path, Y, group = NULL){
     }
 
 
-    print(X)
 
     isWrited <- FALSE
     if(class(X)[1] %in% c("list", "simOptions")){
@@ -127,16 +126,13 @@ writeList  <- function(path, Y, group = NULL){
                           stop("datatype ", storage.mode, " not yet implemented. Try 'double', 'integer', or 'character'.")
                         })
 
-            print("ici")
             fid <- H5Fopen(path)
-            print(objectGroupName)
             sid <- H5Screate_simple(size)
             did <- H5Dcreate(fid, objectGroupName, tid, sid)
             H5Dwrite(did, X, h5spaceMem = sid, h5spaceFile = sid)
             H5Dclose(did)
             H5Sclose(sid)
             H5Fclose(fid)
-            print('la')
            # h5write(X, path, paste0(objectGroupName), write.attributes = TRUE)
            #  H5close()
         }}

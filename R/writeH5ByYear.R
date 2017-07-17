@@ -33,7 +33,6 @@ writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "mon
       allMcYears <- c(allMcYears, -1)
     }
 
-    print(allMcYears)
     sapply(allMcYears, function(mcY)
     {
       if(allMcYears[1] == mcY){
@@ -41,10 +40,11 @@ writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "mon
       }else{
         writeStructure = FALSE
       }
-      writeMCallName <- FALSE
+      mcAll <- FALSE
       if(mcY == -1){
         mcY <- NULL
-        writeMCallName <- TRUE
+        writeStructure <- TRUE
+        mcAll <- TRUE
       }
 
       res <- readAntares(areas = "all" ,
@@ -54,7 +54,7 @@ writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "mon
                          mcYears = mcY,
                          timeStep = timeStep, opts = opts, showProgress = FALSE)
 
-      if(writeStructure){
+      if(writeStructure & !mcAll){
 
         attrib <- attributes(res)
         # Create group
@@ -99,7 +99,7 @@ writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "mon
                          districtKey = c("district",  "mcYear"),
                          clustersKey = c("area", "cluster",  "mcYear"))
 
-      writeAntaresDataNew(res, path, timeStep, writeStructure, writeMCallName, compress)
+      writeAntaresData(res, path, timeStep, writeStructure, mcAll, compress)
     })
   })
 }
