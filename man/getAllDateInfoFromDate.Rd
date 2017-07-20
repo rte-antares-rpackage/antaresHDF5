@@ -4,12 +4,12 @@
 \alias{getAllDateInfoFromDate}
 \title{Read time and generate column who can be calculate from time}
 \usage{
-getAllDateInfoFromDate(path, group)
+getAllDateInfoFromDate(fid, group)
 }
 \arguments{
-\item{path}{\code{character} path of h5 file}
-
 \item{group}{\code{group} group where time are stocked}
+
+\item{path}{\code{character} path of h5 file}
 }
 \description{
 Read time and generate column who can be calculate from time

@@ -28,11 +28,15 @@ getTime <- function(data, timeStep){
 #' @param group \code{group} group where time are stocked
 #'
 #' @export
-getAllDateInfoFromDate <- function(path, group){
+getAllDateInfoFromDate <- function(fid, group){
   # affectation des classes
 
   groupT <- paste0(group, "/time")
-  datetime_data <- data.table(h5read(path, groupT))
+  did <- H5Dopen(fid, groupT)
+  datetime_data <- data.table(H5Dread(did))
+
+
+  H5Dclose(did)
   if(group %in% c("weekly", "annual")){
     return(datetime_data)
   }
@@ -41,30 +45,36 @@ getAllDateInfoFromDate <- function(path, group){
   # mise en locale english pour le time (extraction des mois)
   Sys.setlocale("LC_TIME", "C")
   if(group == c("monthly")){
-
     timCop <- datetime_data$time
     timCop <- paste0(timCop, "-01")
     timCop <- as.Date(timCop)
     class(timCop) <- c("IDate", "Date")
     datetime_data$month <- as.factor(toupper(format(timCop, format = "%b")))
-
     return(datetime_data)
   }
 
   class(datetime_data$idate) <- c("IDate", "Date")
   class(datetime_data$itime) <- c("ITime")
   # recuperation de la locale actuelle du pc
+  uniqueDate <- unique(datetime_data[,.SD, .SDcols = "idate"])
+  uniqueTime <-  unique(datetime_data[,.SD, .SDcols = "itime"])
 
-  # calculs des variables
-  datetime_data[, c("time", "day", "month") := list(
-    as.POSIXct(idate, time = itime, tz = "UTC"),
+  uniqueDate[,c("day", "month") := list(
     mday(idate),
-    as.factor(toupper(format(idate, format = "%b")))
+    as.factor(toupper(format(idate, format = "%b"))))]
+
+
+
+  # calculs
+  datetime_data[, c("time") := list(
+    as.POSIXct(idate, time = itime, tz = "UTC")
   )]
+
+
+
 
   if(group == "daily"){
     datetime_data$time <- as.Date(datetime_data$time)
-
   }
   mthList <- c("APR",
                "AUG",
@@ -79,17 +89,19 @@ getAllDateInfoFromDate <- function(path, group){
                "OCT",
                "SEP")
 
-  toAdd <- mthList[!mthList %in% levels(datetime_data$month)]
+  toAdd <- mthList[!mthList %in% levels(uniqueDate$month)]
   if(length(toAdd)>0)
   {
-    levels(datetime_data$month) <- c(levels(datetime_data$month), toAdd)
+    levels(uniqueDate$month) <- c(levels(uniqueDate$month), toAdd)
   }
 
   if(group == "hourly")
   {
-    datetime_data[, c("hour") := as.factor(substring(as.character(itime), 1, 5))]
-  }
+    uniqueTime[, c("hour") := as.factor(substring(as.character(itime), 1, 5))]
 
+  }
+  datetime_data <- merge(datetime_data, uniqueDate)
+  datetime_data <- merge(datetime_data, uniqueTime, by = "itime")
   datetime_data[, idate := NULL]
   datetime_data[, itime := NULL]
   Sys.setlocale("LC_TIME", current_locale)
