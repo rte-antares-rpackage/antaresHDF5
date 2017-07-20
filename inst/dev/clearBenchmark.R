@@ -56,10 +56,10 @@ arrayToData.table <- function(array, dim = 2)
   alloc.col(W)
 }
 
-
+library(antaresRead)
 
 opts <- setSimulationPath("C:/Users/titorobe/Desktop/antaresStudy", 1)
-readAntar <- system.time(are <- readAntares("all", mcYears = 1:30))
+readAntar <- system.time(are <- readAntares("all"))
 readAntar
 
 path <- "testWrite10Year.h5"

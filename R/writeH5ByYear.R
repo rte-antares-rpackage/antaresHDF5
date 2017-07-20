@@ -65,8 +65,10 @@ writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "mon
         writeTime(res, path, timeStep)
         H5close()
         #Write attributes
-        writeAttribAndCreatGroup(path ,Y = attrib, timeStep)
-
+        # writeAttribAndCreatGroup(path ,Y = attrib, timeStep)
+        #New attrib write (convert to bin)
+        s <- serialize(attrib, NULL, ascii = TRUE)
+        h5write(rawToChar(s), path, paste0(timeStep, "/attrib"))
       }
 
       #Remove useless data
