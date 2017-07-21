@@ -8,18 +8,41 @@ path <- "testNewFormat3.h5"
 
 
 
-setSimulationPath("E:/DES/antaresFlowbased/TestrunSimulationFb/antaresStudy")
-system.time(W <- readAntares(areas = "all" ,mcYears = 1, simplify = TRUE,select = "NODU"))
-W
 
-Rprof(tmp <- tempfile())
+#setSimulationPath("E:/DES/antaresFlowbased/TestrunSimulationFb/antaresStudy")
+setSimulationPath("C:/Users/titorobe/Desktop/test_case")
 
 
-system.time(V <- h5ReadAntares(path,
-                               areas = c("all"),
-                               mcYears = 1:10, select = "NODU"))
+system.time(W <- readAntares(areas = "fr", mcYears = 1:1000))
+names(W)
+
+library(pipeR)
+writeAntaresH5("toto.h5", compress = 1,  misc = TRUE,
+               thermalAvailabilities = TRUE,
+               hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
+               linkCapacity = TRUE, mustRun = TRUE, thermalModulation = TRUE)
 
 
+
+path <- "testNewFormat3.h5"
+#path <- "toto.h5"
+V <- h5ReadAntares(path,
+                   clusters ="all",
+                   mcYears = 1:100)
+J <- 2014512
+
+
+
+
+Bli2 <- h5ReadAntares(path, areas = "all", links = "all", clusters = "all",
+              mcYears = 1:10)
+
+
+
+
+
+
+S <- readAntares(cluster = "fr")
 
 V
 W

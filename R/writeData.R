@@ -15,20 +15,24 @@ writeAntaresData <- function(data,
                                 compress = 0){
 
   if(!is.null(data$areas)){
+    #Write areas
     writeDataType(data = data, path = path,  type = "areas", rootGroup = rootGroup, writeStructure = writeStructure,
                   mcAll = mcAll, compress = compress)
   }
 
   if(!is.null(data$links)){
+    #Write links
     writeDataType(data = data, path = path,  type = "links", rootGroup = rootGroup, writeStructure = writeStructure,
                   mcAll = mcAll, compress = compress)
   }
   if(!is.null(data$districts)){
+    #Write districts
     writeDataType(data = data, path = path,  type = "districts", rootGroup = rootGroup, writeStructure = writeStructure,
                   mcAll = mcAll, compress = compress)
   }
 
   if(!is.null(data$clusters)){
+    #Write clusters
     writeDataType(data = data, path = path,  type = "clusters", rootGroup = rootGroup, writeStructure = writeStructure,
                   mcAll = mcAll, compress = compress)
   }
@@ -91,7 +95,6 @@ writeDataType <- function(data,
 
   #Give structure for data
   dimPreBuild <- names(data)[!names(data)%in%c("mcYear", "V1")]
-
   dimStructure <- list()
   dimStructure$variable <- names(data$V1[[1]])
   dimStructure <- c(dimStructure, sapply(dimPreBuild, function(X){
@@ -110,13 +113,16 @@ writeDataType <- function(data,
   structData <- paste0(Group, "/structure")
   if(writeStructure){
     h5createDataset(path, groupData, dims = dimData, chunk = c(dimData[1], 1, 1, 1),
-                    level = compress)
+                    level = compress, maxdims = c(dimData[1],
+                                                  dimData[2] + 20,
+                                                  dimData[3],
+                                                  dimData[4]))
     fid <- H5Fopen(path)
     h5writeDataset.list(dimStructure, fid, structData, level = compress)
     H5Fclose(fid)
   }
 
-  #Convert my data to an array
+  #Convert data to an array
   arrayDatatowrite <- array(dim = dimData[1:(length(dimData)-1)])
   for(i in 1:nrow(data)){
     arrayDatatowrite[, , i] <- as.matrix(data$V1[[i]])

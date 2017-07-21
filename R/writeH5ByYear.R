@@ -9,30 +9,30 @@
 writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "monthly", "annual"),
                            opts = antaresRead::simOptions(),
                            writeMcAll = TRUE,
-                           compress = 0){
-  # cl <- makeCluster(4)
-  # clusterEvalQ(cl, {
-  #   library(data.table)
-  #   library(antaresRead)
-  #   library(rhdf5)
-  #   library(pipeR)
-  #   library(stringr)
-  #   library(ggplot2)
-  #   library(antaresHdf5)
-  #   library(parallel)
-  #
-  #
-  # })
- # fid <- H5Fopen(path)
-  # clusterExport(cl,c("path", "timeSteps", "opts", "writeMcAll", "fid"), envir = environment())
+                           compress = 1,
+                           misc = FALSE,
+                           thermalAvailabilities = FALSE,
+                           hydroStorage = FALSE,
+                           hydroStorageMaxPower = FALSE,
+                           reserve = FALSE,
+                           linkCapacity = FALSE,
+                           mustRun = FALSE,
+                           thermalModulation = FALSE
+                           ){
+
+  #Create h5 file
   h5createFile(path)
 
+  #loop on timeStep
   sapply(timeSteps, function(timeStep){
+
+    #Add mcAll
     allMcYears <- opts$mcYears
     if(writeMcAll){
       allMcYears <- c(allMcYears, -1)
     }
 
+    #Loop on MCyear
     sapply(allMcYears, function(mcY)
     {
       if(allMcYears[1] == mcY){
@@ -47,12 +47,17 @@ writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "mon
         mcAll <- TRUE
       }
 
+      #Read data
       res <- readAntares(areas = "all" ,
                          links = "all",
                          clusters = "all",
                          districts = "all",
                          mcYears = mcY,
-                         timeStep = timeStep, opts = opts, showProgress = FALSE)
+                         timeStep = timeStep, opts = opts, showProgress = FALSE,
+                         misc = misc, thermalAvailabilities = thermalAvailabilities,
+                         hydroStorage = hydroStorage, hydroStorageMaxPower = hydroStorageMaxPower,
+                         reserve = reserve, linkCapacity = linkCapacity, mustRun = mustRun,
+                         thermalModulation = thermalModulation)
 
       if(writeStructure & !mcAll){
 
@@ -65,8 +70,6 @@ writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "mon
         writeTime(res, path, timeStep)
         H5close()
         #Write attributes
-        # writeAttribAndCreatGroup(path ,Y = attrib, timeStep)
-        #New attrib write (convert to bin)
         s <- serialize(attrib, NULL, ascii = TRUE)
         h5write(rawToChar(s), path, paste0(timeStep, "/attrib"))
       }
@@ -87,7 +90,7 @@ writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "mon
         }
       }) %>>% invisible()
       gc()
-      #Transform for write
+
 
       if(is.null(mcY)){
 
@@ -96,11 +99,12 @@ writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "mon
 
         })
       }
+      #Transform for write
       res <- transformH5(res,areasKey = c("area", "mcYear"),
                          linksKey = c("link",  "mcYear"),
                          districtKey = c("district",  "mcYear"),
                          clustersKey = c("area", "cluster",  "mcYear"))
-
+      #Write data
       writeAntaresData(res, path, timeStep, writeStructure, mcAll, compress)
     })
   })
