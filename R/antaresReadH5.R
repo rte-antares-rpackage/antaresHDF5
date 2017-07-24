@@ -151,6 +151,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 #'
 #' @return data.table
 #'
+#' @noRd
 .arrayToDataTable <- function(array)
 {
   dim <- 2
@@ -174,7 +175,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 #' @param index \code{list} index of data to load
 #' @param GP \code{character} name of group to load
 #'
-#'
+#' @noRd
 .optimH5Read <- function(fid, index = NULL, GP){
   did <- H5Dopen(fid,  GP)
   if(is.null(index)){
@@ -211,6 +212,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 #' @param mcType \code{character}, must be mcInd or mcAll
 #' @param mcYears \code{numeric or character} mcYears to laod
 #'
+#' @noRd
 .makeStructure <- function(type = "area", selectedRow,
                            selectedCol, fid, GP, mcType, mcYears){
   typeS <- paste0(type, "s")
@@ -278,6 +280,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 #' @param synthesis \code{boolean}
 #' @param simplify \code{boolean}
 #'
+#' @noRd
 .loadAreas <- function(areas,
                        fid,
                        select,
@@ -337,6 +340,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 #' @param synthesis \code{boolean}
 #' @param simplify \code{boolean}
 #'
+#' @noRd
 .loadLinks <- function(links,
                        fid,
                        select,
@@ -396,6 +400,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 #' @param synthesis \code{boolean}
 #' @param simplify \code{boolean}
 #'
+#' @noRd
 .loadDistricts <- function(districts,
                            fid,
                            select,
@@ -463,6 +468,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 #' @param synthesis \code{boolean}
 #' @param simplify \code{boolean}
 #'
+#' @noRd
 .loadClusters <- function(clusters,
                           fid,
                           select,
@@ -526,6 +532,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 #' @param nameColumns {character} column names
 #' @param mcType {character}, must be mcInd, and mcAll
 #'
+#' @noRd
 .formatArray <- function(data, struct, nameColumns, mcType){
   dimData <- dim(data)
   data <- .arrayToDataTable(data)

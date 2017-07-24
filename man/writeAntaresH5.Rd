@@ -6,7 +6,9 @@
 \usage{
 writeAntaresH5(path, timeSteps = c("hourly", "daily", "weekly", "monthly",
   "annual"), opts = antaresRead::simOptions(), writeMcAll = TRUE,
-  compress = 0)
+  compress = 1, misc = FALSE, thermalAvailabilities = FALSE,
+  hydroStorage = FALSE, hydroStorageMaxPower = FALSE, reserve = FALSE,
+  linkCapacity = FALSE, mustRun = FALSE, thermalModulation = FALSE)
 }
 \arguments{
 \item{path}{\code{character} path of h5 file to write}

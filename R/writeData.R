@@ -70,11 +70,8 @@ writeDataType <- function(data,
     data[,area := NULL]
   }
 
-  print(data)
 
   Group <- paste0(rootGroup, "/", type)
-  print(rootGroup)
-  print(paste0("Mcall : ", mcAll))
   #Create group by type of data
   if(writeStructure & !mcAll){
     h5createGroup(path, Group)
