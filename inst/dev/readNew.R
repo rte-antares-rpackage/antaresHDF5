@@ -29,15 +29,30 @@ path <- "testNewFormat3.h5"
 V <- h5ReadAntares(path,
                    clusters ="all",
                    mcYears = 1:100)
-J <- 2014512
+
+Bli2 <- h5ReadAntares(path, areas = "all")
+h5ls("toto.h5")
+
+
+
+V <- h5ReadAntares("testNewFormat3.h5",
+                   clusters ="at", mcYears = 1, select = "production")
 
 
 
 
-Bli2 <- h5ReadAntares(path, areas = "all", links = "all", clusters = "all",
-              mcYears = 1:10)
 
-
+path <- "testNewFormat3.h5"
+areas = NULL
+links = NULL
+clusters = "at"
+districts = NULL
+mcYears = 1
+timeStep = "hourly"
+select = "production"
+showProgress = TRUE
+simplify = TRUE
+perf = TRUE
 
 
 

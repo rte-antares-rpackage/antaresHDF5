@@ -1,5 +1,17 @@
 #' Read data
 #'
+#' @param path {character} path of h5file to load
+#' @param areas see \code{\link{antaresRead::readAntares}}
+#' @param links see \code{\link{antaresRead::readAntares}}
+#' @param clusters see \code{\link{antaresRead::readAntares}}
+#' @param districts see \code{\link{antaresRead::readAntares}}
+#' @param mcYears see \code{\link{antaresRead::readAntares}}
+#' @param timeStep see \code{\link{antaresRead::readAntares}}
+#' @param select see \code{\link{antaresRead::readAntares}}
+#' @param showProgress see \code{\link{antaresRead::readAntares}}
+#' @param simplify see \code{\link{antaresRead::readAntares}}
+#' @param perf \code{boolean}, eval performance during developpement time, to remove
+#'
 #' @export
 h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
                           districts = NULL, mcYears = NULL,
@@ -45,8 +57,8 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
                       GP = GP,
                       mcType = mcType,
                       synthesis = synthesis,
-                      attrib = attrib,
-                      simplify = simplify)
+                      simplify = simplify,
+                      attrib = attrib)
   if(!is.null(areas)){
     listOut$areas <- areas
     rm(areas)
@@ -59,8 +71,8 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
                       GP = GP,
                       mcType = mcType,
                       synthesis = synthesis,
-                      attrib = attrib,
-                      simplify = simplify)
+                      simplify = simplify,
+                      attrib = attrib)
 
   if(!is.null(links)){
     listOut$links <- links
@@ -75,8 +87,8 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
                               GP = GP,
                               mcType = mcType,
                               synthesis = synthesis,
-                              attrib = attrib,
-                              simplify = simplify)
+                              simplify = simplify,
+                              attrib = attrib)
 
   if(!is.null(districts)){
     listOut$districts <- districts
@@ -91,8 +103,8 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
                             GP = GP,
                             mcType = mcType,
                             synthesis = synthesis,
-                            attrib = attrib,
-                            simplify = simplify)
+                            simplify = simplify,
+                            attrib = attrib)
 
   if(!is.null(clusters)){
     listOut$clusters <- clusters
@@ -133,10 +145,15 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
 
 
-#' Transform data
+#' Transform array to data.table
 #'
-.arrayToDataTable <- function(array, dim = 2)
+#' @param array \code{array}, array od data to transform
+#'
+#' @return data.table
+#'
+.arrayToDataTable <- function(array)
 {
+  dim <- 2
   ecraseDim <- dim(array)[dim]
   dimS <- 1:length(dim(array))
   dimNot <- dimS[-dim]
@@ -151,10 +168,15 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
   alloc.col(arrayL)
 }
 
-#' Load data
+#' Load antares simulation data
 #'
-.optimH5Read <- function(fid, index = NULL, DF){
-  did <- H5Dopen(fid,  DF)
+#' @param fid \code{H5IdComponent} id of h5 file open which \link{rhdf5::H5Fopen}
+#' @param index \code{list} index of data to load
+#' @param GP \code{character} name of group to load
+#'
+#'
+.optimH5Read <- function(fid, index = NULL, GP){
+  did <- H5Dopen(fid,  GP)
   if(is.null(index)){
     return(.Call("_H5Dread", did@ID, NULL, NULL,
                  NULL, FALSE, 0L , PACKAGE = "rhdf5"))
@@ -181,12 +203,22 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
 #' Give request stucture
 #'
+#' @param type \code{character} type of request, must be area, link, cluster or district
+#' @param selectedRow \code{character} selectoin on raw (country, link, cluster ....)
+#' @param selectedCol \code{character} columns to select
+#' @param fid \code{H5IdComponent} id of h5 file open which \link{rhdf5::H5Fopen}
+#' @param GP \code{character} name of data.frame to load
+#' @param mcType \code{character}, must be mcInd or mcAll
+#' @param mcYears \code{numeric or character} mcYears to laod
+#'
 .makeStructure <- function(type = "area", selectedRow,
                            selectedCol, fid, GP, mcType, mcYears){
   typeS <- paste0(type, "s")
 
   gid <- H5Gopen(fid,  paste0(GP, "/", typeS, "/", mcType, "/structure"))
+
   struct <- h5dump(gid)
+
   H5Gclose(gid)
   compname <- NULL
   if(type == "cluster"){
@@ -237,6 +269,15 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
 #' Load areas
 #'
+#' @param areas \code{character}, area(s) to load
+#' @param fid \code{H5IdComponent} id of h5 file open which \link{rhdf5::H5Fopen}
+#' @param select \code{character} columns to select
+#' @param mcYears \code{numeric or character} mcYears to laod
+#' @param GP \code{character} name of data.frame to load
+#' @param mcType \code{character}, must be mcInd or mcAll
+#' @param synthesis \code{boolean}
+#' @param simplify \code{boolean}
+#'
 .loadAreas <- function(areas,
                        fid,
                        select,
@@ -244,8 +285,8 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
                        GP,
                        mcType,
                        synthesis,
-                       attrib,
-                       simplify){
+                       simplify,
+                       attrib){
 
 
   if(!is.null(areas)){
@@ -261,11 +302,11 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
     if(all(unlist(lapply(struct$index, is.null)))){
       areas <-  .optimH5Read(fid = fid,
-                             DF = paste0(GP, "/areas/", mcType, "/data"))
+                             GP = paste0(GP, "/areas/", mcType, "/data"))
     }else{
       areas <- .optimH5Read(fid = fid,
                             index = struct$index,
-                            DF = paste0(GP, "/areas/", mcType, "/data"))
+                            GP = paste0(GP, "/areas/", mcType, "/data"))
 
     }
 
@@ -287,6 +328,15 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
 #' Load links
 #'
+#' @param links \code{character}, link(s) to load
+#' @param fid \code{H5IdComponent} id of h5 file open which \link{rhdf5::H5Fopen}
+#' @param select \code{character} columns to select
+#' @param mcYears \code{numeric or character} mcYears to laod
+#' @param GP \code{character} name of data.frame to load
+#' @param mcType \code{character}, must be mcInd or mcAll
+#' @param synthesis \code{boolean}
+#' @param simplify \code{boolean}
+#'
 .loadLinks <- function(links,
                        fid,
                        select,
@@ -294,8 +344,8 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
                        GP,
                        mcType,
                        synthesis,
-                       attrib,
-                       simplify){
+                       simplify,
+                       attrib){
   ##Load links
   if(!is.null(links)){
 
@@ -310,11 +360,11 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
     if(all(unlist(lapply(struct$index, is.null)))){
       links <-  .optimH5Read(fid = fid,
-                             DF = paste0(GP, "/links/", mcType, "/data"))
+                             GP = paste0(GP, "/links/", mcType, "/data"))
     }else{
       links <- .optimH5Read(fid = fid,
                             index = struct$index,
-                            DF = paste0(GP, "/links/", mcType, "/data"))
+                            GP = paste0(GP, "/links/", mcType, "/data"))
 
     }
 
@@ -337,6 +387,15 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
 #' Load districts
 #'
+#' @param districts \code{character}, district(s) to load
+#' @param fid \code{H5IdComponent} id of h5 file open which \link{rhdf5::H5Fopen}
+#' @param select \code{character} columns to select
+#' @param mcYears \code{numeric or character} mcYears to laod
+#' @param GP \code{character} name of data.frame to load
+#' @param mcType \code{character}, must be mcInd or mcAll
+#' @param synthesis \code{boolean}
+#' @param simplify \code{boolean}
+#'
 .loadDistricts <- function(districts,
                            fid,
                            select,
@@ -344,8 +403,8 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
                            GP,
                            mcType,
                            synthesis,
-                           attrib,
-                           simplify){
+                           simplify,
+                           attrib){
   if(!is.null(districts)){
 
     if(H5Lexists(fid, paste0(GP, "/districts/", mcType, "/structure")))
@@ -362,11 +421,11 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
     if(all(unlist(lapply(struct$index, is.null)))){
       districts <-  .optimH5Read(fid = fid,
-                                 DF = paste0(GP, "/districts/", mcType, "/data"))
+                                 GP = paste0(GP, "/districts/", mcType, "/data"))
     }else{
       districts <- .optimH5Read(fid = fid,
                                 index = struct$index,
-                                DF = paste0(GP, "/districts/", mcType, "/data"))
+                                GP = paste0(GP, "/districts/", mcType, "/data"))
 
     }
 
@@ -395,6 +454,15 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
 #' Load clusters
 #'
+#' @param clusters \code{character}, cluster(s) to load
+#' @param fid \code{H5IdComponent} id of h5 file open which \link{rhdf5::H5Fopen}
+#' @param select \code{character} columns to select
+#' @param mcYears \code{numeric or character} mcYears to laod
+#' @param GP \code{character} name of data.frame to load
+#' @param mcType \code{character}, must be mcInd or mcAll
+#' @param synthesis \code{boolean}
+#' @param simplify \code{boolean}
+#'
 .loadClusters <- function(clusters,
                           fid,
                           select,
@@ -402,8 +470,8 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
                           GP,
                           mcType,
                           synthesis,
-                          attrib,
-                          simplify){
+                          simplify,
+                          attrib){
   if(!is.null(clusters)){
 
     if(H5Lexists(fid, paste0(GP, "/clusters/", mcType, "/structure")))
@@ -420,11 +488,11 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
       if(all(unlist(lapply(struct$index, is.null)))){
         clusters <-  .optimH5Read(fid = fid,
-                                  DF = paste0(GP, "/clusters/", mcType, "/data"))
+                                  GP = paste0(GP, "/clusters/", mcType, "/data"))
       }else{
         clusters <- .optimH5Read(fid = fid,
                                  index = struct$index,
-                                 DF = paste0(GP, "/clusters/", mcType, "/data"))
+                                 GP = paste0(GP, "/clusters/", mcType, "/data"))
 
       }
 
@@ -451,7 +519,12 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
     }}else{NULL}
 }
 
-#' format array
+#' Add structure information to data
+#'
+#' @param data {data.table} data load
+#' @param struct {list}
+#' @param nameColumns {character} column names
+#' @param mcType {character}, must be mcInd, and mcAll
 #'
 .formatArray <- function(data, struct, nameColumns, mcType){
   dimData <- dim(data)
@@ -464,5 +537,5 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
   {
     data[, mcYear := rep(struct$mcyLoad, each = dimData[1] * dimData[3])]
   }
-
+  data
 }

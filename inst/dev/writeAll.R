@@ -19,6 +19,8 @@ writeAntaresH5(path, compress = 1)
 
 setSimulationPath("D:/Users/titorobe/Desktop/Antares/antaresHdf5/inst/testdata/test_case", 1)
 path <- "smallStud.h5"
+
+
 H5close()
 file.remove(path)
 h5createFile(path)
