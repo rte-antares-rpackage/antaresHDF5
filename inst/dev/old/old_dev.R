@@ -7,7 +7,7 @@
 #' @param writeStructure \code{boolean}, write group and subgroup (only for first MCyear)
 #' @param writeMCallName \code{character}, write mc-all names
 #'
-#' @export
+#'
 writeAntaresData <- function(data,
                              path,
                              rootGroup = NULL,

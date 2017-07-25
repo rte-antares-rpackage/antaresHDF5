@@ -11,23 +11,23 @@ h5ReadAntares(path, areas = NULL, links = NULL, clusters = NULL,
 \arguments{
 \item{path}{{character} path of h5file to load}
 
-\item{areas}{see \code{\link{antaresRead::readAntares}}}
+\item{areas}{see \link{antaresRead::readAntares}}
 
-\item{links}{see \code{\link{antaresRead::readAntares}}}
+\item{links}{see \link{antaresRead::readAntares}}
 
-\item{clusters}{see \code{\link{antaresRead::readAntares}}}
+\item{clusters}{see \link{antaresRead::readAntares}}
 
-\item{districts}{see \code{\link{antaresRead::readAntares}}}
+\item{districts}{see \link{antaresRead::readAntares}}
 
-\item{mcYears}{see \code{\link{antaresRead::readAntares}}}
+\item{mcYears}{see \link{antaresRead::readAntares}}
 
-\item{timeStep}{see \code{\link{antaresRead::readAntares}}}
+\item{timeStep}{see \link{antaresRead::readAntares}}
 
-\item{select}{see \code{\link{antaresRead::readAntares}}}
+\item{select}{see \link{antaresRead::readAntares}}
 
-\item{showProgress}{see \code{\link{antaresRead::readAntares}}}
+\item{showProgress}{see \link{antaresRead::readAntares}}
 
-\item{simplify}{see \code{\link{antaresRead::readAntares}}}
+\item{simplify}{see \link{antaresRead::readAntares}}
 
 \item{perf}{\code{boolean}, eval performance during developpement time, to remove}
 }

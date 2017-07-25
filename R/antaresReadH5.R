@@ -1,15 +1,15 @@
 #' Read data
 #'
 #' @param path {character} path of h5file to load
-#' @param areas see \code{\link{antaresRead::readAntares}}
-#' @param links see \code{\link{antaresRead::readAntares}}
-#' @param clusters see \code{\link{antaresRead::readAntares}}
-#' @param districts see \code{\link{antaresRead::readAntares}}
-#' @param mcYears see \code{\link{antaresRead::readAntares}}
-#' @param timeStep see \code{\link{antaresRead::readAntares}}
-#' @param select see \code{\link{antaresRead::readAntares}}
-#' @param showProgress see \code{\link{antaresRead::readAntares}}
-#' @param simplify see \code{\link{antaresRead::readAntares}}
+#' @param areas see \link{antaresRead::readAntares}
+#' @param links see \link{antaresRead::readAntares}
+#' @param clusters see \link{antaresRead::readAntares}
+#' @param districts see \link{antaresRead::readAntares}
+#' @param mcYears see \link{antaresRead::readAntares}
+#' @param timeStep see \link{antaresRead::readAntares}
+#' @param select see \link{antaresRead::readAntares}
+#' @param showProgress see \link{antaresRead::readAntares}
+#' @param simplify see \link{antaresRead::readAntares}
 #' @param perf \code{boolean}, eval performance during developpement time, to remove
 #'
 #' @export
@@ -184,7 +184,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
   }else{
 
     h5spaceFile <- H5Dget_space(did)
-    maxSize <- .Call("_H5Sget_simple_extent_dims", h5spaceFile@ID, PACKAGE = "rhdf5")$maxsize
+    maxSize <- .Call("_H5Sget_simple_extent_dims", h5spaceFile@ID, PACKAGE = "rhdf5")$size
     len <- length(maxSize)
     K <-  sapply(len:1, function(X){
       if(is.null(index[[len-X + 1]])){

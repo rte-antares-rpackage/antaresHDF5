@@ -3,7 +3,7 @@
 #' @param data \code{antaresDataList} see \link{readAntares}
 #' @param timeStep \code{character} timeStep
 #'
-#' @export
+#'
 getTime <- function(data, timeStep){
   time <- unique(data[[1]]$time)
   current_locale <- Sys.getlocale(category = "LC_TIME")
@@ -27,7 +27,7 @@ getTime <- function(data, timeStep){
 #' @param path \code{character} path of h5 file
 #' @param group \code{group} group where time are stocked
 #'
-#' @export
+#'
 getAllDateInfoFromDate <- function(fid, group){
   # affectation des classes
 
@@ -59,6 +59,8 @@ getAllDateInfoFromDate <- function(fid, group){
   uniqueDate <- unique(datetime_data[,.SD, .SDcols = "idate"])
   uniqueTime <-  unique(datetime_data[,.SD, .SDcols = "itime"])
 
+
+  # Calcul day & mounth
   uniqueDate[,c("day", "month") := list(
     mday(idate),
     as.factor(toupper(format(idate, format = "%b"))))]
@@ -76,30 +78,33 @@ getAllDateInfoFromDate <- function(fid, group){
   if(group == "daily"){
     datetime_data$time <- as.Date(datetime_data$time)
   }
-  mthList <- c("APR",
-               "AUG",
-               "DEC",
-               "FEB",
-               "JAN",
-               "JUL",
-               "JUN",
-               "MAR",
-               "MAY",
-               "NOV",
-               "OCT",
-               "SEP")
 
-  toAdd <- mthList[!mthList %in% levels(uniqueDate$month)]
-  if(length(toAdd)>0)
-  {
-    levels(uniqueDate$month) <- c(levels(uniqueDate$month), toAdd)
-  }
+  # mthList <- c("APR",
+  #              "AUG",
+  #              "DEC",
+  #              "FEB",
+  #              "JAN",
+  #              "JUL",
+  #              "JUN",
+  #              "MAR",
+  #              "MAY",
+  #              "NOV",
+  #              "OCT",
+  #              "SEP")
+  #
+  # toAdd <- mthList[!mthList %in% levels(uniqueDate$month)]
+  # if(length(toAdd)>0)
+  # {
+  #   levels(uniqueDate$month) <- c(levels(uniqueDate$month), toAdd)
+  # }
 
   if(group == "hourly")
   {
     uniqueTime[, c("hour") := as.factor(substring(as.character(itime), 1, 5))]
 
   }
+
+  #Merge
   datetime_data <- merge(datetime_data, uniqueDate)
   datetime_data <- merge(datetime_data, uniqueTime, by = "itime")
   datetime_data[, idate := NULL]
@@ -115,7 +120,7 @@ getAllDateInfoFromDate <- function(fid, group){
 #' @param path \code{character} path of h5 file
 #' @param group \code{group} group where time are stocked
 #'
-#' @export
+#'
 writeTime <- function(data, path, group){
   time <- getTime(data, group)
   group <- paste0(group, "/time")

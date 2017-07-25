@@ -6,7 +6,7 @@
 #' @param writeStructure \code{boolean}, write group and subgroup (only for first MCyear)
 #' @param writeMCallName \code{character}, write mcAll
 #'
-#' @export
+#'
 writeAntaresData <- function(data,
                                 path,
                                 rootGroup = NULL,
@@ -48,7 +48,7 @@ writeAntaresData <- function(data,
 #' @param writeStructure \code{boolean}, write group and subgroup (only for first MCyear)
 #' @param writeMCallName \code{character}, write mcAll
 #'
-#' @export
+#'
 writeDataType <- function(data,
                       path,
                       type,
