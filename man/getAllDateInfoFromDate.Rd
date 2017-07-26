@@ -7,7 +7,7 @@
 getAllDateInfoFromDate(fid, group)
 }
 \arguments{
-\item{fid}{\code{H5IdComponent} id of h5 file open which \link{rhdf5::H5Fopen}}
+\item{fid}{\code{H5IdComponent} id of h5 file open which \link[rhdf5]{H5Fopen}}
 
 \item{group}{\code{group} group where time are stocked}
 }

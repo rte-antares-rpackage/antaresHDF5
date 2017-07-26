@@ -18,7 +18,9 @@ writeDataType(data, path, type, rootGroup = NULL, writeStructure = TRUE,
 
 \item{writeStructure}{\code{boolean}, write group and subgroup (only for first MCyear)}
 
-\item{writeMCallName}{\code{character}, write mcAll}
+\item{mcAll}{\code{character}, write mcAll}
+
+\item{compress}{\code{boolean}, compress level}
 }
 \description{
 Write data by type

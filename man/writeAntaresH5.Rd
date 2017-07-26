@@ -18,6 +18,24 @@ writeAntaresH5(path, timeSteps = c("hourly", "daily", "weekly", "monthly",
 \item{opts}{\code{list} of simulation parameters returned by the function \link{setSimulationPath}. Defaut to \code{antaresRead::simOptions()}}
 
 \item{writeMcAll}{\code{boolean} write mc-all}
+
+\item{compress}{\code{numeric} compress level}
+
+\item{misc}{\code{boolean} see \link[antaresRead]{readAntares}}
+
+\item{thermalAvailabilities}{\code{boolean} see \link[antaresRead]{readAntares}}
+
+\item{hydroStorage}{\code{boolean} see \link[antaresRead]{readAntares}}
+
+\item{hydroStorageMaxPower}{\code{boolean} see \link[antaresRead]{readAntares}}
+
+\item{reserve}{\code{boolean} see \link[antaresRead]{readAntares}}
+
+\item{linkCapacity}{\code{boolean} see \link[antaresRead]{readAntares}}
+
+\item{mustRun}{\code{boolean} see \link[antaresRead]{readAntares}}
+
+\item{thermalModulation}{\code{boolean} see \link[antaresRead]{readAntares}}
 }
 \description{
 Convert antares output to h5 file
