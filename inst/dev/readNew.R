@@ -4,6 +4,7 @@ library(h5)
 library(antaresHdf5)
 library(antaresRead)
 
+
 path <- "testNewFormat3.h5"
 
 
@@ -13,7 +14,24 @@ setSimulationPath("E:/DES/antaresFlowbased/TestrunSimulationFb/antaresStudy")
 #setSimulationPath("C:/Users/titorobe/Desktop/test_case")
 
 
-system.time(W <- readAntares(areas = "fr", mcYears = 1:1000))
+W <- readAntares(areas = "fr", mcYears = 1)
+V <- h5ReadAntares(path, areas = "fr", mcYears = 1)
+
+all(sapply(names(W), function(X){
+  if(identical(V[[X]], W[[X]])){
+    TRUE
+  }else{
+    identical(V[[X]], as.numeric(W[[X]]))
+  }
+}))
+
+
+V$timeId[1:5]
+W$timeId[1:5]
+V$time- W$time
+
+
+
 
 system.time(W <- readAntares(areas = "fr", mcYears = 1, select = "mustRun"))
 

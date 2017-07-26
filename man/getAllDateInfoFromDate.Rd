@@ -7,9 +7,9 @@
 getAllDateInfoFromDate(fid, group)
 }
 \arguments{
-\item{group}{\code{group} group where time are stocked}
+\item{fid}{\code{H5IdComponent} id of h5 file open which \link{rhdf5::H5Fopen}}
 
-\item{path}{\code{character} path of h5 file}
+\item{group}{\code{group} group where time are stocked}
 }
 \description{
 Read time and generate column who can be calculate from time

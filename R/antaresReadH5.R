@@ -294,39 +294,46 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
   if(!is.null(areas)){
 
-    struct  <- .makeStructure(type = "area",
-                              selectedRow = areas,
-                              selectedCol = select,
-                              fid = fid,
-                              GP = GP,
-                              mcType = mcType,
-                              mcYears = mcYears)
+    if(H5Lexists(fid, paste0(GP, "/areas/", mcType, "/structure")))
+    {
+
+      struct  <- .makeStructure(type = "area",
+                                selectedRow = areas,
+                                selectedCol = select,
+                                fid = fid,
+                                GP = GP,
+                                mcType = mcType,
+                                mcYears = mcYears)
 
 
-    if(all(unlist(lapply(struct$index, is.null)))){
-      areas <-  .optimH5Read(fid = fid,
-                             GP = paste0(GP, "/areas/", mcType, "/data"))
+      if(all(unlist(lapply(struct$index, is.null)))){
+        areas <-  .optimH5Read(fid = fid,
+                               GP = paste0(GP, "/areas/", mcType, "/data"))
+      }else{
+        areas <- .optimH5Read(fid = fid,
+                              index = struct$index,
+                              GP = paste0(GP, "/areas/", mcType, "/data"))
+
+      }
+
+
+      #Format array
+      areas <- .formatArray(data = areas, struct = struct, nameColumns = "area", mcType = mcType)
+
+      #Add time
+      tim <- getAllDateInfoFromDate(fid, GP)
+      areas[,c(names(tim)):=tim]
+
+      antaresRead:::.addClassAndAttributes(areas,
+                                           synthesis,
+                                           attrib$timeStep,
+                                           attrib$opts,
+                                           simplify = simplify, type = "areas")
+      areas
     }else{
-      areas <- .optimH5Read(fid = fid,
-                            index = struct$index,
-                            GP = paste0(GP, "/areas/", mcType, "/data"))
-
+      message("No data corresponding to your areas query.")
+      return(NULL)
     }
-
-
-    #Format array
-    areas <- .formatArray(data = areas, struct = struct, nameColumns = "area", mcType = mcType)
-
-    #Add time
-    tim <- getAllDateInfoFromDate(fid, GP)
-    areas[,c(names(tim)):=tim]
-
-    antaresRead:::.addClassAndAttributes(areas,
-                                         synthesis,
-                                         attrib$timeStep,
-                                         attrib$opts,
-                                         simplify = simplify, type = "areas")
-    areas
   }else{NULL}}
 
 #' Load links
@@ -353,39 +360,48 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
   ##Load links
   if(!is.null(links)){
 
-    struct  <- .makeStructure(type = "link",
-                              selectedRow = links,
-                              selectedCol = select,
-                              fid = fid,
-                              GP = GP,
-                              mcType = mcType,
-                              mcYears = mcYears)
+    if(H5Lexists(fid, paste0(GP, "/links/", mcType, "/structure")))
+    {
 
 
-    if(all(unlist(lapply(struct$index, is.null)))){
-      links <-  .optimH5Read(fid = fid,
-                             GP = paste0(GP, "/links/", mcType, "/data"))
+      struct  <- .makeStructure(type = "link",
+                                selectedRow = links,
+                                selectedCol = select,
+                                fid = fid,
+                                GP = GP,
+                                mcType = mcType,
+                                mcYears = mcYears)
+
+
+      if(all(unlist(lapply(struct$index, is.null)))){
+        links <-  .optimH5Read(fid = fid,
+                               GP = paste0(GP, "/links/", mcType, "/data"))
+      }else{
+        links <- .optimH5Read(fid = fid,
+                              index = struct$index,
+                              GP = paste0(GP, "/links/", mcType, "/data"))
+
+      }
+
+      #Format array
+      links <- .formatArray(data = links, struct = struct, nameColumns = "link", mcType = mcType)
+
+      #Add time
+      tim <- getAllDateInfoFromDate(fid, GP)
+      links[,c(names(tim)):=tim]
+
+      antaresRead:::.addClassAndAttributes(links,
+                                           synthesis,
+                                           attrib$timeStep,
+                                           attrib$opts,
+                                           simplify = simplify, type = "links")
+      links
     }else{
-      links <- .optimH5Read(fid = fid,
-                            index = struct$index,
-                            GP = paste0(GP, "/links/", mcType, "/data"))
-
+      message("No data corresponding to your links query.")
+      return(NULL)
     }
-
-    #Format array
-    links <- .formatArray(data = links, struct = struct, nameColumns = "link", mcType = mcType)
-
-    #Add time
-    tim <- getAllDateInfoFromDate(fid, GP)
-    links[,c(names(tim)):=tim]
-
-    antaresRead:::.addClassAndAttributes(links,
-                                         synthesis,
-                                         attrib$timeStep,
-                                         attrib$opts,
-                                         simplify = simplify, type = "links")
-    links
-  }}
+  }else{NULL}
+}
 
 
 
@@ -415,43 +431,43 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
     if(H5Lexists(fid, paste0(GP, "/districts/", mcType, "/structure")))
     {
 
-    struct  <- .makeStructure(type = "district",
-                              selectedRow = districts,
-                              selectedCol = select,
-                              fid = fid,
-                              GP = GP,
-                              mcType = mcType,
-                              mcYears = mcYears)
+      struct  <- .makeStructure(type = "district",
+                                selectedRow = districts,
+                                selectedCol = select,
+                                fid = fid,
+                                GP = GP,
+                                mcType = mcType,
+                                mcYears = mcYears)
 
 
-    if(all(unlist(lapply(struct$index, is.null)))){
-      districts <-  .optimH5Read(fid = fid,
-                                 GP = paste0(GP, "/districts/", mcType, "/data"))
+      if(all(unlist(lapply(struct$index, is.null)))){
+        districts <-  .optimH5Read(fid = fid,
+                                   GP = paste0(GP, "/districts/", mcType, "/data"))
+      }else{
+        districts <- .optimH5Read(fid = fid,
+                                  index = struct$index,
+                                  GP = paste0(GP, "/districts/", mcType, "/data"))
+
+      }
+
+
+      districts <- .formatArray(data = districts, struct = struct, nameColumns = "district", mcType = mcType)
+
+      tim <- getAllDateInfoFromDate(fid, GP)
+
+      #Add time
+      districts[,c(names(tim)):=tim]
+
+      antaresRead:::.addClassAndAttributes(districts,
+                                           synthesis,
+                                           attrib$timeStep,
+                                           attrib$opts,
+                                           simplify = simplify, type = "districts")
+      districts
     }else{
-      districts <- .optimH5Read(fid = fid,
-                                index = struct$index,
-                                GP = paste0(GP, "/districts/", mcType, "/data"))
-
-    }
-
-
-    districts <- .formatArray(data = districts, struct = struct, nameColumns = "district", mcType = mcType)
-
-    tim <- getAllDateInfoFromDate(fid, GP)
-
-    #Add time
-    districts[,c(names(tim)):=tim]
-
-    antaresRead:::.addClassAndAttributes(districts,
-                                         synthesis,
-                                         attrib$timeStep,
-                                         attrib$opts,
-                                         simplify = simplify, type = "districts")
-    districts
-  }else{
-    message("No data corresponding to your districts query.")
-    return(NULL)
-  }}else{NULL}
+      message("No data corresponding to your districts query.")
+      return(NULL)
+    }}else{NULL}
 }
 
 

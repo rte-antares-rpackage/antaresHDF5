@@ -24,7 +24,7 @@ getTime <- function(data, timeStep){
 
 #' Read time and generate column who can be calculate from time
 #'
-#' @param path \code{character} path of h5 file
+#' @param fid \code{H5IdComponent} id of h5 file open which \link{rhdf5::H5Fopen}
 #' @param group \code{group} group where time are stocked
 #'
 #'
@@ -109,6 +109,7 @@ getAllDateInfoFromDate <- function(fid, group){
   datetime_data <- merge(datetime_data, uniqueTime, by = "itime")
   datetime_data[, idate := NULL]
   datetime_data[, itime := NULL]
+  setkey(datetime_data, "time")
   Sys.setlocale("LC_TIME", current_locale)
   datetime_data
 }
