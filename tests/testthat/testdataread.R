@@ -157,8 +157,12 @@ setorderv(DF2, c("mcYear","link", "time"))
 allComp <- unlist(compareValue(DF1, DF2))
 testthat::expect_true(all(allComp))
 
-
-
 H5close()
 unlink(path, force = TRUE)
 unlink("testdata", recursive = TRUE)
+
+h5createFile("testnodata.h5")
+h5createGroup("testnodata.h5", "hourly")
+DF1 <-  h5ReadAntares("testnodata.h5", areas = "all", links = "all", clusters = "all", districts = "all")
+H5close()
+unlink("testnodata.h5")

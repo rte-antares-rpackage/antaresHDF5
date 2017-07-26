@@ -28,24 +28,32 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
   ##Open connection to h5 file
   fid <- H5Fopen(path)
 
+
   #Load attibutes
-  did <- H5Dopen(fid, paste0(timeStep, "/attrib"))
-  attrib <- unserialize(charToRaw(H5Dread(did)))
-  H5Dclose(did)
 
-  if(!is.null(attrib$opts$linksDef)){
-    attrib$opts$linksDef <- data.table(attrib$opts$linksDef)
-  }
-  if(!is.null(attrib$opts$districtsDef)){
-    attrib$opts$districtsDef <- data.table(attrib$opts$districtsDef)
-  }
+  if(H5Lexists(fid, paste0(timeStep, "/attrib")))
+  {
 
+    did <- H5Dopen(fid, paste0(timeStep, "/attrib"))
+    attrib <- unserialize(charToRaw(H5Dread(did)))
+    H5Dclose(did)
+
+    if(!is.null(attrib$opts$linksDef)){
+      attrib$opts$linksDef <- data.table(attrib$opts$linksDef)
+    }
+    if(!is.null(attrib$opts$districtsDef)){
+      attrib$opts$districtsDef <- data.table(attrib$opts$districtsDef)
+    }
+  }else{
+    attrib <- NULL
+  }
   if(is.null(mcYears)){
     mcType <- "mcAll"
     mcYears <- "mcAll"
   }else{
     mcType <- "mcInd"
   }
+
 
 
   ##Load areas
@@ -127,7 +135,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
     listOut[[1]]
   }else{
     listOut <- .addClassAndAttributes(listOut, synthesis, timeStep,
-                                                    attrib$opts, simplify)
+                                      attrib$opts, simplify)
     if(perf){
       TotalTime <-Sys.time() - Beg
       cat(paste0("Time for loading : ", round(TotalTime, 3), "\n"))
@@ -325,10 +333,10 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
       areas[,c(names(tim)):=tim]
 
       .addClassAndAttributes(areas,
-                                           synthesis,
-                                           attrib$timeStep,
-                                           attrib$opts,
-                                           simplify = simplify, type = "areas")
+                             synthesis,
+                             attrib$timeStep,
+                             attrib$opts,
+                             simplify = simplify, type = "areas")
       areas
     }else{
       message("No data corresponding to your areas query.")
@@ -391,10 +399,10 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
       links[,c(names(tim)):=tim]
 
       .addClassAndAttributes(links,
-                                           synthesis,
-                                           attrib$timeStep,
-                                           attrib$opts,
-                                           simplify = simplify, type = "links")
+                             synthesis,
+                             attrib$timeStep,
+                             attrib$opts,
+                             simplify = simplify, type = "links")
       links
     }else{
       message("No data corresponding to your links query.")
@@ -459,10 +467,10 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
       districts[,c(names(tim)):=tim]
 
       .addClassAndAttributes(districts,
-                                           synthesis,
-                                           attrib$timeStep,
-                                           attrib$opts,
-                                           simplify = simplify, type = "districts")
+                             synthesis,
+                             attrib$timeStep,
+                             attrib$opts,
+                             simplify = simplify, type = "districts")
       districts
     }else{
       message("No data corresponding to your districts query.")
@@ -530,10 +538,10 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
       clusters[,c(names(tim)):=tim]
 
       .addClassAndAttributes(clusters,
-                                           synthesis,
-                                           attrib$timeStep,
-                                           attrib$opts,
-                                           simplify = simplify, type = "clusters")
+                             synthesis,
+                             attrib$timeStep,
+                             attrib$opts,
+                             simplify = simplify, type = "clusters")
       clusters
     }else{
       message("No data corresponding to your clusters query.")
