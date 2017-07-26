@@ -19,7 +19,7 @@ library(plyr)
   dfLoc <- .Call("_H5Dopen", h5loc, GP, NULL, PACKAGE = "rhdf5")
   h5group = new("H5IdComponent", ID = dfLoc)
   out <- .Call("_H5Dread", h5group@ID, NULL, NULL, NULL,
-               TRUE, TRUE, PACKAGE = "rhdf5")
+               TRUE, TRUE, FALSE, PACKAGE = "rhdf5")
 
   out <- as.data.table.matrix.fast(out)
   out[,Mer := VV]
@@ -79,7 +79,7 @@ h5loc <- .Call("_H5Fopen", "testOneGroupe.h5", flags, PACKAGE = "rhdf5")
 dfLoc <- .Call("_H5Dopen", h5loc, "To", NULL, PACKAGE = "rhdf5")
 h5group = new("H5IdComponent", ID = dfLoc)
 monoGroupcompress <- system.time(outcp <- data.table(.Call("_H5Dread", h5group@ID, NULL, NULL, NULL,
-                                                           TRUE, TRUE, PACKAGE = "rhdf5")))
+                                                           TRUE, TRUE, FALSE, PACKAGE = "rhdf5")))
 
 flags = h5default("H5F_ACC_RD")
 flags = rhdf5:::h5checkConstants("H5F_ACC_RD", flags)
@@ -87,7 +87,7 @@ h5loc <- .Call("_H5Fopen", "testOneGroupe2.h5", flags, PACKAGE = "rhdf5")
 dfLoc <- .Call("_H5Dopen", h5loc, "To", NULL, PACKAGE = "rhdf5")
 h5group = new("H5IdComponent", ID = dfLoc)
 monoGroupNocompress <- system.time(out2 <- data.table(.Call("_H5Dread", h5group@ID, NULL, NULL, NULL,
-                                                            TRUE, TRUE, PACKAGE = "rhdf5")))
+                                                            TRUE, TRUE, FALSE, PACKAGE = "rhdf5")))
 
 system.time(test2 <- h5read("testOneGroupe2.h5", "To"))
 
@@ -194,7 +194,7 @@ system.time(for(i in unique(areasData$Mer)){
   dfLoc <- .Call("_H5Dopen", h5loc,  paste0("tt",i), NULL, PACKAGE = "rhdf5")
   h5group = new("H5IdComponent", ID = dfLoc)
   Vic[[i]] <- .Call("_H5Dread", h5group@ID, NULL, NULL, NULL,
-                    TRUE, TRUE, PACKAGE = "rhdf5")
+                    TRUE, TRUE, FALSE, PACKAGE = "rhdf5")
 })
 summaryRprof(tmp)
 

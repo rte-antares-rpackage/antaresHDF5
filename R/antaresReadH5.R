@@ -180,7 +180,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
   did <- H5Dopen(fid,  GP)
   if(is.null(index)){
     return(.Call("_H5Dread", did@ID, NULL, NULL,
-                 NULL, FALSE, 0L , PACKAGE = "rhdf5"))
+                 NULL, FALSE, 0L, FALSE , PACKAGE = "rhdf5"))
   }else{
 
     h5spaceFile <- H5Dget_space(did)
@@ -197,7 +197,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
     W <- H5Screate_simple(H5Sselect_index(h5spaceFile, K))@ID
 
     .Call("_H5Dread", did@ID, h5spaceFile@ID, W,
-          NULL, FALSE, 0L , PACKAGE = "rhdf5")
+          NULL, FALSE, 0L , FALSE, PACKAGE = "rhdf5")
   }
 
 }
