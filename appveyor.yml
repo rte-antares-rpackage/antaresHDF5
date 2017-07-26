@@ -14,9 +14,9 @@ cache:
   - C:\RLibrary
 
 # Adapt as necessary starting from here
-r: bioc-devel
-
 build_script:
+  - travis-tool.sh install_bioc zlibbioc
+  - travis-tool.sh install_bioc rhdf5
   - travis-tool.sh install_deps
 
 test_script:
