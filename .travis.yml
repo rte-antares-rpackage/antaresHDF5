@@ -5,12 +5,13 @@ language: R
 sudo: false
 cache: packages
 
+
+install:
+  - ./travis-tool.sh install_bioc zlibbioc
+  - ./travis-tool.sh install_bioc rhdf5
+
 r_packages:
   - covr
 
 after_success:
   - Rscript -e 'library(covr); codecov()'
-
-install:
-  - ./travis-tool.sh install_r zlibbioc
-  - ./travis-tool.sh install_r rhdf5
