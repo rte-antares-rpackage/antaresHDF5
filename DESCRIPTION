@@ -1,12 +1,14 @@
 Package: antaresHdf5
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Use h5 files for antares
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Authors@R: c(
+    person("Titouan", "ROBERT", , "titouan.robert@rte-france.com", role = c("aut", "cre")),
+    person("RTE", role = "cph")
+    )
+Maintainer: Jalal-edine ZAWAM <Jalal-edine.zawam@rte-france.com>
+Description: Use h5 files for antares
+License: GPL (>= 2) | file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
@@ -15,5 +17,6 @@ Imports:
   rhdf5 (>= 2.20.0),
   pipeR,
   stringr,
-  testthat
+  testthat,
+  pipeR
 RoxygenNote: 6.0.1
