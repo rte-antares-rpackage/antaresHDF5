@@ -1,0 +1,1 @@
+.addClassAndAttributes <- antaresRead:::.addClassAndAttributes

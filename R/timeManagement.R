@@ -24,7 +24,7 @@ getTime <- function(data, timeStep){
 
 #' Read time and generate column who can be calculate from time
 #'
-#' @param fid \code{H5IdComponent} id of h5 file open which \link{rhdf5::H5Fopen}
+#' @param fid \code{H5IdComponent} id of h5 file open which \link[rhdf5]{H5Fopen}
 #' @param group \code{group} group where time are stocked
 #'
 #'

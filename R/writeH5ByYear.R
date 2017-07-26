@@ -4,6 +4,16 @@
 #' @param timeSteps \code{character} timeSteps
 #' @param opts \code{list} of simulation parameters returned by the function \link{setSimulationPath}. Defaut to \code{antaresRead::simOptions()}
 #' @param writeMcAll \code{boolean} write mc-all
+#' @param compress \code{numeric} compress level
+#' @param misc \code{boolean} see \link[antaresRead]{readAntares}
+#' @param thermalAvailabilities \code{boolean} see \link[antaresRead]{readAntares}
+#' @param hydroStorage \code{boolean} see \link[antaresRead]{readAntares}
+#' @param hydroStorageMaxPower \code{boolean} see \link[antaresRead]{readAntares}
+#' @param reserve \code{boolean} see \link[antaresRead]{readAntares}
+#' @param linkCapacity \code{boolean} see \link[antaresRead]{readAntares}
+#' @param mustRun \code{boolean} see \link[antaresRead]{readAntares}
+#' @param thermalModulation \code{boolean} see \link[antaresRead]{readAntares}
+#'
 #'
 #' @export
 writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "monthly", "annual"),

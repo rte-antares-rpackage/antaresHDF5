@@ -1,15 +1,15 @@
 #' Read data
 #'
 #' @param path {character} path of h5file to load
-#' @param areas see \link{antaresRead::readAntares}
-#' @param links see \link{antaresRead::readAntares}
-#' @param clusters see \link{antaresRead::readAntares}
-#' @param districts see \link{antaresRead::readAntares}
-#' @param mcYears see \link{antaresRead::readAntares}
-#' @param timeStep see \link{antaresRead::readAntares}
-#' @param select see \link{antaresRead::readAntares}
-#' @param showProgress see \link{antaresRead::readAntares}
-#' @param simplify see \link{antaresRead::readAntares}
+#' @param areas see \link[antaresRead]{readAntares}
+#' @param links see \link[antaresRead]{readAntares}
+#' @param clusters see \link[antaresRead]{readAntares}
+#' @param districts see \link[antaresRead]{readAntares}
+#' @param mcYears see \link[antaresRead]{readAntares}
+#' @param timeStep see \link[antaresRead]{readAntares}
+#' @param select see \link[antaresRead]{readAntares}
+#' @param showProgress see \link[antaresRead]{readAntares}
+#' @param simplify see \link[antaresRead]{readAntares}
 #' @param perf \code{boolean}, eval performance during developpement time, to remove
 #'
 #' @export
@@ -126,7 +126,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
     listOut[[1]]
   }else{
-    listOut <- antaresRead:::.addClassAndAttributes(listOut, synthesis, timeStep,
+    listOut <- .addClassAndAttributes(listOut, synthesis, timeStep,
                                                     attrib$opts, simplify)
     if(perf){
       TotalTime <-Sys.time() - Beg
@@ -207,7 +207,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 #' @param type \code{character} type of request, must be area, link, cluster or district
 #' @param selectedRow \code{character} selectoin on raw (country, link, cluster ....)
 #' @param selectedCol \code{character} columns to select
-#' @param fid \code{H5IdComponent} id of h5 file open which \link{rhdf5::H5Fopen}
+#' @param fid \code{H5IdComponent} id of h5 file open which \link[rhdf5]{H5Fopen}
 #' @param GP \code{character} name of data.frame to load
 #' @param mcType \code{character}, must be mcInd or mcAll
 #' @param mcYears \code{numeric or character} mcYears to laod
@@ -272,7 +272,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 #' Load areas
 #'
 #' @param areas \code{character}, area(s) to load
-#' @param fid \code{H5IdComponent} id of h5 file open which \link{rhdf5::H5Fopen}
+#' @param fid \code{H5IdComponent} id of h5 file open which \link[rhdf5]{H5Fopen}
 #' @param select \code{character} columns to select
 #' @param mcYears \code{numeric or character} mcYears to laod
 #' @param GP \code{character} name of data.frame to load
@@ -324,7 +324,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
       tim <- getAllDateInfoFromDate(fid, GP)
       areas[,c(names(tim)):=tim]
 
-      antaresRead:::.addClassAndAttributes(areas,
+      .addClassAndAttributes(areas,
                                            synthesis,
                                            attrib$timeStep,
                                            attrib$opts,
@@ -339,7 +339,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 #' Load links
 #'
 #' @param links \code{character}, link(s) to load
-#' @param fid \code{H5IdComponent} id of h5 file open which \link{rhdf5::H5Fopen}
+#' @param fid \code{H5IdComponent} id of h5 file open which \link[rhdf5]{H5Fopen}
 #' @param select \code{character} columns to select
 #' @param mcYears \code{numeric or character} mcYears to laod
 #' @param GP \code{character} name of data.frame to load
@@ -390,7 +390,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
       tim <- getAllDateInfoFromDate(fid, GP)
       links[,c(names(tim)):=tim]
 
-      antaresRead:::.addClassAndAttributes(links,
+      .addClassAndAttributes(links,
                                            synthesis,
                                            attrib$timeStep,
                                            attrib$opts,
@@ -408,7 +408,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 #' Load districts
 #'
 #' @param districts \code{character}, district(s) to load
-#' @param fid \code{H5IdComponent} id of h5 file open which \link{rhdf5::H5Fopen}
+#' @param fid \code{H5IdComponent} id of h5 file open which \link[rhdf5]{H5Fopen}
 #' @param select \code{character} columns to select
 #' @param mcYears \code{numeric or character} mcYears to laod
 #' @param GP \code{character} name of data.frame to load
@@ -458,7 +458,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
       #Add time
       districts[,c(names(tim)):=tim]
 
-      antaresRead:::.addClassAndAttributes(districts,
+      .addClassAndAttributes(districts,
                                            synthesis,
                                            attrib$timeStep,
                                            attrib$opts,
@@ -529,7 +529,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
       #Add time
       clusters[,c(names(tim)):=tim]
 
-      antaresRead:::.addClassAndAttributes(clusters,
+      .addClassAndAttributes(clusters,
                                            synthesis,
                                            attrib$timeStep,
                                            attrib$opts,

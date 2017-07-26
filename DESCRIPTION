@@ -3,11 +3,11 @@ Type: Package
 Title: Use h5 files for antares
 Version: 0.1.0
 Authors@R: c(
-    person("Titouan", "ROBERT", , "titouan.robert@rte-france.com", role = c("aut", "cre")),
+    person("Titouan", "ROBERT", ,"titouan.robert@rte-france.com", role = c("aut", "cre")),
     person("RTE", role = "cph")
     )
 Maintainer: Jalal-edine ZAWAM <Jalal-edine.zawam@rte-france.com>
-Description: Use h5 files for antares
+Description: Use h5 files for antares.
 License: GPL (>= 2) | file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -17,6 +17,5 @@ Imports:
   rhdf5 (>= 2.20.0),
   pipeR,
   stringr,
-  testthat,
-  pipeR
+  testthat
 RoxygenNote: 6.0.1

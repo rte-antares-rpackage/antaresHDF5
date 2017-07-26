@@ -47,7 +47,8 @@ writeAntaresData <- function(data,
 #' @param type \code{character} type of data to write, must be areas, links, districts or clusters
 #' @param rootGroup \code{character} group will contain all h5 organization
 #' @param writeStructure \code{boolean}, write group and subgroup (only for first MCyear)
-#' @param writeMCallName \code{character}, write mcAll
+#' @param mcAll \code{character}, write mcAll
+#' @param compress \code{boolean}, compress level
 #'
 #'
 writeDataType <- function(data,
