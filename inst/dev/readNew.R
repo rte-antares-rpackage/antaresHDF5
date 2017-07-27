@@ -170,3 +170,147 @@ select = "all"
 showProgress = TRUE
 simplify = TRUE
 perf = TRUE
+
+
+#'
+#'
+#'
+#'
+#'
+#'
+#'
+#'
+#' #' Read data parrallel test
+#' #'
+#' #' @param path {character} path of h5file to load
+#' #' @param areas see \link[antaresRead]{readAntares}
+#' #' @param links see \link[antaresRead]{readAntares}
+#' #' @param clusters see \link[antaresRead]{readAntares}
+#' #' @param districts see \link[antaresRead]{readAntares}
+#' #' @param mcYears see \link[antaresRead]{readAntares}
+#' #' @param timeStep see \link[antaresRead]{readAntares}
+#' #' @param select see \link[antaresRead]{readAntares}
+#' #' @param showProgress see \link[antaresRead]{readAntares}
+#' #' @param simplify see \link[antaresRead]{readAntares}
+#' #' @param perf \code{boolean}, eval performance during developpement time, to remove
+#' #'
+#' #' @export
+#' writeAntaresH5Parrallel <- function(path, timeSteps = c("hourly", "daily", "weekly", "monthly", "annual"),
+#'                                     opts = antaresRead::simOptions(),
+#'                                     writeMcAll = TRUE,
+#'                                     compress = 1,
+#'                                     misc = FALSE,
+#'                                     thermalAvailabilities = FALSE,
+#'                                     hydroStorage = FALSE,
+#'                                     hydroStorageMaxPower = FALSE,
+#'                                     reserve = FALSE,
+#'                                     linkCapacity = FALSE,
+#'                                     mustRun = FALSE,
+#'                                     thermalModulation = FALSE
+#' ){
+#'
+#'   #Create h5 file
+#'   h5createFile(path)
+#'
+#'
+#'   cl <- makeCluster(5)
+#'   clusterEvalQ(cl, {
+#'     library(antaresHdf5)
+#'     library(antaresRead)
+#'     library(rhdf5)
+#'     library(data.table)
+#'     library(pipeR)
+#'   })
+#'   clusterExport(cl, c("opts", "writeMcAll", "compress", "misc", "thermalAvailabilities",
+#'                       "hydroStorage", "hydroStorageMaxPower", "reserve", "linkCapacity",
+#'                       "mustRun", "thermalModulation"), envir = environment())
+#'
+#'
+#'
+#'   #loop on timeStep
+#'   parSapplyLB(cl, timeSteps, function(timeStep){
+#'
+#'     #Add mcAll
+#'     allMcYears <- opts$mcYears
+#'     if(writeMcAll){
+#'       allMcYears <- c(allMcYears, -1)
+#'     }
+#'
+#'     #Loop on MCyear
+#'     sapply(allMcYears, function(mcY)
+#'     {
+#'       if(allMcYears[1] == mcY){
+#'         writeStructure = TRUE
+#'       }else{
+#'         writeStructure = FALSE
+#'       }
+#'       mcAll <- FALSE
+#'       if(mcY == -1){
+#'         mcY <- NULL
+#'         writeStructure <- TRUE
+#'         mcAll <- TRUE
+#'       }
+#'
+#'       #Read data
+#'       res <- readAntares(areas = "all" ,
+#'                          links = "all",
+#'                          clusters = "all",
+#'                          districts = "all",
+#'                          mcYears = mcY,
+#'                          timeStep = timeStep, opts = opts, showProgress = FALSE,
+#'                          misc = misc, thermalAvailabilities = thermalAvailabilities,
+#'                          hydroStorage = hydroStorage, hydroStorageMaxPower = hydroStorageMaxPower,
+#'                          reserve = reserve, linkCapacity = linkCapacity, mustRun = mustRun,
+#'                          thermalModulation = thermalModulation)
+#'
+#'       if(writeStructure & !mcAll){
+#'
+#'         attrib <- attributes(res)
+#'         # Create group
+#'         H5close()
+#'         h5createGroup(path, timeStep)
+#'         H5close()
+#'         #Write time
+#'         writeTime(res, path, timeStep)
+#'         H5close()
+#'         #Write attributes
+#'         s <- serialize(attrib, NULL, ascii = TRUE)
+#'         h5write(rawToChar(s), path, paste0(timeStep, "/attrib"))
+#'       }
+#'
+#'       #Remove useless data
+#'       sapply(1:length(res), function(i){
+#'         if("day" %in% names(res[[i]])){
+#'           res[[i]][, day := NULL]
+#'         }
+#'         if("month" %in% names(res[[i]])){
+#'           res[[i]][, month := NULL]
+#'         }
+#'         if("hour" %in% names(res[[i]])){
+#'           res[[i]][, hour := NULL]
+#'         }
+#'         if("time" %in% names(res[[i]])){
+#'           res[[i]][, time := NULL]
+#'         }
+#'       }) %>>% invisible()
+#'       gc()
+#'
+#'
+#'       if(is.null(mcY)){
+#'
+#'         lapply(res, function(X){
+#'           X[, mcYear := "mcAll"]
+#'
+#'         })
+#'       }
+#'       #Transform for write
+#'       res <- transformH5(res,areasKey = c("area", "mcYear"),
+#'                          linksKey = c("link",  "mcYear"),
+#'                          districtKey = c("district",  "mcYear"),
+#'                          clustersKey = c("area", "cluster",  "mcYear"))
+#'       #Write data
+#'       writeAntaresData(res, path, timeStep, writeStructure, mcAll, compress)
+#'     })
+#'   })
+#' }
+#'

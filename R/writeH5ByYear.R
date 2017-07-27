@@ -118,4 +118,7 @@ writeAntaresH5 <- function(path, timeSteps = c("hourly", "daily", "weekly", "mon
       writeAntaresData(res, path, timeStep, writeStructure, mcAll, compress)
     })
   })
+  H5close()
+  cat(paste0("File write : ", path))
+  invisible()
 }
