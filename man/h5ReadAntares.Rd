@@ -5,8 +5,11 @@
 \title{Read data}
 \usage{
 h5ReadAntares(path, areas = NULL, links = NULL, clusters = NULL,
-  districts = NULL, mcYears = NULL, timeStep = "hourly", select = "all",
-  showProgress = TRUE, simplify = TRUE, perf = TRUE)
+  districts = NULL, mcYears = NULL, misc = FALSE,
+  thermalAvailabilities = FALSE, hydroStorage = FALSE,
+  hydroStorageMaxPower = FALSE, reserve = FALSE, linkCapacity = FALSE,
+  mustRun = FALSE, thermalModulation = FALSE, timeStep = "hourly",
+  select = NULL, showProgress = TRUE, simplify = TRUE, perf = TRUE)
 }
 \arguments{
 \item{path}{{character} path of h5file to load}
@@ -20,6 +23,22 @@ h5ReadAntares(path, areas = NULL, links = NULL, clusters = NULL,
 \item{districts}{see \link[antaresRead]{readAntares}}
 
 \item{mcYears}{see \link[antaresRead]{readAntares}}
+
+\item{misc}{see \link[antaresRead]{readAntares}}
+
+\item{thermalAvailabilities}{see \link[antaresRead]{readAntares}}
+
+\item{hydroStorage}{see \link[antaresRead]{readAntares}}
+
+\item{hydroStorageMaxPower}{see \link[antaresRead]{readAntares}}
+
+\item{reserve}{see \link[antaresRead]{readAntares}}
+
+\item{linkCapacity}{see \link[antaresRead]{readAntares}}
+
+\item{mustRun}{see \link[antaresRead]{readAntares}}
+
+\item{thermalModulation}{see \link[antaresRead]{readAntares}}
 
 \item{timeStep}{see \link[antaresRead]{readAntares}}
 

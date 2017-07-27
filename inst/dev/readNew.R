@@ -3,19 +3,26 @@ library(data.table)
 library(h5)
 library(antaresHdf5)
 library(antaresRead)
-
+library(plyr)
 
 path <- "testNewFormat3.h5"
 
 
-
-
 setSimulationPath("E:/DES/antaresFlowbased/TestrunSimulationFb/antaresStudy")
-#setSimulationPath("C:/Users/titorobe/Desktop/test_case")
+setSimulationPath("C:/Users/titorobe/Desktop/test_case")
+
+path <- "tt.h5"
+
+system.time(W <- readAntares(areas = "all", mcYears = 1, select = "mustRun"))
+
+V <- h5ReadAntares(path, areas = "a", mcYears = 1, select = NULL)
+
+identical( h5ReadAntares(path, areas = "a", mcYears = 1, select = "mustRun"),
+           h5ReadAntares(path, areas = "a", mcYears = 1, mustRun = TRUE))
 
 
-W <- readAntares(areas = "fr", mcYears = 1)
-V <- h5ReadAntares(path, areas = "fr", mcYears = 1)
+
+V <- h5ReadAntares(path, areas = "a", mcYears = 1, select = "linkCapacity")
 
 all(sapply(names(W), function(X){
   if(identical(V[[X]], W[[X]])){

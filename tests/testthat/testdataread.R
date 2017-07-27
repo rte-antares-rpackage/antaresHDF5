@@ -157,6 +157,25 @@ setorderv(DF2, c("mcYear","link", "time"))
 allComp <- unlist(compareValue(DF1, DF2))
 testthat::expect_true(all(allComp))
 
+
+
+DF1 <- h5ReadAntares(path, area = 'all', links = "all", clusters = "all", districts = "all",misc = TRUE, thermalAvailabilities = TRUE,
+                     hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
+                     linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE)
+DF2 <- readAntares(area = 'all', links = "all", clusters = "all", districts = "all",misc = TRUE, thermalAvailabilities = TRUE,
+                   hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
+                   linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE)
+setorderv(DF2$areas, c("area", "time"))
+setorderv(DF2$links, c("link", "time"))
+setorderv(DF2$districts, c("district", "time"))
+setorderv(DF2$clusters, c("area", "cluster", "time"))
+allComp <- unlist(compareValue( DF1,DF2))
+testthat::expect_true(all(allComp))
+
+testthat::expect_true(length(h5ReadAntares(path, select = "all", misc = TRUE)) == 0)
+testthat::expect_true(length(h5ReadAntares(path, select = list(), misc = TRUE)) == 0)
+
+
 H5close()
 unlink(path, force = TRUE)
 unlink("testdata", recursive = TRUE)

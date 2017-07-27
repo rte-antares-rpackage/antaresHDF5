@@ -10,24 +10,91 @@
 #' @param select see \link[antaresRead]{readAntares}
 #' @param showProgress see \link[antaresRead]{readAntares}
 #' @param simplify see \link[antaresRead]{readAntares}
+#' @param misc see \link[antaresRead]{readAntares}
+#' @param thermalAvailabilities see \link[antaresRead]{readAntares}
+#' @param hydroStorage see \link[antaresRead]{readAntares}
+#' @param hydroStorageMaxPower see \link[antaresRead]{readAntares}
+#' @param reserve see \link[antaresRead]{readAntares}
+#' @param linkCapacity see \link[antaresRead]{readAntares}
+#' @param mustRun see \link[antaresRead]{readAntares}
+#' @param thermalModulation see \link[antaresRead]{readAntares}
 #' @param perf \code{boolean}, eval performance during developpement time, to remove
 #'
 #' @export
 h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
                           districts = NULL, mcYears = NULL,
-                          timeStep = "hourly", select = "all", showProgress = TRUE,
+                          misc = FALSE, thermalAvailabilities = FALSE,
+                          hydroStorage = FALSE, hydroStorageMaxPower = FALSE, reserve = FALSE,
+                          linkCapacity = FALSE, mustRun = FALSE, thermalModulation = FALSE,
+                          timeStep = "hourly", select = NULL, showProgress = TRUE,
                           simplify = TRUE, perf = TRUE){
 
   if(perf){
     Beg <- Sys.time()
   }
 
-  synthesis <- ifelse(is.null(mcYears), TRUE, FALSE)
+  # reqInfos <- .giveInfoRequest(select = select,
+  #                              areas = areas,
+  #                              links = links,
+  #                              clusters = clusters,
+  #                              districts = districts,
+  #                              mcYears = mcYears)
+  #
+  # select <- reqInfos$select
+  # areas <- reqInfos$areas
+  # links <- reqInfos$links
+  # clusters <- reqInfos$clusters
+  # districts <- reqInfos$districts
+  # mcYears <- reqInfos$mcYears
+  # synthesis <- reqInfos$synthesis
+
+  if(misc){
+    select <- .addColumns(select, "misc")
+  }
+  if(thermalAvailabilities){
+    select <- .addColumns(select, "thermalAvailabilities")
+  }
+  if(hydroStorage){
+    select <- .addColumns(select, "hydroStorage")
+  }
+  if(hydroStorageMaxPower){
+    select <- .addColumns(select, "hydroStorageMaxPower")
+  }
+  if(reserve){
+    select <- .addColumns(select, "reserve")
+  }
+  if(linkCapacity){
+    select <- .addColumns(select, "linkCapacity")
+  }
+  if(mustRun){
+    select <- .addColumns(select, "mustRun")
+  }
+  if(thermalModulation){
+    select <- .addColumns(select, "mustRthermalModulationun")
+  }
+
+  if(!is.null(select) & !is.list(select)){
+    select <- list(areas = select, links = select, clusters = select, districts = select)
+    select <- sapply(names(select), function(X){
+      as.vector(unlist(sapply(select[[X]], function(Y){
+        if(is.null(pkgEnvAntareasH5$varAliasCraeted[[Y]][[X]])){
+          Y
+        }else{
+          pkgEnvAntareasH5$varAliasCraeted[[Y]][[X]]
+        }
+      })))
+    }, simplify = FALSE)
+  }
+  if(is.null(select)){
+    select <-  list(areas = "all", links = "all", clusters = "all", districts = "all")
+  }
+
+  synthesis <- is.null(mcYears)
+
   GP <- timeStep
 
   ##Open connection to h5 file
   fid <- H5Fopen(path)
-
 
   #Load attibutes
 
@@ -54,13 +121,11 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
     mcType <- "mcInd"
   }
 
-
-
   ##Load areas
   listOut <- list()
   areas <- .loadAreas(areas = areas,
                       fid = fid,
-                      select = select,
+                      select = select$areas,
                       mcYears = mcYears,
                       GP = GP,
                       mcType = mcType,
@@ -74,7 +139,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
   links <- .loadLinks(links = links,
                       fid = fid,
-                      select = select,
+                      select = select$links,
                       mcYears = mcYears,
                       GP = GP,
                       mcType = mcType,
@@ -87,10 +152,9 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
     rm(links)
   }
 
-
   districts <- .loadDistricts(districts = districts,
                               fid = fid,
-                              select = select,
+                              select = select$districts,
                               mcYears = mcYears,
                               GP = GP,
                               mcType = mcType,
@@ -103,10 +167,9 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
     rm(districts)
   }
 
-
   clusters <- .loadClusters(clusters = clusters,
                             fid = fid,
-                            select = select,
+                            select = select$clusters,
                             mcYears = mcYears,
                             GP = GP,
                             mcType = mcType,
@@ -118,7 +181,6 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
     listOut$clusters <- clusters
     rm(clusters)
   }
-
 
   if(length(listOut) == 1){
 
@@ -250,7 +312,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
       compname <- compname[indexType]
     }
   }
-  if(selectedCol == "all"){
+  if(selectedCol[1] == "all"){
     indexVar <- NULL
     varKeep <- struct$variable
   }else{
@@ -571,5 +633,19 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
   data
 }
 
-
-
+#' @param select select column(s)
+#' @param var var to add
+#'
+#' @noRd
+.addColumns <- function(select, var){
+  if(identical(select, "all")){
+    return(select)
+  }
+  if(is.null(select)){
+    return(var)
+  }
+  if(is.list(select)){
+    return(lapply(select, function(X){c(X, var)}))
+  }
+  c(select, var)
+}
