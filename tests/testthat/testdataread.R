@@ -9,6 +9,36 @@ writeAntaresH5(path, misc = TRUE, thermalAvailabilities = TRUE,
                hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
                linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE)
 
+
+testthat::expect_true(identical( h5ReadAntares(path, areas = "a", mcYears = 1, select = "mustRun"),
+           h5ReadAntares(path, areas = "a", mcYears = 1, mustRun = TRUE)))
+
+
+testthat::expect_true(identical( h5ReadAntares(path, areas = "a", mcYears = 1, select = "thermalModulation"),
+           h5ReadAntares(path, areas = "a", mcYears = 1, thermalModulation = TRUE)))
+
+testthat::expect_true(identical( h5ReadAntares(path, areas = "a", mcYears = 1, select = "linkCapacity"),
+           h5ReadAntares(path, areas = "a", mcYears = 1, linkCapacity = TRUE)))
+
+testthat::expect_true(identical( h5ReadAntares(path, areas = "a", mcYears = 1, select = "reserve"),
+           h5ReadAntares(path, areas = "a", mcYears = 1, reserve = TRUE)))
+
+testthat::expect_true(identical( h5ReadAntares(path, areas = "a", mcYears = 1, select = "hydroStorageMaxPower"),
+           h5ReadAntares(path, areas = "a", mcYears = 1, hydroStorageMaxPower = TRUE)))
+
+testthat::expect_true(identical( h5ReadAntares(path, areas = "a", mcYears = 1, select = "hydroStorage"),
+           h5ReadAntares(path, areas = "a", mcYears = 1, hydroStorage = TRUE)))
+
+testthat::expect_true(identical( h5ReadAntares(path, areas = "a", mcYears = 1, select = "thermalAvailabilities"),
+           h5ReadAntares(path, areas = "a", mcYears = 1, thermalAvailabilities = TRUE)))
+
+testthat::expect_true(identical( h5ReadAntares(path, areas = "a", mcYears = 1, select = "misc"),
+           h5ReadAntares(path, areas = "a", mcYears = 1, misc = TRUE)))
+
+
+
+
+
 compareValue <- function(A, B, res = NULL){
   if(class(A)[3] == "list"){
     res <- c(res, sapply(c("areas", "links", "cluster", "districts"), function(x){
