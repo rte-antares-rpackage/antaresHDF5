@@ -9,15 +9,18 @@ library(parallel)
 
  #setSimulationPath("D:/Users/titorobe/Desktop/antaresStudy", 1)
 #setSimulationPath("C:/Users/Titouan/Desktop/test_case", 1)
- setSimulationPath("C:/Users/titorobe/Desktop/exemple_test")
-path <- "bigStud.h5"
+setSimulationPath("C:/Users/TTT/Mystudy", 1)
+path <- "Mystudy.h5"
+writeAntaresH5(path, compress = 1)
+
+
 H5close()
 file.remove(path)
 writeAntaresH5(path, compress = 1)
 
 
 
-setSimulationPath("C:/Users/titorobe/Desktop/test_case", 0, nbCores = 2)
+setSimulationPath("C:/Users/titorobe/Desktop/test_case", 0)
 writeAntaresH5(path, writeAllSimulations = TRUE, nbCores = 1)
 
 setSimulationPath("C:/Users/titorobe/Desktop/test06", 2)

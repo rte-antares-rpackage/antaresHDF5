@@ -16,6 +16,29 @@
 #' @param writeAllSimulations \code{boolean}, write all simulations of your antares study.
 #' @param nbCores \code{numeric}, number of cores to use, only used if writeAllSimulations is TRUE
 #'
+#' @examples
+#' \dontrun{
+#' #Write simulation one by one
+#' setSimulationPath("C:/Users/TTT/Mystudy", 1)
+#' path <- "Mystudy.h5"
+#' writeAntaresH5(path)
+#'
+#' #Write all simulations
+#' setSimulationPath("C:/Users/TTT/Mystudy")
+#' writeAntaresH5(writeAllSimulations = TRUE)
+#'
+#' #Choose timestep to write
+#' setSimulationPath("C:/Users/TTT/Mystudy", 1)
+#' path <- "Mystudy.h5"
+#' writeAntaresH5(path, timeSteps = "hourly")
+#'
+#' #Write with additionnal information
+#' writeAntaresH5(path, timeSteps = "hourly",
+#'    misc = FALSE, thermalAvailabilities = FALSE,
+#'    hydroStorage = FALSE, hydroStorageMaxPower = FALSE, reserve = FALSE,
+#'    linkCapacity = FALSE, mustRun = FALSE, thermalModulation = FALSE)
+#'
+#' }
 #'
 #' @export
 writeAntaresH5 <- function(path = NULL, timeSteps = c("hourly", "daily", "weekly", "monthly", "annual"),
