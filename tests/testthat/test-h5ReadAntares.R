@@ -10,7 +10,7 @@ writeAntaresH5(path, misc = TRUE, thermalAvailabilities = TRUE,
                linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE)
 
 
-writeAntaresH5(writeAllSimulations = TRUE)
+writeAntaresH5(writeAllSimulations = TRUE, nbCores = 2)
 testthat::expect_true(file.exists(paste0(list.files(paste0(opts$studyPath, "/output")), ".h5")))
 file.remove(paste0(list.files(paste0(opts$studyPath, "/output")), ".h5"))
 
