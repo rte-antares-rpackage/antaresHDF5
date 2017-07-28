@@ -173,7 +173,7 @@ allComp <- unlist(compareValue( DF1,DF2))
 testthat::expect_true(all(allComp))
 
 testthat::expect_true(length(h5ReadAntares(path, select = "all", misc = TRUE)) == 0)
-testthat::expect_true(length(h5ReadAntares(path, select = list(), misc = TRUE)) == 0)
+testthat::expect_true(length(h5ReadAntares(path, select = list(a = 1), misc = TRUE)) == 0)
 
 
 H5close()
