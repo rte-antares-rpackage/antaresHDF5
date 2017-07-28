@@ -17,7 +17,7 @@ writeAntaresH5(path, compress = 1)
 
 
 
-setSimulationPath("C:/Users/titorobe/Desktop/test_case", 0)
+setSimulationPath("C:/Users/titorobe/Desktop/test_case", 0, nbCores = 2)
 writeAntaresH5(path, writeAllSimulations = TRUE, nbCores = 1)
 
 setSimulationPath("C:/Users/titorobe/Desktop/test06", 2)
