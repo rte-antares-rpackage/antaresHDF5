@@ -72,6 +72,11 @@ writeAntaresH5("toto.h5", compress = 1,  misc = TRUE,
                linkCapacity = TRUE, mustRun = TRUE, thermalModulation = TRUE)
 
 
+writeAntaresH5("toto2.h5", compress = 1, writeAllSimulations = TRUE)
+testthat::exept
+
+
+
 
 path <- "testNewFormat3.h5"
 #path <- "toto.h5"

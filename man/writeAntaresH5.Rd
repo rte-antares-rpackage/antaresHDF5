@@ -4,11 +4,12 @@
 \alias{writeAntaresH5}
 \title{Convert antares output to h5 file}
 \usage{
-writeAntaresH5(path, timeSteps = c("hourly", "daily", "weekly", "monthly",
-  "annual"), opts = antaresRead::simOptions(), writeMcAll = TRUE,
+writeAntaresH5(path = NULL, timeSteps = c("hourly", "daily", "weekly",
+  "monthly", "annual"), opts = antaresRead::simOptions(), writeMcAll = TRUE,
   compress = 1, misc = FALSE, thermalAvailabilities = FALSE,
   hydroStorage = FALSE, hydroStorageMaxPower = FALSE, reserve = FALSE,
-  linkCapacity = FALSE, mustRun = FALSE, thermalModulation = FALSE)
+  linkCapacity = FALSE, mustRun = FALSE, thermalModulation = FALSE,
+  writeAllSimulations = FALSE, nbCores = 4)
 }
 \arguments{
 \item{path}{\code{character} path of h5 file to write}
@@ -36,6 +37,10 @@ writeAntaresH5(path, timeSteps = c("hourly", "daily", "weekly", "monthly",
 \item{mustRun}{\code{boolean} see \link[antaresRead]{readAntares}}
 
 \item{thermalModulation}{\code{boolean} see \link[antaresRead]{readAntares}}
+
+\item{writeAllSimulations}{\code{boolean}, write all simulations of your antares study.}
+
+\item{nbCores}{\code{numeric}, number of cores to use, only used if writeAllSimulations is TRUE}
 }
 \description{
 Convert antares output to h5 file

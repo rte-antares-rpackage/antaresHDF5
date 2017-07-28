@@ -17,6 +17,14 @@ writeAntaresH5(path, compress = 1)
 
 
 
+setSimulationPath("C:/Users/titorobe/Desktop/test_case", 0)
+writeAntaresH5(path, writeAllSimulations = TRUE, nbCores = 1)
+
+setSimulationPath("C:/Users/titorobe/Desktop/test06", 2)
+writeAntaresH5("toto2.h5")
+
+
+
 setSimulationPath("D:/Users/titorobe/Desktop/Antares/antaresHdf5/inst/testdata/test_case", 1)
 path <- "smallStud.h5"
 

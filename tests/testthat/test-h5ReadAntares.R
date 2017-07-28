@@ -1,14 +1,24 @@
-context("Transform to h5")
+context("h5ReadAntares")
 
 zipPath <- system.file("testdata.zip", package = "antaresHdf5")
 unzip(zipPath)
-
 setSimulationPath("testdata/test_case")
+opts <- setSimulationPath("testdata/test_case")
 path <- "testStudy.h5"
 writeAntaresH5(path, misc = TRUE, thermalAvailabilities = TRUE,
                hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
                linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE)
 
+
+writeAntaresH5(writeAllSimulations = TRUE)
+testthat::expect_true(file.exists(paste0(list.files(paste0(opts$studyPath, "/output")), ".h5")))
+file.remove(paste0(list.files(paste0(opts$studyPath, "/output")), ".h5"))
+
+
+
+writeAntaresH5(writeAllSimulations = TRUE, nbCores = 1)
+testthat::expect_true(file.exists(paste0(list.files(paste0(opts$studyPath, "/output")), ".h5")))
+file.remove(paste0(list.files(paste0(opts$studyPath, "/output")), ".h5"))
 
 testthat::expect_true(identical( h5ReadAntares(path, areas = "a", mcYears = 1, select = "mustRun"),
            h5ReadAntares(path, areas = "a", mcYears = 1, mustRun = TRUE)))
