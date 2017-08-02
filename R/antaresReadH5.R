@@ -35,20 +35,28 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
     Beg <- Sys.time()
   }
 
-  # reqInfos <- .giveInfoRequest(select = select,
-  #                              areas = areas,
-  #                              links = links,
-  #                              clusters = clusters,
-  #                              districts = districts,
-  #                              mcYears = mcYears)
-  #
-  # select <- reqInfos$select
-  # areas <- reqInfos$areas
-  # links <- reqInfos$links
-  # clusters <- reqInfos$clusters
-  # districts <- reqInfos$districts
-  # mcYears <- reqInfos$mcYears
-  # synthesis <- reqInfos$synthesis
+  reqInfos <- .giveInfoRequest(select = select,
+                               areas = areas,
+                               links = links,
+                               clusters = clusters,
+                               districts = districts,
+                               mcYears = mcYears)
+  unselect <- reqInfos$unselect
+  if(sum(unlist(lapply(reqInfos$select, length)))>0){
+    select <- reqInfos$select
+  }
+  print(select)
+  if(is.null(select$clusters))
+  {
+  select$clusters <- select$areas
+  }
+  areas <- reqInfos$areas
+  links <- reqInfos$links
+  clusters <- reqInfos$clusters
+  districts <- reqInfos$districts
+  mcYears <- reqInfos$mcYears
+  synthesis <- reqInfos$synthesis
+
 
   if(misc){
     select <- .addColumns(select, "misc")
@@ -75,8 +83,12 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
     select <- .addColumns(select, "mustRthermalModulationun")
   }
 
-  if(!is.null(select) & !is.list(select)){
-    select <- list(areas = select, links = select, clusters = select, districts = select)
+
+
+  if(!is.null(select)){
+    if(!is.list(select)){
+      select <- list(areas = select, links = select, clusters = select, districts = select)
+    }
     select <- sapply(names(select), function(X){
       as.vector(unlist(sapply(select[[X]], function(Y){
         if(is.null(pkgEnvAntareasH5$varAliasCraeted[[Y]][[X]])){
@@ -90,6 +102,16 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
   if(is.null(select)){
     select <-  list(areas = "all", links = "all", clusters = "all", districts = "all")
   }
+
+  for(i in names(select)){
+    if(length(which(! select[[i]] %in% unselect[[i]])) > 0)
+    {
+      select[[i]] <- select[[i]][which(! select[[i]] %in% unselect[[i]])]
+    }
+  }
+
+
+
 
   synthesis <- is.null(mcYears)
 
@@ -168,7 +190,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
     listOut$districts <- districts
     rm(districts)
   }
-
+  print(select)
   clusters <- .loadClusters(clusters = clusters,
                             fid = fid,
                             select = select$clusters,
@@ -287,6 +309,10 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 #' @noRd
 .makeStructure <- function(type = "area", selectedRow,
                            selectedCol, fid, GP, mcType, mcYears){
+  if(is.null(selectedCol)){
+    selectedCol <- "all"
+  }
+
   typeS <- paste0(type, "s")
 
   gid <- H5Gopen(fid,  paste0(GP, "/", typeS, "/", mcType, "/structure"))

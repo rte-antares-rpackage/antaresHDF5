@@ -113,7 +113,7 @@ writeDataType <- function(data,
   if(writeStructure){
     h5createDataset(path, groupData, dims = dimData, chunk = c(dimData[1], 1, 1, 1),
                     level = compress, maxdims = c(dimData[1],
-                                                  dimData[2] + 20,
+                                                  dimData[2] + 100,
                                                   dimData[3],
                                                   dimData[4]))
     fid <- H5Fopen(path)

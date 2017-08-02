@@ -83,6 +83,6 @@ pkgEnvAntareasH5$varAliasCraeted$thermalModulation$clusters <- c("marginalCostMo
 
 
 
-
-
+.giveInfoRequest <- antaresRead:::.giveInfoRequest
+pkgEnv <- antaresRead:::pkgEnv
 
