@@ -1,6 +1,28 @@
 .addClassAndAttributes <- antaresRead:::.addClassAndAttributes
 
 pkgEnvAntareasH5 <- new.env()
+
+
+pkgEnvAntareasH5$varAreas <- c("OV. COST", "OP. COST", "MRG. PRICE", "CO2 EMIS.", "BALANCE",
+                               "ROW BAL.", "PSP", "MISC. NDG",  "LOAD", "H. ROR", "WIND", "SOLAR",
+                               "NUCLEAR", "LIGNITE", "COAL", "GAS", "OIL", "MIX. FUEL", "MISC. DTG", "H. STOR",
+                               "UNSP. ENRG", "SPIL. ENRG", "LOLD", "LOLP", "AVL DTG", "DTG MRG", "MAX MRG", "NP COST", "NODU")
+pkgEnvAntareasH5$varAreas <- as.vector(sapply(pkgEnvAntareasH5$varAreas, function(X){paste0(X, c("", "_min", "_max", "_std"))}))
+pkgEnvAntareasH5$varDistricts <- pkgEnvAntareasH5$varAreas
+
+pkgEnvAntareasH5$varLinks <- c("FLOW LIN.", "UCAP LIN.", "FLOW QUAD.",
+                               "CONG. FEE (ALG.)", "CONG. FEE (ABS.)",
+                               "MARG. COST", "CONG. PROB +", "CONG. PROB -", "HURDLE COST")
+pkgEnvAntareasH5$varLinks <- as.vector(sapply(pkgEnvAntareasH5$varLinks, function(X){paste0(X, c("", "_min", "_max", "_std"))}))
+
+
+
+pkgEnvAntareasH5$varClusters <- c("production", "NP Cost", "NODU")
+
+
+
+
+
 pkgEnvAntareasH5$varAliasCraeted <- list()
 
 
@@ -76,9 +98,9 @@ pkgEnvAntareasH5$varAliasCraeted$mustRun$clusters <- c("thermalPmin",
                                                        "mustRunTotal")
 
 pkgEnvAntareasH5$varAliasCraeted$thermalModulation$clusters <- c("marginalCostModulation",
-                                                                "marketBidModulation",
-                                                                "capacityModulation",
-                                                                "minGenModulation")
+                                                                 "marketBidModulation",
+                                                                 "capacityModulation",
+                                                                 "minGenModulation")
 
 
 

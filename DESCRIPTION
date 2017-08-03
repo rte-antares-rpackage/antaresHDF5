@@ -21,4 +21,6 @@ Imports:
   plyr,
   parallel
 RoxygenNote: 6.0.1
-Suggests: covr
+Suggests:
+  covr,
+  antaresProcessing

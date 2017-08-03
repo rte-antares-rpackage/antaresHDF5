@@ -7,6 +7,6 @@ library(rhdf5)
 library(pipeR)
 library(stringr)
 library(antaresHdf5)
-
+library(antaresProcessing)
 
 testthat::test_check("antaresHdf5")

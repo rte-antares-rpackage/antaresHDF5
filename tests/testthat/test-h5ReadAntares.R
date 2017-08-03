@@ -1,56 +1,23 @@
 context("h5ReadAntares")
 
+
+alias <- showAliases()$name
+alias <- as.character(alias)
+##Data for test
 zipPath <- system.file("testdata.zip", package = "antaresHdf5")
 unzip(zipPath)
-setSimulationPath("testdata/test_case")
+# setSimulationPath("testdata/test_case")
 opts <- setSimulationPath("testdata/test_case")
 path <- "testStudy.h5"
 writeAntaresH5(path, misc = TRUE, thermalAvailabilities = TRUE,
                hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
                linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE)
+timeStep <-  c("hourly", "daily", "weekly",
+               "monthly", "annual")
 
-
-
-
-
-# writeAntaresH5(writeAllSimulations = TRUE, nbCores = 2)
-# testthat::expect_true(file.exists(paste0(list.files(paste0(opts$studyPath, "/output")), ".h5")))
-# file.remove(paste0(list.files(paste0(opts$studyPath, "/output")), ".h5"))
-#
-#
-#
 writeAntaresH5(writeAllSimulations = TRUE, nbCores = 1)
 testthat::expect_true(file.exists(paste0(list.files(paste0(opts$studyPath, "/output")), ".h5")))
 file.remove(paste0(list.files(paste0(opts$studyPath, "/output")), ".h5"))
-
-testthat::expect_true(identical( h5ReadAntares(path, areas = "a", mcYears = 1, select = "mustRun"),
-           h5ReadAntares(path, areas = "a", mcYears = 1, mustRun = TRUE)))
-
-
-testthat::expect_true(identical( h5ReadAntares(path, areas = "a", mcYears = 1, select = "thermalModulation"),
-           h5ReadAntares(path, areas = "a", mcYears = 1, thermalModulation = TRUE)))
-
-testthat::expect_true(identical( h5ReadAntares(path, areas = "a", mcYears = 1, select = "linkCapacity"),
-           h5ReadAntares(path, areas = "a", mcYears = 1, linkCapacity = TRUE)))
-
-testthat::expect_true(identical( h5ReadAntares(path, areas = "a", mcYears = 1, select = "reserve"),
-           h5ReadAntares(path, areas = "a", mcYears = 1, reserve = TRUE)))
-
-testthat::expect_true(identical( h5ReadAntares(path, areas = "a", mcYears = 1, select = "hydroStorageMaxPower"),
-           h5ReadAntares(path, areas = "a", mcYears = 1, hydroStorageMaxPower = TRUE)))
-
-testthat::expect_true(identical( h5ReadAntares(path, areas = "a", mcYears = 1, select = "hydroStorage"),
-           h5ReadAntares(path, areas = "a", mcYears = 1, hydroStorage = TRUE)))
-
-testthat::expect_true(identical( h5ReadAntares(path, areas = "a", mcYears = 1, select = "thermalAvailabilities"),
-           h5ReadAntares(path, areas = "a", mcYears = 1, thermalAvailabilities = TRUE)))
-
-testthat::expect_true(identical( h5ReadAntares(path, areas = "a", mcYears = 1, select = "misc"),
-           h5ReadAntares(path, areas = "a", mcYears = 1, misc = TRUE)))
-
-
-
-
 
 compareValue <- function(A, B, res = NULL){
   if(class(A)[3] == "list"){
@@ -73,147 +40,110 @@ compareValue <- function(A, B, res = NULL){
   }
 
 }
-
-DF1 <- h5ReadAntares(path, area = 'all', links = "all", clusters = "all", districts = "all")
-DF2 <- readAntares(area = 'all', links = "all", clusters = "all", districts = "all",misc = TRUE, thermalAvailabilities = TRUE,
-                   hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
-                   linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE)
-setorderv(DF2$areas, c("area", "time"))
-setorderv(DF2$links, c("link", "time"))
-setorderv(DF2$districts, c("district", "time"))
-setorderv(DF2$clusters, c("area", "cluster", "time"))
-allComp <- unlist(compareValue( DF1,DF2))
-testthat::expect_true(all(allComp))
-
-DF1 <-   h5ReadAntares(path, area = 'all', links = "all", clusters = "all", districts = "all", mcYears = "all")
-DF2 <- readAntares(area = 'all', links = "all", clusters = "all", districts = "all", mcYears = "all",misc = TRUE, thermalAvailabilities = TRUE,
-                   hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
-                   linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE)
-setorderv(DF2$areas, c("mcYear","area", "time"))
-setorderv(DF2$links, c("mcYear","link", "time"))
-setorderv(DF2$districts, c("mcYear", "district","time"))
-setorderv(DF2$clusters, c("mcYear", "area", "cluster","time"))
-allComp <- unlist(compareValue(DF1, DF2))
-testthat::expect_true(all(allComp))
+##End data for test
 
 
-DF1 <-  h5ReadAntares(path, area = 'all', links = "all", clusters = "all", districts = "all", mcYears = 1)
-DF2 <-   readAntares(area = 'all', links = "all", clusters = "all", districts = "all", mcYears = 1,misc = TRUE, thermalAvailabilities = TRUE,
-                     hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
-                     linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE)
-setorderv(DF2$areas, c("mcYear","area", "time"))
-setorderv(DF2$links, c("mcYear","link", "time"))
-setorderv(DF2$districts, c("mcYear", "district","time"))
-setorderv(DF2$clusters, c("mcYear", "area", "cluster","time"))
-allComp <- unlist(compareValue(DF1, DF2))
-testthat::expect_true(all(allComp))
+# writeAntaresH5(writeAllSimulations = TRUE, nbCores = 2)
+# testthat::expect_true(file.exists(paste0(list.files(paste0(opts$studyPath, "/output")), ".h5")))
+# file.remove(paste0(list.files(paste0(opts$studyPath, "/output")), ".h5"))
+#
+#
+#
 
 
+sapply(pkgEnv$allCompute, function(X){
+  test_that(paste0("Select : ", X, " timeStep : "),{
+    param1 <- list(path = path, areas = "a", mcYears = 1, select = X)
+    param2 <- list(path = path, areas = "a", mcYears = 1)
+    param2[[X]] <- TRUE
+    testthat::expect_true(identical(do.call(h5ReadAntares, param1),
+                                    do.call(h5ReadAntares, param2)))
+  })
+})
 
-DF1 <- h5ReadAntares(path, area = 'a', links = "b - c", clusters = "a", districts = "a and b")
-DF2 <- h5ReadAntares(path, area = 'a', links = "b - c", clusters = "a", districts = "a and b")
-setorderv(DF2$areas, c("area", "time"))
-setorderv(DF2$links, c("link", "time"))
-setorderv(DF2$districts, c("district", "time"))
-setorderv(DF2$clusters, c("area", "cluster", "time"))
-allComp <- unlist(compareValue(DF1,DF2))
-testthat::expect_true(all(allComp))
+##Test
+paramComparaison <- list(
+  areasAll = list(areas = "all"),
+  linksAll = list(links = "all"),
+  clustersAll = list(clusters = "all"),
+  districtsAll = list(districts = "all"),
+  areasAllMc1 = list(areas = "all", mcYears = 1),
+  linksAllMc1 = list(links = "all", mcYears = 1),
+  clustersAllMc1 = list(clusters = "all", mcYears = 1),
+  districtsAllMc1 = list(districts = "all", mcYears = 1),
+  areasAllMcAll = list(areas = "all", mcYears = "all"),
+  linksAllMcAll = list(links = "all", mcYears = "all"),
+  clustersAllMcAll = list(clusters = "all", mcYears = "all"),
+  districtsAllMcAll = list(districts = "all", mcYears = "all"),
+  areasaMcAll = list(area = "a", mcYears = "all"),
+  linksBCMcAll = list(links = "b - c", mcYears = "all"),
+  clustersaMcAll = list(clusters = "a", mcYears = "all"),
+  districtsABMcAll = list(districts = "a and b", mcYears = "all"),
+  linksFolowIn = list(links = "all", select = "FLOW LIN."),
+  areasSelectAll = list(areas = "all", select = "all"),
+  linksSelectAll = list(links = "all", select = "all"),
+  clusterSelectAll = list(clusters = "all", select = "all"),
+  districtsSelectAll = list(districts = "all", select = "all"),
+  allData = list(areas = "all", links = "all", clusters = "all", districts = "all"),
+  allDataMc1 = list(areas = "all", links = "all", clusters = "all", districts = "all", mcYears = 1),
+  allDataMc2 = list(areas = "all", links = "all", clusters = "all", districts = "all", mcYears = 2),
+  allDataMcAll = list(areas = "all", links = "all", clusters = "all", districts = "all", mcYears = "all")
+)
 
-
-DF1 <-  h5ReadAntares(path, area = 'a', links = "b - c", clusters = "a", districts = "a and b", mcYears = 2)
-DF2 <-   readAntares(area = 'a', links = "b - c", clusters = "a", districts = "a and b", mcYears = 2,misc = TRUE, thermalAvailabilities = TRUE,
-                     hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
-                     linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE)
-setorderv(DF2$areas, c("mcYear","area", "time"))
-setorderv(DF2$links, c("mcYear","link", "time"))
-setorderv(DF2$districts, c("mcYear", "district","time"))
-setorderv(DF2$clusters, c("mcYear", "area", "cluster","time"))
-allComp <- unlist(compareValue(DF1, DF2))
-testthat::expect_true(all(allComp))
-
-
-DF1 <-  h5ReadAntares(path, area = 'a', links = "b - c", clusters = "a", districts = "a and b", mcYears = 2, timeStep = "annual")
-DF2 <-   readAntares(area = 'a', links = "b - c", clusters = "a", districts = "a and b", mcYears = 2,misc = TRUE, thermalAvailabilities = TRUE,
-                     hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
-                     linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE, timeStep = "annual")
-setorderv(DF2$areas, c("mcYear","area", "time"))
-setorderv(DF2$links, c("mcYear","link", "time"))
-setorderv(DF2$districts, c("mcYear", "district","time"))
-setorderv(DF2$clusters, c("mcYear", "area", "cluster","time"))
-allComp <- unlist(compareValue(DF1, DF2))
-testthat::expect_true(all(allComp))
-
-
-DF1 <-  h5ReadAntares(path, area = 'a', links = "b - c", clusters = "a", districts = "a and b", mcYears = 2, timeStep = "daily")
-DF2 <-   readAntares(area = 'a', links = "b - c", clusters = "a", districts = "a and b", mcYears = 2,misc = TRUE, thermalAvailabilities = TRUE,
-                     hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
-                     linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE, timeStep = "daily")
-setorderv(DF2$areas, c("mcYear","area", "time"))
-setorderv(DF2$links, c("mcYear","link", "time"))
-setorderv(DF2$districts, c("mcYear", "district","time"))
-setorderv(DF2$clusters, c("mcYear", "area", "cluster","time"))
-allComp <- unlist(compareValue(DF1, DF2))
-testthat::expect_true(all(allComp))
+#Test alias request
+for(i in alias){
+  paramComparaison[[i]] <- list(select = i)
+}
 
 
-DF1 <-  h5ReadAntares(path, area = 'a', links = "b - c", clusters = "a", districts = "a and b", mcYears = 2, timeStep = "weekly")
-DF2 <-   readAntares(area = 'a', links = "b - c", clusters = "a", districts = "a and b", mcYears = 2,misc = TRUE, thermalAvailabilities = TRUE,
-                     hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
-                     linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE, timeStep = "weekly")
-setorderv(DF2$areas, c("mcYear","area", "time"))
-setorderv(DF2$links, c("mcYear","link", "time"))
-setorderv(DF2$districts, c("mcYear", "district","time"))
-setorderv(DF2$clusters, c("mcYear", "area", "cluster","time"))
-allComp <- unlist(compareValue(DF1, DF2))
-testthat::expect_true(all(allComp))
+#Test remove
+for(i in alias){
+  var <- strsplit(as.character(showAliases(i)$select[1]), ",")[[1]]
+  for(j in var)
+  {
+  minus <- paste0("-", j)
+  paramComparaison[[paste(i,minus)]] <- list(select = c(i, minus))
+  }
+}
 
-DF1 <-  h5ReadAntares(path, area = 'a', links = "b - c", clusters = "a", districts = "a and b", mcYears = 2, timeStep = "monthly")
-DF2 <-   readAntares(area = 'a', links = "b - c", clusters = "a", districts = "a and b", mcYears = 2,misc = TRUE, thermalAvailabilities = TRUE,
-                     hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
-                     linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE, timeStep = "monthly")
-setorderv(DF2$areas, c("mcYear","area", "time"))
-setorderv(DF2$links, c("mcYear","link", "time"))
-setorderv(DF2$districts, c("mcYear", "district","time"))
-setorderv(DF2$clusters, c("mcYear", "area", "cluster","time"))
-allComp <- unlist(compareValue(DF1, DF2))
-testthat::expect_true(all(allComp))
+sapply("hourly", function(Z){
+  sapply(names(paramComparaison), function(X){
+    test_that(paste(X, Z), {
+      param1 <- paramComparaison[[X]]
+      param1$timeStep <- Z
+      param2 <- param1
 
+      ##Silent
+      param1$showProgress <- FALSE
+      param2$perf <- FALSE
 
-DF1 <-  h5ReadAntares(path, area = 'a', mcYears = 2, timeStep = "monthly")
-DF2 <-   readAntares(area = 'a', mcYears = 2,misc = TRUE,
-                     hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
-                     mustRun = TRUE, timeStep = "monthly")
-setorderv(DF2, c("mcYear","area", "time"))
-allComp <- unlist(compareValue(DF1, DF2))
-testthat::expect_true(all(allComp))
-
-
-DF1 <-  h5ReadAntares(path, areas = 'a', mcYears = 2, timeStep = "monthly", select = "OV. COST")
-DF2 <-   readAntares(areas = 'a', mcYears = 2, timeStep = "monthly", select = "OV. COST")
-setorderv(DF2, c("mcYear","area", "time"))
-allComp <- unlist(compareValue(DF1, DF2))
-testthat::expect_true(all(allComp))
-
-DF1 <-  h5ReadAntares(path, links = 'a - b', mcYears = 2, timeStep = "monthly", select = "FLOW LIN.")
-DF2 <-   readAntares(links = 'a - b', mcYears = 2, timeStep = "monthly", select = "FLOW LIN.")
-setorderv(DF2, c("mcYear","link", "time"))
-allComp <- unlist(compareValue(DF1, DF2))
-testthat::expect_true(all(allComp))
+      ##End silent
+      param2$path <- path
+      DF1 <- do.call(readAntares, param1)
+      DF2 <- do.call(h5ReadAntares, param2)
+      if(!is(DF1, "antaresDataList"))
+      {
+        setorderv(DF1, getIdCols(DF1))
+      }else{
+        for(i in 1:length(DF1)){
+          setorderv(DF1[[i]], getIdCols(DF1[[i]]))
+        }
+      }
+      if(!is(DF2, "antaresDataList"))
+      {
+        setorderv(DF2, getIdCols(DF2))
+      }else{
+        for(i in 1:length(DF2)){
+          setorderv(DF2[[i]], getIdCols(DF2[[i]]))
+        }
+      }
+      expect_true(all(unlist(compareValue( DF1,DF2))))
+    })
+  })
+})
 
 
 
-DF1 <- h5ReadAntares(path, area = 'all', links = "all", clusters = "all", districts = "all",misc = TRUE, thermalAvailabilities = TRUE,
-                     hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
-                     linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE)
-DF2 <- readAntares(area = 'all', links = "all", clusters = "all", districts = "all",misc = TRUE, thermalAvailabilities = TRUE,
-                   hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
-                   linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE)
-setorderv(DF2$areas, c("area", "time"))
-setorderv(DF2$links, c("link", "time"))
-setorderv(DF2$districts, c("district", "time"))
-setorderv(DF2$clusters, c("area", "cluster", "time"))
-allComp <- unlist(compareValue( DF1,DF2))
-testthat::expect_true(all(allComp))
 
 
 H5close()

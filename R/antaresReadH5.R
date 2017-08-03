@@ -35,73 +35,107 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
     Beg <- Sys.time()
   }
 
+  ctrlselectlist <- FALSE
+  if(!is.list(select)){
+    ctrlselectlist <- TRUE
+  }
+
+  if(is.null(select)){
+    select <- "all"
+  }
+
   reqInfos <- .giveInfoRequest(select = select,
                                areas = areas,
                                links = links,
                                clusters = clusters,
                                districts = districts,
                                mcYears = mcYears)
+  select <- reqInfos$select
+  if(ctrlselectlist){
+    select$clusters <- c(pkgEnvAntareasH5$varClusters, select$areas)
+  }
+
+
   unselect <- reqInfos$unselect
-  if(sum(unlist(lapply(reqInfos$select, length)))>0){
-    select <- reqInfos$select
-  }
-  print(select)
-  if(is.null(select$clusters))
-  {
-  select$clusters <- select$areas
-  }
-  areas <- reqInfos$areas
-  links <- reqInfos$links
-  clusters <- reqInfos$clusters
-  districts <- reqInfos$districts
-  mcYears <- reqInfos$mcYears
-  synthesis <- reqInfos$synthesis
-
-
-  if(misc){
-    select <- .addColumns(select, "misc")
-  }
-  if(thermalAvailabilities){
-    select <- .addColumns(select, "thermalAvailabilities")
-  }
-  if(hydroStorage){
-    select <- .addColumns(select, "hydroStorage")
-  }
-  if(hydroStorageMaxPower){
-    select <- .addColumns(select, "hydroStorageMaxPower")
-  }
-  if(reserve){
-    select <- .addColumns(select, "reserve")
-  }
-  if(linkCapacity){
-    select <- .addColumns(select, "linkCapacity")
-  }
-  if(mustRun){
-    select <- .addColumns(select, "mustRun")
-  }
-  if(thermalModulation){
-    select <- .addColumns(select, "mustRthermalModulationun")
-  }
 
 
 
-  if(!is.null(select)){
-    if(!is.list(select)){
-      select <- list(areas = select, links = select, clusters = select, districts = select)
+  allCompute <- pkgEnv$allCompute
+  computeAdd <- unlist(select)[unlist(select) %in% allCompute]
+  computeAdd <- unique(computeAdd)
+  if(length(computeAdd) > 0){
+    for(i in computeAdd)
+    {
+      assign(i, TRUE)
     }
-    select <- sapply(names(select), function(X){
-      as.vector(unlist(sapply(select[[X]], function(Y){
-        if(is.null(pkgEnvAntareasH5$varAliasCraeted[[Y]][[X]])){
-          Y
-        }else{
-          pkgEnvAntareasH5$varAliasCraeted[[Y]][[X]]
-        }
-      })))
-    }, simplify = FALSE)
   }
-  if(is.null(select)){
-    select <-  list(areas = "all", links = "all", clusters = "all", districts = "all")
+
+  for(i in allCompute){
+    if(get(i)){
+      select <- .addColumns(select, i)
+    }
   }
+
+  select <- sapply(names(select), function(X){
+    as.vector(unlist(sapply(select[[X]], function(Y){
+      if(is.null(pkgEnvAntareasH5$varAliasCraeted[[Y]][[X]])){
+        Y
+      }else{
+        pkgEnvAntareasH5$varAliasCraeted[[Y]][[X]]
+      }
+    })))
+  }, simplify = FALSE)
+
+  ctrl <- FALSE
+  if(!is.null(select$areas))
+  {
+    if(select$areas[1] == "all" & length(select$areas) == 1){
+      ctrl <- TRUE
+    }
+  }
+  if(is.null(select$areas) | ctrl)
+  {
+    select$areas <- pkgEnvAntareasH5$varAreas
+  }
+
+  ctrl <- FALSE
+  if(!is.null(select$links) & length(select$links) == 1)
+  {
+    if(select$links[1] == "all"){
+      ctrl <- TRUE
+    }
+  }
+
+  if(is.null(select$links)| ctrl)
+  {
+    select$links <- pkgEnvAntareasH5$varLinks
+  }
+
+  ctrl <- FALSE
+  if(!is.null(select$districts) & length(select$districts) == 1)
+  {
+    if(select$districts[1] == "all"){
+      ctrl <- TRUE
+    }
+  }
+
+  if(is.null(select$districts) | ctrl)
+  {
+    select$districts <- pkgEnvAntareasH5$varDistricts
+  }
+  ctrl <- FALSE
+  if(!is.null(select$clusters) & length(select$clusters) == 1)
+  {
+    if(select$clusters[1] == "all"){
+      ctrl <- TRUE
+    }
+  }
+
+  if(is.null(select$clusters) | ctrl)
+  {
+    select$clusters <- pkgEnvAntareasH5$varClusters
+  }
+
 
   for(i in names(select)){
     if(length(which(! select[[i]] %in% unselect[[i]])) > 0)
@@ -110,8 +144,24 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
     }
   }
 
+  for(i in 1:length(select)){
+    if(length(select[[i]]) > 1){
+      if(length(which(select[[i]] == "all")) > 0){
+        select[[i]] <- select[[i]][-c(which(select[[i]] == "all"))]
+      }
+    }
+  }
+
+  ##End give select
 
 
+
+  areas <- reqInfos$areas
+  links <- reqInfos$links
+  clusters <- reqInfos$clusters
+  districts <- reqInfos$districts
+  mcYears <- reqInfos$mcYears
+  synthesis <- reqInfos$synthesis
 
   synthesis <- is.null(mcYears)
 
@@ -122,22 +172,9 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
   #Load attibutes
 
-  if(H5Lexists(fid, paste0(timeStep, "/attrib")))
-  {
 
-    did <- H5Dopen(fid, paste0(timeStep, "/attrib"))
-    attrib <- unserialize(charToRaw(H5Dread(did)))
-    H5Dclose(did)
+  attrib <- .loadAttributes(fid, timeStep)
 
-    if(!is.null(attrib$opts$linksDef)){
-      attrib$opts$linksDef <- data.table(attrib$opts$linksDef)
-    }
-    if(!is.null(attrib$opts$districtsDef)){
-      attrib$opts$districtsDef <- data.table(attrib$opts$districtsDef)
-    }
-  }else{
-    attrib <- NULL
-  }
   if(is.null(mcYears)){
     mcType <- "mcAll"
     mcYears <- "mcAll"
@@ -190,7 +227,6 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
     listOut$districts <- districts
     rm(districts)
   }
-  print(select)
   clusters <- .loadClusters(clusters = clusters,
                             fid = fid,
                             select = select$clusters,
@@ -314,10 +350,9 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
   }
 
   typeS <- paste0(type, "s")
+  struct <- .getstructure(fid, paste0(GP, "/", typeS, "/", mcType, "/structure"))
 
-  gid <- H5Gopen(fid,  paste0(GP, "/", typeS, "/", mcType, "/structure"))
 
-  struct <- h5dump(gid)
 
   H5Gclose(gid)
   compname <- NULL
@@ -666,14 +701,38 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 #'
 #' @noRd
 .addColumns <- function(select, var){
-  if(identical(select, "all")){
-    return(select)
-  }
   if(is.null(select)){
     return(var)
   }
   if(is.list(select)){
     return(lapply(select, function(X){c(X, var)}))
   }
-  c(select, var)
+  c(var, select)
+}
+
+
+.loadAttributes <- function(fid, timeStep){
+  if(H5Lexists(fid, paste0(timeStep, "/attrib")))
+  {
+
+    did <- H5Dopen(fid, paste0(timeStep, "/attrib"))
+    attrib <- unserialize(charToRaw(H5Dread(did)))
+    H5Dclose(did)
+
+    if(!is.null(attrib$opts$linksDef)){
+      attrib$opts$linksDef <- data.table(attrib$opts$linksDef)
+    }
+    if(!is.null(attrib$opts$districtsDef)){
+      attrib$opts$districtsDef <- data.table(attrib$opts$districtsDef)
+    }
+  }else{
+    attrib <- NULL
+  }
+  attrib
+}
+
+
+.getstructure <- function(fid, strgp){
+  gid <- H5Gopen(fid,  strgp)
+  h5dump(gid)
 }
