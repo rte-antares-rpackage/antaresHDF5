@@ -351,10 +351,8 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
   typeS <- paste0(type, "s")
   struct <- .getstructure(fid, paste0(GP, "/", typeS, "/", mcType, "/structure"))
+  print(struct)
 
-
-
-  H5Gclose(gid)
   compname <- NULL
   if(type == "cluster"){
     splitClust <- strsplit(struct[[type]], "/")
@@ -734,5 +732,12 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
 .getstructure <- function(fid, strgp){
   gid <- H5Gopen(fid,  strgp)
-  h5dump(gid)
+  data <- h5dump(gid)
+  H5Gclose(gid)
+  if(length(which(data$reCalcVar!="")) > 0)
+  {
+    data$reCalcVar <- data$reCalcVar[which(data$reCalcVar!="")]
+    data$variable <- c(data$variable, data$reCalcVar)
+  }
+  data
 }
