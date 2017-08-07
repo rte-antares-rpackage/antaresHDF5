@@ -351,7 +351,6 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
   typeS <- paste0(type, "s")
   struct <- .getstructure(fid, paste0(GP, "/", typeS, "/", mcType, "/structure"))
-  print(struct)
 
   compname <- NULL
   if(type == "cluster"){

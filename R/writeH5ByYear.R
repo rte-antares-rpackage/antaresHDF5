@@ -15,6 +15,11 @@
 #' @param thermalModulation \code{boolean} see \link[antaresRead]{readAntares}
 #' @param writeAllSimulations \code{boolean}, write all simulations of your antares study.
 #' @param nbCores \code{numeric}, number of cores to use, only used if writeAllSimulations is TRUE
+#' @param removeVirtualAreas \code{boolean}, remove virtual areas, see \link[antaresRead]{removeVirtualAreas}
+#' @param storageFlexibility \code{character}, see \link[antaresRead]{removeVirtualAreas}
+#' @param production \code{character}, see \link[antaresRead]{removeVirtualAreas}
+#' @param reassignCosts \code{boolean}, see \link[antaresRead]{removeVirtualAreas}
+#' @param newCols \code{boolean}, see \link[antaresRead]{removeVirtualAreas}
 #'
 #' @examples
 #' \dontrun{
@@ -54,8 +59,15 @@ writeAntaresH5 <- function(path = NULL, timeSteps = c("hourly", "daily", "weekly
                            mustRun = FALSE,
                            thermalModulation = FALSE,
                            writeAllSimulations = FALSE,
-                           nbCores = 4
+                           nbCores = 4,
+                           removeVirtualAreas = FALSE,
+                           storageFlexibility = NULL,
+                           production = NULL,
+                           reassignCosts = FALSE,
+                           newCols = TRUE
 ){
+
+
 
   if(!writeAllSimulations){
     .writeAntaresH5Fun(path = path,
@@ -70,7 +82,12 @@ writeAntaresH5 <- function(path = NULL, timeSteps = c("hourly", "daily", "weekly
                        reserve = reserve,
                        linkCapacity = linkCapacity,
                        mustRun = mustRun,
-                       thermalModulation = thermalModulation)
+                       thermalModulation = thermalModulation,
+                       removeVirtualAreas = removeVirtualAreas,
+                       storageFlexibility = storageFlexibility,
+                       production = production,
+                       reassignCosts = reassignCosts,
+                       newCols = newCols)
   }else{
     studieSToWrite <- list.dirs(paste0(opts$studyPath, "/output"), recursive = FALSE, full.names = FALSE)
     studyPath <- opts$studyPath
@@ -91,7 +108,13 @@ writeAntaresH5 <- function(path = NULL, timeSteps = c("hourly", "daily", "weekly
                         "reserve",
                         "linkCapacity",
                         "mustRun",
-                        "thermalModulation"), envir = environment())
+                        "thermalModulation",
+                        "removeVirtualAreas",
+                        "storageFlexibility",
+                        "production",
+                        "reassignCosts",
+                        "newCols"
+                        ), envir = environment())
 
     parSapplyLB(cl, studieSToWrite, function(X){
       opts <- setSimulationPath(studyPath, X)
@@ -107,7 +130,12 @@ writeAntaresH5 <- function(path = NULL, timeSteps = c("hourly", "daily", "weekly
                          reserve = reserve,
                          linkCapacity = linkCapacity,
                          mustRun = mustRun,
-                         thermalModulation = thermalModulation)
+                         thermalModulation = thermalModulation,
+                         removeVirtualAreas = removeVirtualAreas,
+                         storageFlexibility = storageFlexibility,
+                         production = production,
+                         reassignCosts = reassignCosts,
+                         newCols = newCols)
 
 
     })
@@ -128,7 +156,12 @@ writeAntaresH5 <- function(path = NULL, timeSteps = c("hourly", "daily", "weekly
                            reserve = reserve,
                            linkCapacity = linkCapacity,
                            mustRun = mustRun,
-                           thermalModulation = thermalModulation)
+                           thermalModulation = thermalModulation,
+                           removeVirtualAreas = removeVirtualAreas,
+                           storageFlexibility = storageFlexibility,
+                           production = production,
+                           reassignCosts = reassignCosts,
+                           newCols = newCols)
 
 
       })
@@ -140,20 +173,6 @@ writeAntaresH5 <- function(path = NULL, timeSteps = c("hourly", "daily", "weekly
 }
 
 #' Convert antares output to h5 file
-#'
-#' @param path \code{character} path of h5 file to write
-#' @param timeSteps \code{character} timeSteps
-#' @param opts \code{list} of simulation parameters returned by the function \link{setSimulationPath}. Defaut to \code{antaresRead::simOptions()}
-#' @param writeMcAll \code{boolean} write mc-all
-#' @param compress \code{numeric} compress level
-#' @param misc \code{boolean} see \link[antaresRead]{readAntares}
-#' @param thermalAvailabilities \code{boolean} see \link[antaresRead]{readAntares}
-#' @param hydroStorage \code{boolean} see \link[antaresRead]{readAntares}
-#' @param hydroStorageMaxPower \code{boolean} see \link[antaresRead]{readAntares}
-#' @param reserve \code{boolean} see \link[antaresRead]{readAntares}
-#' @param linkCapacity \code{boolean} see \link[antaresRead]{readAntares}
-#' @param mustRun \code{boolean} see \link[antaresRead]{readAntares}
-#' @param thermalModulation \code{boolean} see \link[antaresRead]{readAntares}
 #'
 #' @noRd
 .writeAntaresH5Fun <- function(path,
@@ -168,7 +187,12 @@ writeAntaresH5 <- function(path = NULL, timeSteps = c("hourly", "daily", "weekly
                                reserve,
                                linkCapacity,
                                mustRun,
-                               thermalModulation ){
+                               thermalModulation,
+                               removeVirtualAreas,
+                               storageFlexibility,
+                               production,
+                               reassignCosts,
+                               newCols){
   if(is.null(path)){
     studPath <- unlist(strsplit(opts$simPath, "/"))
     studName <- studPath[length(studPath)]
@@ -213,6 +237,14 @@ writeAntaresH5 <- function(path = NULL, timeSteps = c("hourly", "daily", "weekly
                          hydroStorage = hydroStorage, hydroStorageMaxPower = hydroStorageMaxPower,
                          reserve = reserve, linkCapacity = linkCapacity, mustRun = mustRun,
                          thermalModulation = thermalModulation)
+
+      if(removeVirtualAreas){
+        removeVirtualAreas(res,
+                           storageFlexibility = storageFlexibility,
+                           production = production,
+                           reassignCosts = reassignCosts,
+                           newCols = newCols)
+      }
 
       if(writeStructure & !mcAll){
 

@@ -84,8 +84,7 @@ addStraitments <- function(opts,
   })
 
 
-  #path <- opts$h5path
-  path <- "testStudy.h5"
+  path <- opts$h5path
   fid <- H5Fopen(path)
 
   ##Add control on straitments to define all this objects
@@ -261,7 +260,6 @@ addStraitments <- function(opts,
   if(allStraitments$surplusClusters){
     try({
     surplusClusters <- surplusClusters(res, timeStep =  "hourly")
-
     idC <- getIdCols(surplusClusters)
     res$clusters <- merge(res$clusters, surplusClusters, by = idC)
     })

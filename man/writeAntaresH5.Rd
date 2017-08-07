@@ -9,7 +9,9 @@ writeAntaresH5(path = NULL, timeSteps = c("hourly", "daily", "weekly",
   compress = 1, misc = FALSE, thermalAvailabilities = FALSE,
   hydroStorage = FALSE, hydroStorageMaxPower = FALSE, reserve = FALSE,
   linkCapacity = FALSE, mustRun = FALSE, thermalModulation = FALSE,
-  writeAllSimulations = FALSE, nbCores = 4)
+  writeAllSimulations = FALSE, nbCores = 4, removeVirtualAreas = FALSE,
+  storageFlexibility = NULL, production = NULL, reassignCosts = FALSE,
+  newCols = TRUE)
 }
 \arguments{
 \item{path}{\code{character} path of h5 file to write}
@@ -41,6 +43,16 @@ writeAntaresH5(path = NULL, timeSteps = c("hourly", "daily", "weekly",
 \item{writeAllSimulations}{\code{boolean}, write all simulations of your antares study.}
 
 \item{nbCores}{\code{numeric}, number of cores to use, only used if writeAllSimulations is TRUE}
+
+\item{removeVirtualAreas}{\code{boolean}, remove virtual areas, see \link[antaresRead]{removeVirtualAreas}}
+
+\item{storageFlexibility}{\code{character}, see \link[antaresRead]{removeVirtualAreas}}
+
+\item{production}{\code{character}, see \link[antaresRead]{removeVirtualAreas}}
+
+\item{reassignCosts}{\code{boolean}, see \link[antaresRead]{removeVirtualAreas}}
+
+\item{newCols}{\code{boolean}, see \link[antaresRead]{removeVirtualAreas}}
 }
 \description{
 Convert antares output to h5 file
