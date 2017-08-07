@@ -1,28 +1,16 @@
-# showAliases()
-# path <- "testStudy.h5"
-# res <- h5ReadAntares(path, select = "downwardMargin")
-# dim(res$areas)
-# dim(res$links)
-#
-# removeVirtualAreas(res, getAreas(c("psp out-2")))
-#
-# antaresProcessing::addDownwardMargin(res)
-# dim(res$areas)
-# dim(res$links)
-#
-#
-#
-#
-# showAliases("downwardMargin")
-# mydata <- readAntares(select = c("downwardMargin", "FLOW LIN."))
-# mydata <- removeVirtualAreas(mydata, getAreas(c("psp out-2")))
-# addDownwardMargin(mydata)
-# names(mydata$areas)
-#
-# opts <- setSimulationPathH5(path)
-#
-#
-# addStraitments(opts,
+
+# opts <- setSimulationPathH5()
+# h5ReadAntares(path, select = "Out_addDownwardMargin", mcYears = 1)
+# h5ReadAntares(path, select = "Out_addUpwardMargin", mcYears = 1)
+# h5ReadAntares(path, select = "Out_addExportAndImport", mcYears = 1)
+# h5ReadAntares(path, select = "Out_addLoadFactorLink", mcYears = 1)
+# h5ReadAntares(path, select = "Out_externalDependency", mcYears = 1)
+# h5ReadAntares(path, select = "Out_loadFactor", mcYears = 1)
+# h5ReadAntares(path, select = "Out_modulation", mcYears = 1)
+# h5ReadAntares(path, select = "Out_netLoadRamp", mcYears = 1)
+# h5ReadAntares(path, select = "Out_surplus", mcYears = 1)
+# h5ReadAntares(path, select = "Out_surplusClusters", mcYears = 1)
+# addStraitments(opts,addDownwardMargin = TRUE)
 
 addStraitments <- function(opts,
                            addDownwardMargin = FALSE,
@@ -35,19 +23,18 @@ addStraitments <- function(opts,
                            netLoadRamp = FALSE,
                            surplus = FALSE,
                            surplusClusters = FALSE
-                           #surplusSectors = FALSE
                            ){
 
-  addDownwardMargin = TRUE
-  addUpwardMargin = TRUE
-  addExportAndImport = TRUE
-  addLoadFactorLink = TRUE
-  externalDependency = TRUE
-  loadFactor = TRUE
-  modulation = TRUE
-  netLoadRamp = TRUE
-  surplus = TRUE
-  surplusClusters = TRUE
+  # addDownwardMargin = TRUE
+  # addUpwardMargin = TRUE
+  # addExportAndImport = TRUE
+  # addLoadFactorLink = TRUE
+  # externalDependency = TRUE
+  # loadFactor = TRUE
+  # modulation = TRUE
+  # netLoadRamp = TRUE
+  # surplus = TRUE
+  # surplusClusters = TRUE
   #surplusSectors = TRUE
 
   allStraitments <- list(
@@ -60,7 +47,7 @@ addStraitments <- function(opts,
     modulation = modulation,
     netLoadRamp = netLoadRamp,
     surplus = surplus,
-    surplusClusters = surplusClusters)#,surplusSectors = surplusSectors
+    surplusClusters = surplusClusters)
 
   columnsToAdd <- .getNewColumnsName(allStraitments)
   writeAreas <- ifelse(is.null(columnsToAdd$areas), FALSE, TRUE)
@@ -97,9 +84,8 @@ addStraitments <- function(opts,
   })
 
 
-
   #path <- opts$h5path
-   path <- "testStudy.h5"
+  path <- "testStudy.h5"
   fid <- H5Fopen(path)
 
   ##Add control on straitments to define all this objects
@@ -109,14 +95,37 @@ addStraitments <- function(opts,
   ##IfverWiteAreas
 
   if(writeAreas){
-    GP <- paste0(timeStep, "/", dfStrait, "/", mcY)
-    namesVariable <- variableToAddAreas
+    GP <- paste0(timeStep, "/", "areas", "/", mcY)
     .writeNewColumns(path = path,
                 newdata = outToWrite$areas,
                 GP = GP,
                 namesVariable = columnsToAdd$areas)
+  }
 
-    }
+
+  if(writeLinks){
+    GP <- paste0(timeStep, "/", "links", "/", mcY)
+    .writeNewColumns(path = path,
+                     newdata = outToWrite$links,
+                     GP = GP,
+                     namesVariable = columnsToAdd$links)
+  }
+
+  if(writeClusters){
+    GP <- paste0(timeStep, "/", "clusters", "/", mcY)
+    .writeNewColumns(path = path,
+                     newdata = outToWrite$clusters,
+                     GP = GP,
+                     namesVariable = columnsToAdd$clusters)
+  }
+
+  if(writeDistricts){
+    GP <- paste0(timeStep, "/", "districts", "/", mcY)
+    .writeNewColumns(path = path,
+                     newdata = outToWrite$districts,
+                     GP = GP,
+                     namesVariable = columnsToAdd$districts)
+  }
 
 }
 
@@ -154,7 +163,7 @@ addStraitments <- function(opts,
   arrayToWrite <- array(newdata, dimtowrite)
   newDim <- actualDim
   newDim[2] <- newDim[2] + dimtowrite[2]
-  h5set_extent(fid, datatype, c(len1, newDim))
+  h5set_extent(fid, datatype, c(newDim))
   h5writeDataset.array(obj = arrayToWrite, fid, datatype, index = indexToWrite)
 }
 
@@ -181,54 +190,81 @@ addStraitments <- function(opts,
 }
 
 .getSelectalias <- function(allStraitments){
-  as.character(pkgEnvAntareasH5$processDispo[pkgEnvAntareasH5$processDispo$trtName%in%
+  as.character(pkgEnvAntareasH5$processDispo[pkgEnvAntareasH5$processDispo$fctname%in%
                                   names(which(unlist(allStraitments))),]$trtName)
 }
 
 
 .calcNewColumns <- function(res, allStraitments){
   if(allStraitments$addDownwardMargin){
+    try({
     res <- addDownwardMargin(res)
+    })
   }
   if(allStraitments$addUpwardMargin){
+    try({
     res <- addUpwardMargin(res)
+    })
   }
   if(allStraitments$addExportAndImport){
+    try({
     res <- addExportAndImport(res)
+    })
   }
   if(allStraitments$addLoadFactorLink){
+    try({
     res <- addLoadFactorLink(res)
+    })
   }
   if(allStraitments$externalDependency){
+    try({
     res <- addNetLoad(res)
+    })
+    try({
     extDep <- externalDependency(res, timeStep =  "hourly")
+
     idC <- getIdCols(extDep)
     res$areas <- merge(res$areas, extDep, by = idC)
+    })
   }
   if(allStraitments$loadFactor){
+    try({
     loadFactor <- loadFactor(res, timeStep =  "hourly")
     idC <- getIdCols(loadFactor)
     res$clusters <- merge(res$clusters, loadFactor, by = idC)
+    })
   }
   if(allStraitments$modulation){
+    try({
     mod <- modulation(res, timeStep =  "hourly")
+
     idC <- getIdCols(mod)
     res$clusters <- merge(res$clusters, mod, by = idC)
+    })
   }
   if(allStraitments$netLoadRamp){
+    try({
     netLoadRamp <- netLoadRamp(res, timeStep =  "hourly")
+
     idC <- getIdCols(netLoadRamp)
     res$areas <- merge(res$areas, netLoadRamp, by = idC)
+    })
   }
   if(allStraitments$surplus){
+    try({
     surplus <- surplus(res, timeStep =  "hourly")
+
     idC <- getIdCols(surplus)
     res$areas <- merge(res$areas, surplus, by = idC)
+    })
   }
   if(allStraitments$surplusClusters){
+    try({
     surplusClusters <- surplusClusters(res, timeStep =  "hourly")
+
     idC <- getIdCols(surplusClusters)
     res$clusters <- merge(res$clusters, surplusClusters, by = idC)
+    })
   }
   res
 }

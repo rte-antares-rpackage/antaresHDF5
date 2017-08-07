@@ -113,14 +113,14 @@ writeDataType <- function(data,
   if(writeStructure){
     h5createDataset(path, groupData, dims = dimData, chunk = c(dimData[1], 1, 1, 1),
                     level = compress, maxdims = c(dimData[1],
-                                                  dimData[2] + 100,
+                                                  dimData[2] + 1000,
                                                   dimData[3],
                                                   dimData[4]))
     fid <- H5Fopen(path)
     # dimStructure$reCalcVar <- rep("NoVariable", 100)
     h5writeDataset.list(dimStructure, fid, structData, level = compress)
     structNew <- paste0(structData, "/reCalcVar")
-    h5createDataset(path, structNew, storage.mode = "character", level = compress , dims = 100,
+    h5createDataset(path, structNew, storage.mode = "character", level = compress , dims = 1000,
                     size = 200)
 
     H5Fclose(fid)
