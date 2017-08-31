@@ -8,16 +8,12 @@ zipPath <- system.file("testdata.zip", package = "antaresHdf5")
 unzip(zipPath)
 # setSimulationPath("testdata/test_case")
 opts <- setSimulationPath("testdata/test_case")
-path <- "testStudy.h5"
-writeAntaresH5(path, misc = TRUE, thermalAvailabilities = TRUE,
+
+writeAntaresH5(misc = TRUE, thermalAvailabilities = TRUE,
                hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
                linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE)
 timeStep <-  c("hourly", "daily", "weekly",
                "monthly", "annual")
-
-writeAntaresH5(writeAllSimulations = TRUE, nbCores = 1)
-testthat::expect_true(file.exists(paste0(list.files(paste0(opts$studyPath, "/output")), ".h5")))
-file.remove(paste0(list.files(paste0(opts$studyPath, "/output")), ".h5"))
 
 compareValue <- function(A, B, res = NULL){
   if(class(A)[3] == "list"){
@@ -49,9 +45,9 @@ compareValue <- function(A, B, res = NULL){
 #
 #
 #
+path <- "20170315-1140eco-test.h5"
 
-
-sapply(pkgEnv$allCompute, function(X){
+sapply(pkgEnvH5$allCompute, function(X){
   test_that(paste0("Select : ", X, " timeStep : "),{
     param1 <- list(path = path, areas = "a", mcYears = 1, select = X)
     param2 <- list(path = path, areas = "a", mcYears = 1)
@@ -110,6 +106,7 @@ sapply("hourly", function(Z){
   sapply(names(paramComparaison), function(X){
     test_that(paste(X, Z), {
       param1 <- paramComparaison[[X]]
+      print(param1)
       param1$timeStep <- Z
       param2 <- param1
 
@@ -155,3 +152,4 @@ h5createGroup("testnodata.h5", "hourly")
 DF1 <-  h5ReadAntares("testnodata.h5", areas = "all", links = "all", clusters = "all", districts = "all")
 H5close()
 unlink("testnodata.h5")
+

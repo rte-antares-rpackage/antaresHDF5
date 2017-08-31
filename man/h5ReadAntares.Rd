@@ -9,7 +9,7 @@ h5ReadAntares(path, areas = NULL, links = NULL, clusters = NULL,
   thermalAvailabilities = FALSE, hydroStorage = FALSE,
   hydroStorageMaxPower = FALSE, reserve = FALSE, linkCapacity = FALSE,
   mustRun = FALSE, thermalModulation = FALSE, timeStep = "hourly",
-  select = NULL, showProgress = TRUE, simplify = TRUE, perf = TRUE)
+  select = NULL, showProgress = TRUE, simplify = TRUE, perf = FALSE)
 }
 \arguments{
 \item{path}{{character} path of h5file to load}

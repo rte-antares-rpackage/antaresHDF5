@@ -4,7 +4,7 @@
 \alias{writeAntaresH5}
 \title{Convert antares output to h5 file}
 \usage{
-writeAntaresH5(path = NULL, timeSteps = c("hourly", "daily", "weekly",
+writeAntaresH5(path = getwd(), timeSteps = c("hourly", "daily", "weekly",
   "monthly", "annual"), opts = antaresRead::simOptions(), writeMcAll = TRUE,
   compress = 1, misc = FALSE, thermalAvailabilities = FALSE,
   hydroStorage = FALSE, hydroStorageMaxPower = FALSE, reserve = FALSE,
@@ -14,7 +14,7 @@ writeAntaresH5(path = NULL, timeSteps = c("hourly", "daily", "weekly",
   newCols = TRUE)
 }
 \arguments{
-\item{path}{\code{character} path of h5 file to write}
+\item{path}{\code{character} folder where h5 file will be write (default getwd())}
 
 \item{timeSteps}{\code{character} timeSteps}
 
@@ -61,8 +61,7 @@ Convert antares output to h5 file
 \dontrun{
 #Write simulation one by one
 setSimulationPath("C:/Users/TTT/Mystudy", 1)
-path <- "Mystudy.h5"
-writeAntaresH5(path)
+writeAntaresH5()
 
 #Write all simulations
 setSimulationPath("C:/Users/TTT/Mystudy")
@@ -70,14 +69,13 @@ writeAntaresH5(writeAllSimulations = TRUE)
 
 #Choose timestep to write
 setSimulationPath("C:/Users/TTT/Mystudy", 1)
-path <- "Mystudy.h5"
-writeAntaresH5(path, timeSteps = "hourly")
+writeAntaresH5(timeSteps = "hourly")
 
 #Write with additionnal information
-writeAntaresH5(path, timeSteps = "hourly",
-   misc = FALSE, thermalAvailabilities = FALSE,
-   hydroStorage = FALSE, hydroStorageMaxPower = FALSE, reserve = FALSE,
-   linkCapacity = FALSE, mustRun = FALSE, thermalModulation = FALSE)
+writeAntaresH5(timeSteps = "hourly",
+   misc = TRUE, thermalAvailabilities = TRUE,
+   hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
+   linkCapacity = TRUE, mustRun = TRUE, thermalModulation = TRUE)
 
 }
 

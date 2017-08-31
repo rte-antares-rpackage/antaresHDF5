@@ -19,8 +19,8 @@ Imports:
   stringr,
   testthat,
   plyr,
-  parallel
-RoxygenNote: 6.0.1
-Suggests:
-  covr,
+  parallel,
   antaresProcessing
+Suggests: 
+  covr
+RoxygenNote: 6.0.1

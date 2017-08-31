@@ -4,10 +4,12 @@
 \alias{setSimulationPathH5}
 \title{Set simulation path for h5 file}
 \usage{
-setSimulationPathH5(path)
+setSimulationPathH5(path, simulation = NULL)
 }
 \arguments{
 \item{path}{\code{character} path of h5 file}
+
+\item{simulation}{\code{character} simulation number or name}
 }
 \description{
 Set simulation path for h5 file

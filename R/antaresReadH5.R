@@ -20,7 +20,7 @@
 #' @param thermalModulation see \link[antaresRead]{readAntares}
 #' @param perf \code{boolean}, eval performance during developpement time, to remove
 #'
-#' @import parallel
+#' @import parallel plyr antaresProcessing
 #'
 #' @export
 h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
@@ -29,7 +29,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
                           hydroStorage = FALSE, hydroStorageMaxPower = FALSE, reserve = FALSE,
                           linkCapacity = FALSE, mustRun = FALSE, thermalModulation = FALSE,
                           timeStep = "hourly", select = NULL, showProgress = TRUE,
-                          simplify = TRUE, perf = TRUE){
+                          simplify = TRUE, perf = FALSE){
 
   if(perf){
     Beg <- Sys.time()
@@ -40,10 +40,38 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
     ctrlselectlist <- TRUE
   }
 
+
+  if(ctrlselectlist){
+    if(misc){
+      select <- c(select, "misc")
+    }
+    if(thermalAvailabilities){
+      select <- c(select, "thermalAvailabilities")
+    }
+    if(hydroStorage){
+      select <- c(select, "hydroStorage")
+    }
+    if(hydroStorageMaxPower){
+      select <- c(select, "hydroStorageMaxPower")
+    }
+    if(reserve){
+      select <- c(select, "reserve")
+    }
+    if(linkCapacity){
+      select <- c(select, "linkCapacity")
+    }
+    if(mustRun){
+      select <- c(select, "mustRun")
+    }
+    if(thermalModulation){
+      select <- c(select, "thermalModulation")
+    }
+  }
+
+
   if(is.null(select)){
     select <- "all"
   }
-
   reqInfos <- .giveInfoRequest(select = select,
                                areas = areas,
                                links = links,
@@ -60,7 +88,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
 
 
-  allCompute <- pkgEnv$allCompute
+  allCompute <- pkgEnvH5$allCompute
   computeAdd <- unlist(select)[unlist(select) %in% allCompute]
   computeAdd <- unique(computeAdd)
   if(length(computeAdd) > 0){
@@ -89,17 +117,17 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
   ctrl <- FALSE
   if(!is.null(select$areas))
   {
-    if(select$areas[1] == "all" & length(select$areas) == 1){
+    if(select$areas[1] == "all"){
       ctrl <- TRUE
     }
   }
   if(is.null(select$areas) | ctrl)
   {
-    select$areas <- pkgEnvAntareasH5$varAreas
+    select$areas <- c(pkgEnvAntareasH5$varAreas,select$areas)
   }
 
   ctrl <- FALSE
-  if(!is.null(select$links) & length(select$links) == 1)
+  if(!is.null(select$links))
   {
     if(select$links[1] == "all"){
       ctrl <- TRUE
@@ -108,11 +136,11 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
   if(is.null(select$links)| ctrl)
   {
-    select$links <- pkgEnvAntareasH5$varLinks
+    select$links <- c(pkgEnvAntareasH5$varLinks, select$links)
   }
 
   ctrl <- FALSE
-  if(!is.null(select$districts) & length(select$districts) == 1)
+  if(!is.null(select$districts))
   {
     if(select$districts[1] == "all"){
       ctrl <- TRUE
@@ -121,10 +149,10 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
   if(is.null(select$districts) | ctrl)
   {
-    select$districts <- pkgEnvAntareasH5$varDistricts
+    select$districts <- c(pkgEnvAntareasH5$varDistricts,  select$districts )
   }
   ctrl <- FALSE
-  if(!is.null(select$clusters) & length(select$clusters) == 1)
+  if(!is.null(select$clusters))
   {
     if(select$clusters[1] == "all"){
       ctrl <- TRUE
@@ -133,7 +161,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 
   if(is.null(select$clusters) | ctrl)
   {
-    select$clusters <- pkgEnvAntareasH5$varClusters
+    select$clusters <- c(pkgEnvAntareasH5$varClusters, select$clusters )
   }
 
 
@@ -153,9 +181,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
   }
 
   ##End give select
-
-
-
+  
   areas <- reqInfos$areas
   links <- reqInfos$links
   clusters <- reqInfos$clusters
@@ -324,7 +350,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
     size <- unlist(lapply(K,length))
     h5spaceMem = H5Screate_simple(size)
     sid <- .Call("_H5Screate_simple", as.double(size), as.double(size), PACKAGE = "rhdf5")
-    W <- H5Screate_simple(H5Sselect_index(h5spaceFile, K))@ID
+    W <- H5Screate_simple(H5Sselect_index(h5spaceFile, as.list(K)))@ID
 
     .Call("_H5Dread", did@ID, h5spaceFile@ID, W,
           NULL, FALSE, 0L , FALSE, PACKAGE = "rhdf5")
@@ -737,6 +763,106 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
   {
     data$reCalcVar <- data$reCalcVar[which(data$reCalcVar!="")]
     data$variable <- c(data$variable, data$reCalcVar)
+    data$reCalcVar <- NULL
   }
   data
 }
+
+
+
+#' Use to transform inputs arguments to be passable to reading function
+#'
+#'
+#'
+#' @param select Character vector containing the name of the columns to import. See \link{readAntares} for further information.
+#' @param areas Vector containing the names of the areas to import. See \link{readAntares} for further information.
+#' @param links Vector containing the names of the links to import. See \link{readAntares} for further information.
+#' @param clusters Vector containing the names of the clusters to import. See \link{readAntares} for further information.
+#' @param districts Vector containing the names of the districts to import. See \link{readAntares} for further information.
+#' @param mcYears Index of the Monte-Carlo years to import. See \link{readAntares} for further information.
+#'
+#' @return \code{list}
+#' \itemize{
+#' \item select
+#' \item areas
+#' \item links
+#' \item clusters
+#' \item districts
+#' \item mcYears
+#' \item synthesis
+#' \item computeAdd
+#' }
+#'
+#' @noRd
+.giveInfoRequest <- function(select,
+                             areas,
+                             links,
+                             clusters,
+                             districts,
+                             mcYears){
+
+  if (!is.list(select)) select <- list(areas = select, links = select, districts = select)
+  ##Get unselect columns (by - operator)
+  unselect <- lapply(select, function(X){
+    minusColumns <- grep("^-", X)
+    if(length(minusColumns)>0)
+    {
+      uns <- X[minusColumns]
+      gsub("^-", "", uns)
+    }else{
+      NULL
+    }
+  })
+
+  ##Remove unselect columns
+  select <- lapply(select, function(X){
+    minusColumns <- grep("^-", X)
+    if(length(minusColumns) > 0){
+      X[-c(minusColumns)]
+    }else{
+      X
+    }
+  })
+
+
+  # Aliases for groups of variables
+  select <- llply(select, function(x) {
+    for (alias in names(pkgEnvH5$varAliases)) {
+      if (tolower(alias) %in% tolower(x)) x <- append(x, pkgEnvH5$varAliases[[alias]]$select)
+    }
+    x
+  })
+
+  allCompute <- pkgEnvH5$allCompute
+  computeAdd <- allCompute[allCompute%in%unlist(select)]
+
+  if ("areas" %in% unlist(select) & is.null(areas)) areas <- "all"
+  if ("links" %in% unlist(select) & is.null(links)) {
+    if (!is.null(areas)) links <- getLinks(getAreas(areas, regexpSelect = FALSE))
+    else links <- "all"
+  }
+  if ("clusters" %in% unlist(select) & is.null(clusters)) {
+    if (!is.null(areas)) clusters <- areas
+    else clusters <- "all"
+  }
+  if ("mcYears" %in% unlist(select) & is.null(mcYears)) mcYears <- "all"
+
+  # If all arguments are NULL, import all areas
+  if (is.null(areas) & is.null(links) & is.null(clusters) & is.null(districts)) {
+    areas <- "all"
+  }
+
+  # Check arguments validity. The function .checkArgs is defined below
+  synthesis <- is.null(mcYears)
+
+  return(list(select = select,
+              areas = areas,
+              links = links,
+              clusters = clusters,
+              districts = districts,
+              mcYears = mcYears,
+              synthesis = synthesis,
+              computeAdd = computeAdd,
+              unselect = unselect))
+}
+

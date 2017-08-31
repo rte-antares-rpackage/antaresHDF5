@@ -173,6 +173,5 @@ pkgEnvAntareasH5$processDispo <- data.frame(
                                     "surplusClusters"
                                      ))
 
-.giveInfoRequest <- antaresRead:::.giveInfoRequest
-pkgEnv <- antaresRead:::pkgEnv
+pkgEnvH5 <- antaresRead:::pkgEnv
 

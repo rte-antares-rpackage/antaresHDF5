@@ -1,6 +1,6 @@
 #' Convert antares output to h5 file
 #'
-#' @param path \code{character} path of h5 file to write
+#' @param path \code{character} folder where h5 file will be write (default getwd())
 #' @param timeSteps \code{character} timeSteps
 #' @param opts \code{list} of simulation parameters returned by the function \link{setSimulationPath}. Defaut to \code{antaresRead::simOptions()}
 #' @param writeMcAll \code{boolean} write mc-all
@@ -25,8 +25,7 @@
 #' \dontrun{
 #' #Write simulation one by one
 #' setSimulationPath("C:/Users/TTT/Mystudy", 1)
-#' path <- "Mystudy.h5"
-#' writeAntaresH5(path)
+#' writeAntaresH5()
 #'
 #' #Write all simulations
 #' setSimulationPath("C:/Users/TTT/Mystudy")
@@ -34,19 +33,18 @@
 #'
 #' #Choose timestep to write
 #' setSimulationPath("C:/Users/TTT/Mystudy", 1)
-#' path <- "Mystudy.h5"
-#' writeAntaresH5(path, timeSteps = "hourly")
+#' writeAntaresH5(timeSteps = "hourly")
 #'
 #' #Write with additionnal information
-#' writeAntaresH5(path, timeSteps = "hourly",
-#'    misc = FALSE, thermalAvailabilities = FALSE,
-#'    hydroStorage = FALSE, hydroStorageMaxPower = FALSE, reserve = FALSE,
-#'    linkCapacity = FALSE, mustRun = FALSE, thermalModulation = FALSE)
+#' writeAntaresH5(timeSteps = "hourly",
+#'    misc = TRUE, thermalAvailabilities = TRUE,
+#'    hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
+#'    linkCapacity = TRUE, mustRun = TRUE, thermalModulation = TRUE)
 #'
 #' }
 #'
 #' @export
-writeAntaresH5 <- function(path = NULL, timeSteps = c("hourly", "daily", "weekly", "monthly", "annual"),
+writeAntaresH5 <- function(path = getwd(), timeSteps = c("hourly", "daily", "weekly", "monthly", "annual"),
                            opts = antaresRead::simOptions(),
                            writeMcAll = TRUE,
                            compress = 1,
@@ -67,6 +65,9 @@ writeAntaresH5 <- function(path = NULL, timeSteps = c("hourly", "daily", "weekly
                            newCols = TRUE
 ){
 
+  simName <- unlist(strsplit(opts$simPath, "/"))
+  simName <- simName[length(simName)]
+  path <- paste0(path, "/", simName, ".h5")
 
 
   if(!writeAllSimulations){
@@ -259,6 +260,21 @@ writeAntaresH5 <- function(path = NULL, timeSteps = c("hourly", "daily", "weekly
         #Write attributes
         s <- serialize(attrib, NULL, ascii = TRUE)
         h5write(rawToChar(s), path, paste0(timeStep, "/attrib"))
+
+
+        ###Write inputs
+        h5createGroup(path, paste0(timeStep, "/inputs"))
+        layout <- readLayout()
+        s <- serialize(layout, NULL, ascii = TRUE)
+        h5write(rawToChar(s), path, paste0(timeStep, "/inputs/layout"))
+        cldesc <- readClusterDesc()
+        s <- serialize(cldesc, NULL, ascii = TRUE)
+        h5write(rawToChar(s), path, paste0(timeStep, "/inputs/cldesc"))
+        bc <- readBindingConstraints()
+        s <- serialize(bc, NULL, ascii = TRUE)
+        h5write(rawToChar(s), path, paste0(timeStep, "/inputs/buildingcte"))
+        h5ls(path)
+
       }
 
       #Remove useless data
