@@ -1,31 +1,23 @@
-# library(antaresHdf5)
-# library(antaresProcessing)
-# library(data.table)
-# path <- "D:/Users/titorobe/Desktop/Antares/antaresHdf5/bigStd - Copie.h5"
-# opts <- setSimulationPathH5(path)
-# h5ReadAntares(path, select = "Out_addDownwardMargin", mcYears = 1)
-# h5ReadAntares(path, select = "Out_addUpwardMargin", mcYears = 1)
-# h5ReadAntares(path, select = "Out_addExportAndImport", mcYears = 1)
-# h5ReadAntares(path, select = "Out_addLoadFactorLink", mcYears = 1)
-# h5ReadAntares(path, select = "Out_externalDependency", mcYears = 1)
-# h5ReadAntares(path, select = "Out_loadFactor", mcYears = 1)
-# h5ReadAntares(path, select = "Out_modulation", mcYears = 1)
-# h5ReadAntares(path, select = "Out_netLoadRamp", mcYears = 1)
-# h5ReadAntares(path, select = "Out_surplus", mcYears = 1)
-# h5ReadAntares(path, select = "Out_surplusClusters", mcYears = 1)
-# addStraitments(opts,addDownwardMargin = TRUE)
-# timeStep = "hourly"
-# addDownwardMargin = TRUE
-# addUpwardMargin = TRUE
-# addExportAndImport = TRUE
-# addLoadFactorLink = TRUE
-# externalDependency = TRUE
-# loadFactor = TRUE
-# modulation = TRUE
-# netLoadRamp = TRUE
-# surplus = TRUE
-# surplusClusters = TRUE
-
+  # library(antaresHdf5)
+  # library(antaresProcessing)
+  # library(data.table)
+  # devtools::load_all(".")
+  # path <- "D:/Users/titorobe/Desktop/Antares/antaresHdf5"
+  # opts <- setSimulationPathH5(path)
+  # addStraitments(opts,addDownwardMargin = TRUE)
+  # timeStep = "hourly"
+  # addDownwardMargin = TRUE
+  # addUpwardMargin = TRUE
+  # addExportAndImport = TRUE
+  # addLoadFactorLink = TRUE
+  # externalDependency = TRUE
+  # loadFactor = TRUE
+  # modulation = TRUE
+  # netLoadRamp = TRUE
+  # surplus = TRUE
+  # surplusClusters = TRUE
+  # opts <- setSimulationPath("D:/Users/titorobe/Desktop/Antares/antaresHdf5", 1)
+  # mcY = "mcInd"
 addStraitments <- function(opts,
                            mcY = "mcInd",
                            addDownwardMargin = FALSE,
@@ -37,9 +29,13 @@ addStraitments <- function(opts,
                            modulation = FALSE,
                            netLoadRamp = FALSE,
                            surplus = FALSE,
-                           surplusClusters = FALSE
-){
-
+                           surplusClusters = FALSE,
+                           evalAreas = list(),
+                           evalLinks = list(),
+                           evalClusters = list(),
+                           evalDistricts = list(),
+                           columnsToSelects = NULL){
+  
   # addDownwardMargin = TRUE
   # addUpwardMargin = TRUE
   # addExportAndImport = TRUE
@@ -50,8 +46,8 @@ addStraitments <- function(opts,
   # netLoadRamp = TRUE
   # surplus = TRUE
   # surplusClusters = TRUE
-  #surplusSectors = TRUE
-
+  # surplusSectors = TRUE
+  
   allStraitments <- list(
     addDownwardMargin = addDownwardMargin,
     addUpwardMargin = addUpwardMargin,
@@ -63,81 +59,85 @@ addStraitments <- function(opts,
     netLoadRamp = netLoadRamp,
     surplus = surplus,
     surplusClusters = surplusClusters)
-
+  
   columnsToAdd <- .getNewColumnsName(allStraitments)
   writeAreas <- ifelse(is.null(columnsToAdd$areas), FALSE, TRUE)
   writeLinks <- ifelse(is.null(columnsToAdd$links), FALSE, TRUE)
   writeClusters <- ifelse(is.null(columnsToAdd$clusters), FALSE, TRUE)
   writeDistricts <- ifelse(is.null(columnsToAdd$districts), FALSE, TRUE)
-
+  
   select <- .getSelectalias(allStraitments)
+  
+  
+  #select <- c(select, columnsToSelects)
   ##Load first Mcyear
-
+  
   if(mcY == "mcInd")
   {
-  mcYear <- opts$mcYears
+    mcYear <- opts$mcYears
   }
   if(mcY == "mcAll")
   {
     mcYear <- "mcAll"
   }
-
-
+  timeStep <- "hourly"
+  
   outToWrite <- sapply(mcYear, function(X){
     if(X == "mcAll"){
       X <- NULL
     }
-    .readDataEndAddColumn(X)
+    myOut <- .readDataEndAddColumn(opts, select = select, mcYears = X, timeStep = timeStep,
+                                   evalAreas = evalAreas, evalLinks = evalLinks,
+                                   evalClusters = evalClusters, evalDistricts = evalDistricts,
+                                   columnsToSelects = columnsToSelects)
+    outList <- names(myOut)
+    outToWrite <- sapply(outList, function(HH){
+      as.matrix(myOut[[HH]])
+    })
+    
+    
+    .writeAllTables(timeStep = timeStep,
+                    mcY = mcY,
+                    path = opts$h5path,
+                    outToWrite = outToWrite ,
+                    areas = writeAreas,
+                    links = writeLinks,
+                    clusters = writeClusters,
+                    districts = writeDistricts,
+                    mcYear = X, writeStruct = X == mcYear[1])
   }, simplify = FALSE)
-  outList <- names(outToWrite[[1]])
-  outToWrite <- sapply(outList, function(X){
-    as.matrix(rbindlist(lapply(outToWrite, function(Y){Y[[X]]})))
-  })
-
-
-  path <- opts$h5path
-  fid <- H5Fopen(path)
-
+  
+  
   ##Add control on straitments to define all this objects
-  timeStep <- "hourly"
-  mcY <- mcY
-
+  
   ##IfverWiteAreas
-
-  if(writeAreas){
-    GP <- paste0(timeStep, "/", "areas", "/", mcY)
-    .writeNewColumns(path = path,
-                     newdata = outToWrite$areas,
-                     GP = GP,
-                     namesVariable = columnsToAdd$areas)
-  }
-
-
-  if(writeLinks){
-    GP <- paste0(timeStep, "/", "links", "/", mcY)
-    .writeNewColumns(path = path,
-                     newdata = outToWrite$links,
-                     GP = GP,
-                     namesVariable = columnsToAdd$links)
-  }
-
-  if(writeClusters){
-    GP <- paste0(timeStep, "/", "clusters", "/", mcY)
-    .writeNewColumns(path = path,
-                     newdata = outToWrite$clusters,
-                     GP = GP,
-                     namesVariable = columnsToAdd$clusters)
-  }
-
-  if(writeDistricts){
-    GP <- paste0(timeStep, "/", "districts", "/", mcY)
-    .writeNewColumns(path = path,
-                     newdata = outToWrite$districts,
-                     GP = GP,
-                     namesVariable = columnsToAdd$districts)
-  }
-
+  
+  
+  
+  
+  
+  
 }
+.writeAllTables <- function(timeStep, mcY, path, outToWrite,
+                            areas, links, clusters, districts, mcYear = NULL, writeStruct = FALSE){
+  fid <- H5Fopen(path)
+  sapply(c("areas", "links", "clusters", "districts"), function(X){
+    print(X)
+    if(get(X)){
+      fid <- H5Fopen(path)
+      Y <- eval(X)
+      print(Y)
+      GP <- paste0(timeStep, "/", Y, "/", mcY)
+      .writeNewColumns(fid = fid,
+                       newdata = outToWrite[[Y]],
+                       GP = GP, mcYear = mcYear,
+                       writeStruct = writeStruct)
+    }
+    
+  })
+  
+}
+
 
 
 
@@ -151,49 +151,79 @@ addStraitments <- function(opts,
   dim
 }
 
-.getIndexToWrite <- function(dim, nbVarToWrite){
-  list(1:dim[1], (dim[2] + 1) : (dim[2] + nbVarToWrite), 1:dim[3], 1:dim[4])
+.getIndexToWrite <- function(dim, nbVarToWrite, mcYear = NULL){
+  d4 <- ifelse(is.null(mcYear), 1:dim[4], mcYear)
+  list(1:dim[1], (dim[2] + 1) : (dim[2] + nbVarToWrite), 1:dim[3], d4)
 }
 
 
-.readDataEndAddColumn <- function(mcYear){
-  res <- h5ReadAntares(path, select = select, mcYears = mcYear, timeStep = timeStep)
+.readDataEndAddColumn <- function(opts, select, mcYears, timeStep, 
+                                  evalAreas, evalLinks,
+                                  evalClusters, evalDistricts, columnsToSelects){
+  res <- readAntares(opts = opts, select = c(select,columnsToSelects), mcYears = mcYears, timeStep = timeStep)
+  for(i in 1:length(res)){
+    res[[i]] <- res[[i]][, .SD, .SDcols = names(res[[i]])[!names(res[[i]])%in%select]]
+  }
   res <- .calcNewColumns(res, allStraitments, timeStep = timeStep)
   if(writeAreas){
-    res$areas <- res$areas[, .SD, .SDcols = columnsToAdd$areas]
+    if(length(evalAreas) > 0)
+    {
+      res$areas[, names(evalAreas) := lapply(evalAreas, function(X){eval(parse(text = X))})]
+    }
+    res$areas <- res$areas[, .SD, .SDcols = c(columnsToAdd$areas, names(evalAreas))]
   }
   if(writeLinks){
-    res$links <- res$links[, .SD, .SDcols = columnsToAdd$links]
+    if(length(evalLinks) > 0)
+    {
+      res$areas[, names(evalLinks) := lapply(evalLinks, function(X){eval(parse(text = X))})]
+    }
+    res$links <- res$links[, .SD, .SDcols = c(columnsToAdd$links, names(evalLinks))]
   }
   if(writeClusters){
-    res$clusters <- res$clusters[, .SD, .SDcols = columnsToAdd$clusters]
+    if(length(evalClusters) > 0)
+    {
+      res$areas[, names(evalClusters) := lapply(evalClusters, function(X){eval(parse(text = X))})]
+    }
+    res$clusters <- res$clusters[, .SD, .SDcols = c(columnsToAdd$clusters,names(evalClusters))]
   }
   if(writeDistricts){
-    res$districts <- res$districts[, .SD, .SDcols = columnsToAdd$districts]
+    if(length(evalDistricts) > 0)
+    {
+      res$areas[, names(evalDistricts) := lapply(evalDistricts, function(X){eval(parse(text = X))})]
+    }
+    res$districts <- res$districts[, .SD, .SDcols = c(columnsToAdd$districts, names(evalDistricts))]
   }
   res
 }
 
 
-.writeNewColumns <- function(path, newdata, GP, namesVariable)
+.writeNewColumns <- function(fid, newdata, GP, mcYear = NULL, writeStruct = FALSE)
 {
-  fid <- H5Fopen(path)
-  nbVarToWrite <- ncol(newdata)
-  nbVarToWrite <- length(namesVariable)
-  datatype <- paste0(GP, "/data")
-  oldStruct <-  paste0(GP, "/structure/reCalcVar")
-  structVarAdd <- h5read(path, oldStruct)
-  structVarAdd[which(structVarAdd == "")[1:nbVarToWrite]] <- namesVariable
-  h5write(structVarAdd, path, oldStruct)
 
+  nbVarToWrite <- ncol(newdata)
+  namesVariable <- colnames(newdata)
+  datatype <- paste0(GP, "/data")
+  if(writeStruct)
+  {
+    oldStruct <-  paste0(GP, "/structure/reCalcVar")
+    
+    did <- H5Dopen(fid, oldStruct)
+    structVarAdd <- H5Dread(did )
+    H5Dclose(did)
+    structVarAdd[which(structVarAdd == "")[1:nbVarToWrite]] <- namesVariable
+    #h5write(structVarAdd, path, oldStruct)
+    h5writeDataset(obj = structVarAdd,  fid, oldStruct)
+  }
+  
   actualDim <- .getDim(fid, datatype)
-  indexToWrite <- .getIndexToWrite(actualDim, nbVarToWrite)
+  indexToWrite <- .getIndexToWrite(actualDim, nbVarToWrite, mcYear)
   dimtowrite <- unlist(lapply(indexToWrite, length))
   arrayToWrite <- array(newdata, dimtowrite)
   newDim <- actualDim
   newDim[2] <- newDim[2] + dimtowrite[2]
   h5set_extent(fid, datatype, c(newDim))
   h5writeDataset.array(obj = arrayToWrite, fid, datatype, index = indexToWrite)
+  H5close()
 }
 
 
@@ -209,7 +239,7 @@ addStraitments <- function(opts,
       links <- c(links, pkgEnvAntareasH5$process[[X]]$links)
       clusters <- c(clusters, pkgEnvAntareasH5$process[[X]]$clusters)
       districts <- c(districts, pkgEnvAntareasH5$process[[X]]$districts)
-
+      
     }
   }
   list(areas = areas,
@@ -251,7 +281,7 @@ addStraitments <- function(opts,
     })
     try({
       extDep <- externalDependency(res, timeStep =  timeStep)
-
+      
       idC <- getIdCols(extDep)
       res$areas <- merge(res$areas, extDep, by = idC)
     })
@@ -266,7 +296,7 @@ addStraitments <- function(opts,
   if(allStraitments$modulation){
     try({
       mod <- modulation(res, timeStep =  timeStep)
-
+      
       idC <- getIdCols(mod)
       res$clusters <- merge(res$clusters, mod, by = idC)
     })
@@ -274,7 +304,7 @@ addStraitments <- function(opts,
   if(allStraitments$netLoadRamp){
     try({
       netLoadRamp <- netLoadRamp(res, timeStep = timeStep)
-
+      
       idC <- getIdCols(netLoadRamp)
       res$areas <- merge(res$areas, netLoadRamp, by = idC)
     })
@@ -282,7 +312,7 @@ addStraitments <- function(opts,
   if(allStraitments$surplus){
     try({
       surplus <- surplus(res, timeStep = timeStep)
-
+      
       idC <- getIdCols(surplus)
       res$areas <- merge(res$areas, surplus, by = idC)
     })
@@ -296,3 +326,4 @@ addStraitments <- function(opts,
   }
   res
 }
+
