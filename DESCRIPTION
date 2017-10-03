@@ -11,6 +11,7 @@ Description: Use h5 files for antares.
 License: GPL (>= 2) | file LICENSE
 Encoding: UTF-8
 LazyData: true
+Depends: R (>= 3.4.0)
 Imports:
   data.table (>= 1.10.4),
   antaresRead (>= 1.1.1),
