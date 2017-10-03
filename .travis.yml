@@ -5,10 +5,6 @@ language: R
 sudo: required
 cache: packages
 
-install:
-  ## For a Bioconductor package
-  - ./travis-tool.sh install_bioc rhdf5
-
 r: bioc-devel
 
 r_packages:
