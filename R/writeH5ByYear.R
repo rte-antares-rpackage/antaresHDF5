@@ -273,7 +273,6 @@ writeAntaresH5 <- function(path = getwd(), timeSteps = c("hourly", "daily", "wee
         bc <- readBindingConstraints()
         s <- serialize(bc, NULL, ascii = TRUE)
         h5write(rawToChar(s), path, paste0(timeStep, "/inputs/buildingcte"))
-        h5ls(path)
 
       }
 
