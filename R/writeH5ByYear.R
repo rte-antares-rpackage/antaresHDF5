@@ -24,15 +24,15 @@
 #' @examples
 #' \dontrun{
 #' #Write simulation one by one
-#' setSimulationPath("C:/Users/TTT/Mystudy", 1)
+#' setSimulationPath("C:/Users/MyUser/Mystudy", 1)
 #' writeAntaresH5()
 #'
 #' #Write all simulations
-#' setSimulationPath("C:/Users/TTT/Mystudy")
+#' setSimulationPath("C:/Users/MyUser/Mystudy")
 #' writeAntaresH5(writeAllSimulations = TRUE)
 #'
 #' #Choose timestep to write
-#' setSimulationPath("C:/Users/TTT/Mystudy", 1)
+#' setSimulationPath("C:/Users/MyUser/Mystudy", 1)
 #' writeAntaresH5(timeSteps = "hourly")
 #'
 #' #Write with additionnal information

@@ -1,25 +1,49 @@
-  # library(antaresHdf5)
-  # library(antaresProcessing)
-  # library(data.table)
-  # devtools::load_all(".")
-  # path <- "D:/Users/titorobe/Desktop/Antares/antaresHdf5"
-  # opts <- setSimulationPathH5(path)
-  # addStraitments(opts,addDownwardMargin = TRUE)
-  # timeStep = "hourly"
-  # addDownwardMargin = TRUE
-  # addUpwardMargin = TRUE
-  # addExportAndImport = TRUE
-  # addLoadFactorLink = TRUE
-  # externalDependency = TRUE
-  # loadFactor = TRUE
-  # modulation = TRUE
-  # netLoadRamp = TRUE
-  # surplus = TRUE
-  # surplusClusters = TRUE
-  # opts <- setSimulationPath("D:/Users/titorobe/Desktop/Antares/antaresHdf5", 1)
-  # mcY = "mcInd"
+#' Add columns to an antares h5 file
+#' 
+#' @description In this version only hourly data can be enriched. 
+#'
+#' @param opts \code{simOptions} obtain wich [antaresRead]{setSimulationPath}
+#' @param mcY  \code{character}, "mcInd" or "mcAll".
+#' @param addDownwardMargin \code{boolean} refer to [antaresProcessing]{addDownwardMargin}
+#' @param addUpwardMargin \code{boolean} refer to [antaresProcessing]{addUpwardMargin}
+#' @param addExportAndImport \code{boolean} refer to [antaresProcessing]{addExportAndImport}
+#' @param addLoadFactorLink \code{boolean} refer to [antaresProcessing]{addLoadFactorLink}
+#' @param externalDependency \code{boolean} refer to [antaresProcessing]{externalDependency}
+#' @param loadFactor \code{boolean} refer to [antaresProcessing]{loadFactor}
+#' @param modulation \code{boolean} refer to [antaresProcessing]{modulation}
+#' @param netLoadRamp \code{boolean} refer to [antaresProcessing]{netLoadRamp}
+#' @param surplus \code{boolean} refer to [antaresProcessing]{surplus}
+#' @param surplusClusters \code{boolean} refer to [antaresProcessing]{surplusClusters}
+#' @param evalAreas \code{list}, list of operation to evaluate in areas data
+#' @param evalLinks \code{list}, list of operation to evaluate in links data
+#' @param evalClusters \code{list}, list of operation to evaluate in clusters data
+#' @param evalDistricts \code{list}, list of operation to evaluate in districts data
+#' @param columnsToSelects \code{character} culomns required by evalAreas, evalLinks
+#' evalClusters & evalDistricts
+#' 
+#' @examples
+#' \dontrun{
+#' addStraitments(opts = opts,  mcY = "mcInd",
+#'                addDownwardMargin = TRUE,
+#'                addUpwardMargin = TRUE,
+#'                addExportAndImport = TRUE,
+#'                addLoadFactorLink = TRUE,
+#'                externalDependency = TRUE,
+#'                loadFactor = TRUE,
+#'                modulation = TRUE,
+#'                netLoadRamp = TRUE,
+#'                surplus = TRUE,
+#'                surplusClusters = TRUE,
+#'                evalAreas = list(Tota = "`H. STOR` + `MISC. DTG`",
+#'                                 Tota2 = "NODU + `NP COST` + 1"),
+#'                evalLinks = list(),
+#'                evalClusters = list(),
+#'                evalDistricts = list(),
+#'                columnsToSelects = c("H. STOR", " MISC. DTG", "NODU", "NP COST"))
+#' }
+#' 
 addStraitments <- function(opts,
-                           mcY = "mcInd",
+                           mcY = c("mcInd", "mcAll"),
                            addDownwardMargin = FALSE,
                            addUpwardMargin = FALSE,
                            addExportAndImport = FALSE,
@@ -47,7 +71,7 @@ addStraitments <- function(opts,
   # surplus = TRUE
   # surplusClusters = TRUE
   # surplusSectors = TRUE
-  
+  mcY <- match.arg(mcY)
   allStraitments <- list(
     addDownwardMargin = addDownwardMargin,
     addUpwardMargin = addUpwardMargin,
@@ -327,3 +351,25 @@ addStraitments <- function(opts,
   res
 }
 
+
+
+# library(antaresHdf5)
+# library(antaresProcessing)
+# library(data.table)
+# devtools::load_all(".")
+# path <- "D:/Users/titorobe/Desktop/Antares/antaresHdf5"
+# opts <- setSimulationPathH5(path)
+# addStraitments(opts,addDownwardMargin = TRUE)
+# timeStep = "hourly"
+# addDownwardMargin = TRUE
+# addUpwardMargin = TRUE
+# addExportAndImport = TRUE
+# addLoadFactorLink = TRUE
+# externalDependency = TRUE
+# loadFactor = TRUE
+# modulation = TRUE
+# netLoadRamp = TRUE
+# surplus = TRUE
+# surplusClusters = TRUE
+# opts <- setSimulationPath("D:/Users/titorobe/Desktop/Antares/antaresHdf5", 1)
+# mcY = "mcInd"
