@@ -1,6 +1,6 @@
 #' Set simulation path for h5 file
 #'
-#' @param path \code{character} path of h5 file
+#' @param path \code{character} path of a .h5 file or a repertory with .h5 file(s)
 #' @param simulation \code{character} simulation number or name
 #'
 #' @export
@@ -41,8 +41,13 @@ setSimulationPathH5 <- function(path, simulation = NULL){
       simulation <- avaliableFile[simulation]
     }
 
+    path <- paste0(path, "/", simulation)
+  } else if(!file.exists(path) & grepl(".h5$", path)){
+    stop("Invalid path argument. File not found. Must be a .h5 file or a repertory with .h5 file(s)")
+  } else if(file.exists(path) & !grepl(".h5$", path)){
+    stop("Invalid path argument. Must be a .h5 file or a repertory with .h5 file(s)")
   }
-  path <- paste0(path, "/", simulation)
+
   print(path)
   attributes <- getOptionsH5(path)
   options(antares=attributes)

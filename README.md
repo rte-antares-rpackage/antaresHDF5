@@ -2,6 +2,26 @@
 
 # Convert an antares study to a h5 file and read him with R package 'antaresHdf5'
 
+## rhdf5 installation
+
+This package depends on **rhdf5** package. This is a **bioconductor** package. Morevover, the current version need the last **R** version (>= 3.4) and a developpement version of **rhdf5** : 
+
+```r
+
+# rhdf5 installation
+source('https://bioconductor.org/biocLite.R')
+BiocInstaller::useDevel() # for latest version
+biocLite('rhdf5')
+
+# update R (one way...)
+# installing/loading the package:
+if(!require(installr)) {
+install.packages("installr"); require(installr)} #load / install+load installr
+ 
+# using the package:
+updateR() # this will start the updating process of your R installation.  It will check for newer versions, and if one is available, will guide you through the decisions you'd need to make.
+```
+
 ## Convert data from a simulation to h5 file
 
 Load the package
