@@ -7,7 +7,7 @@
 setSimulationPathH5(path, simulation = NULL)
 }
 \arguments{
-\item{path}{\code{character} path of h5 file}
+\item{path}{\code{character} path of a .h5 file or a repertory with .h5 file(s)}
 
 \item{simulation}{\code{character} simulation number or name}
 }
