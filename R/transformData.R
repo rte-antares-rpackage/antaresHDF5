@@ -6,7 +6,7 @@
 #' @param districtKey \code{character} organization key for districts, define h5 group and subgroup
 #' @param clustersKey \code{character} organization key for clusters, define h5 group and subgroup
 #'
-#' @import data.table antaresRead rhdf5
+#' @import data.table antaresRead
 #'
 #'
 transformH5 <- function(data,

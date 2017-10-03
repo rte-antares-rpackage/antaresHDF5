@@ -14,7 +14,6 @@ LazyData: true
 Imports:
   data.table (>= 1.10.4),
   antaresRead (>= 1.1.1),
-  rhdf5 (>= 2.21.2),
   pipeR,
   stringr,
   testthat,
@@ -22,5 +21,6 @@ Imports:
   parallel,
   antaresProcessing
 Suggests: 
+  rhdf5 (>= 2.21.2),
   covr
 RoxygenNote: 6.0.1
