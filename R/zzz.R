@@ -1,3 +1,20 @@
+.onLoad <- function(libname, pkgname){
+  if(!require(rhdf5)){
+    stop("This package require 'rhdf5' (>= 2.21.2) package.
+    This is a bioconductor package. You can install it with :
+    source('https://bioconductor.org/biocLite.R')
+    BiocInstaller::useDevel() # for latest version
+    biocLite('rhdf5')")
+  } else if(packageVersion("rhdf5") < '2.21.2'){
+    stop("This package require 'rhdf5' (>= 2.21.2) package.
+    The installed version is older than expected.
+    This is a bioconductor package. You can install it with :
+    source('https://bioconductor.org/biocLite.R')
+    BiocInstaller::useDevel() # for latest version
+    biocLite('rhdf5')")
+  }
+}
+
 .addClassAndAttributes <- antaresRead:::.addClassAndAttributes
 
 pkgEnvAntareasH5 <- new.env()
