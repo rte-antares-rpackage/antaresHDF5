@@ -19,8 +19,7 @@ Imports:
   testthat,
   plyr,
   parallel,
-  antaresProcessing,
-  Rcpp
+  antaresProcessing
 Suggests: 
   rhdf5 (>= 2.21.2),
   covr
