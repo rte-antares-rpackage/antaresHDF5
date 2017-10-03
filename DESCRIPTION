@@ -20,7 +20,8 @@ Imports:
   testthat,
   plyr,
   parallel,
-  antaresProcessing
+  antaresProcessing,
+  Rcpp
 Suggests: 
   covr
 RoxygenNote: 6.0.1

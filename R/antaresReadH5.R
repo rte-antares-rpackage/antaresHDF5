@@ -20,7 +20,7 @@
 #' @param thermalModulation see \link[antaresRead]{readAntares}
 #' @param perf \code{boolean}, eval performance during developpement time, to remove
 #'
-#' @import parallel plyr antaresProcessing
+#' @import parallel plyr antaresProcessing Rcpp
 #'
 #' @export
 h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
