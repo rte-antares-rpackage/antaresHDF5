@@ -48,7 +48,6 @@ setSimulationPathH5 <- function(path, simulation = NULL){
     stop("Invalid path argument. Must be a .h5 file or a repertory with .h5 file(s)")
   }
 
-  print(path)
   attributes <- getOptionsH5(path)
   options(antares=attributes)
   attributes
