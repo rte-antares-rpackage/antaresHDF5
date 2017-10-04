@@ -18,8 +18,7 @@ Imports:
   stringr,
   testthat,
   plyr,
-  parallel,
-  antaresProcessing
+  parallel
 Suggests: 
   rhdf5 (>= 2.21.2),
   covr
