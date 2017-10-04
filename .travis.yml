@@ -5,6 +5,8 @@ language: R
 sudo: required
 cache: packages
 
+r: bioc-devel
+
 bioc_packages:
  - rhdf5
 
