@@ -2,6 +2,7 @@ Package: antaresHdf5
 Type: Package
 Title: Use h5 files for antares
 Version: 0.1.0
+Date: 2017-10-04
 Authors@R: c(
     person("Titouan", "ROBERT", ,"titouan.robert@rte-france.com", role = c("aut", "cre")),
     person("RTE", role = "cph")
