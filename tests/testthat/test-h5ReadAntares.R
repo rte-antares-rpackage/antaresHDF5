@@ -147,6 +147,7 @@ sapply("hourly", function(Z){
 test_that("processing", {
   
   optsH5 <- setSimulationPathH5(getwd(), path)
+  print(optsH5)
   addStraitments(opts = optsH5,  mcY = "mcInd",
                  addDownwardMargin = TRUE,
                  addUpwardMargin = TRUE,
