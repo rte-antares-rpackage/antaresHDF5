@@ -14,7 +14,7 @@ LazyData: true
 Depends: R (>= 3.4.0)
 Imports:
   data.table (>= 1.10.4),
-  antaresRead (>= 1.1.4),
+  antaresRead (>= 1.1.5),
   pipeR,
   stringr,
   testthat,
