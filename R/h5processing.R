@@ -151,7 +151,6 @@ addStraitments <- function(opts,
                             areas, links, clusters, districts, mcYear = NULL, writeStruct = FALSE){
   fid <- H5Fopen(path)
   sapply(c("areas", "links", "clusters", "districts"), function(X){
-    print(X)
     if(get(X)){
       fid <- H5Fopen(path)
       Y <- eval(X)
