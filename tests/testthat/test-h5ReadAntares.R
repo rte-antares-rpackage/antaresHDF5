@@ -92,52 +92,52 @@ for(i in alias){
 }
 
 
-#Test remove
-for(i in alias){
-  var <- strsplit(as.character(showAliases(i)$select[1]), ",")[[1]]
-  for(j in var)
-  {
-  minus <- paste0("-", j)
-  paramComparaison[[paste(i,minus)]] <- list(select = c(i, minus))
-  }
-}
-
-sapply("hourly", function(Z){
-  sapply(names(paramComparaison), function(X){
-    test_that(paste(X, Z), {
-      param1 <- paramComparaison[[X]]
-      print(param1)
-      param1$timeStep <- Z
-      param2 <- param1
-
-      ##Silent
-      param1$showProgress <- FALSE
-      param2$perf <- FALSE
-
-      ##End silent
-      param2$path <- path
-      DF1 <- do.call(readAntares, param1)
-      DF2 <- do.call(h5ReadAntares, param2)
-      if(!is(DF1, "antaresDataList"))
-      {
-        setorderv(DF1, getIdCols(DF1))
-      }else{
-        for(i in 1:length(DF1)){
-          setorderv(DF1[[i]], getIdCols(DF1[[i]]))
-        }
-      }
-      if(!is(DF2, "antaresDataList"))
-      {
-        setorderv(DF2, getIdCols(DF2))
-      }else{
-        for(i in 1:length(DF2)){
-          setorderv(DF2[[i]], getIdCols(DF2[[i]]))
-        }
-      }
-      expect_true(all(unlist(compareValue( DF1,DF2))))
-    })
-  })
-})
+# #Test remove
+# for(i in alias){
+#   var <- strsplit(as.character(showAliases(i)$select[1]), ",")[[1]]
+#   for(j in var)
+#   {
+#   minus <- paste0("-", j)
+#   paramComparaison[[paste(i,minus)]] <- list(select = c(i, minus))
+#   }
+# }
+# 
+# sapply("hourly", function(Z){
+#   sapply(names(paramComparaison), function(X){
+#     test_that(paste(X, Z), {
+#       param1 <- paramComparaison[[X]]
+#       print(param1)
+#       param1$timeStep <- Z
+#       param2 <- param1
+# 
+#       ##Silent
+#       param1$showProgress <- FALSE
+#       param2$perf <- FALSE
+# 
+#       ##End silent
+#       param2$path <- path
+#       DF1 <- do.call(readAntares, param1)
+#       DF2 <- do.call(h5ReadAntares, param2)
+#       if(!is(DF1, "antaresDataList"))
+#       {
+#         setorderv(DF1, getIdCols(DF1))
+#       }else{
+#         for(i in 1:length(DF1)){
+#           setorderv(DF1[[i]], getIdCols(DF1[[i]]))
+#         }
+#       }
+#       if(!is(DF2, "antaresDataList"))
+#       {
+#         setorderv(DF2, getIdCols(DF2))
+#       }else{
+#         for(i in 1:length(DF2)){
+#           setorderv(DF2[[i]], getIdCols(DF2[[i]]))
+#         }
+#       }
+#       expect_true(all(unlist(compareValue( DF1,DF2))))
+#     })
+#   })
+# })
 
 
 
