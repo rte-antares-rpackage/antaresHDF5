@@ -1,7 +1,7 @@
 Package: antaresHdf5
 Type: Package
 Title: Use h5 files for antares
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
     person("Titouan", "ROBERT", ,"titouan.robert@rte-france.com", role = c("aut", "cre")),
     person("RTE", role = "cph")
@@ -14,13 +14,13 @@ LazyData: true
 Depends: R (>= 3.4.0)
 Imports:
   data.table (>= 1.10.4),
-  antaresRead (>= 1.1.1),
+  antaresRead (>= 1.1.5),
   pipeR,
   stringr,
   testthat,
   plyr,
   parallel,
-  antaresProcessing
+  antaresProcessing (>=  0.12.0)
 Suggests: 
   rhdf5 (>= 2.21.2),
   covr
