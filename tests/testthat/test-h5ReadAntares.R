@@ -167,7 +167,23 @@ test_that("processing", {
 })
 
 
+test_that("h5ReadBindingConstraints", {
+  optsH5 <- setSimulationPathH5(getwd(), path)
+  h5ReadBindingConstraints(optsH5)
+})
+  
+ 
+test_that("h5ReadLayout", {
+  optsH5 <- setSimulationPathH5(getwd(), path)
+  h5ReadLayout(optsH5)
+})
 
+test_that("h5ReadClusterDesc", {
+  optsH5 <- setSimulationPathH5(getwd(), path)
+  h5ReadClusterDesc(optsH5)
+})
+
+ 
 
 
 H5close()
