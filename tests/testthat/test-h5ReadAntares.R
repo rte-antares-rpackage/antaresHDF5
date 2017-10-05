@@ -16,7 +16,6 @@ writeAntaresH5(misc = TRUE, thermalAvailabilities = TRUE,
 timeStep <-  c("hourly", "daily", "weekly",
                "monthly", "annual")
 
-optsH5 <- setSimulationPath("20170315-1140eco-test.h5")
 
 
 
@@ -147,6 +146,8 @@ sapply("hourly", function(Z){
 
 
 test_that("processing", {
+  
+  optsH5 <- setSimulationPath("20170315-1140eco-test.h5")
   addStraitments(opts = optsH5,  mcY = "mcInd",
                  addDownwardMargin = TRUE,
                  addUpwardMargin = TRUE,
