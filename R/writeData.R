@@ -7,7 +7,7 @@
 #' @param mcAll \code{character}, write mcAll
 #' @param compress \code{numeric}, compression level
 #'
-#' @import pipeR
+#' @import pipeR rhdf5
 writeAntaresData <- function(data,
                                 path,
                                 rootGroup = NULL,
