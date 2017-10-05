@@ -154,7 +154,6 @@ addStraitments <- function(opts,
     if(get(X)){
       fid <- H5Fopen(path)
       Y <- eval(X)
-      print(Y)
       GP <- paste0(timeStep, "/", Y, "/", mcY)
       .writeNewColumns(fid = fid,
                        newdata = outToWrite[[Y]],
