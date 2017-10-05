@@ -16,6 +16,10 @@ writeAntaresH5(misc = TRUE, thermalAvailabilities = TRUE,
 timeStep <-  c("hourly", "daily", "weekly",
                "monthly", "annual")
 
+optsH5 <- setSimulationPath("20170315-1140eco-test.h5")
+
+
+
 compareValue <- function(A, B, res = NULL){
   if(class(A)[3] == "list"){
     res <- c(res, sapply(c("areas", "links", "cluster", "districts"), function(x){
@@ -141,6 +145,26 @@ sapply("hourly", function(Z){
 })
 
 
+
+test_that("processing", {
+  addStraitments(opts = optsH5,  mcY = "mcInd",
+                 addDownwardMargin = TRUE,
+                 addUpwardMargin = TRUE,
+                 addExportAndImport = TRUE,
+                 addLoadFactorLink = TRUE,
+                 externalDependency = TRUE,
+                 loadFactor = TRUE,
+                 modulation = TRUE,
+                 netLoadRamp = TRUE,
+                 surplus = TRUE,
+                 surplusClusters = TRUE,
+                 evalAreas = list(Tota = "`H. STOR` + `MISC. DTG`",
+                                  Tota2 = "NODU + `NP COST` + 1"),
+                 evalLinks = list(),
+                 evalClusters = list(),
+                 evalDistricts = list(),
+                 columnsToSelects = c("H. STOR", " MISC. DTG", "NODU", "NP COST"))
+})
 
 
 
