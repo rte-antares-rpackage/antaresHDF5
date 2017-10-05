@@ -110,7 +110,6 @@ sapply("hourly", function(Z){
   sapply(names(paramComparaison), function(X){
     test_that(paste(X, Z), {
       param1 <- paramComparaison[[X]]
-      print(param1)
       param1$timeStep <- Z
       param2 <- param1
 
@@ -147,7 +146,7 @@ sapply("hourly", function(Z){
 
 test_that("processing", {
   
-  optsH5 <- setSimulationPath("20170315-1140eco-test.h5")
+  optsH5 <- setSimulationPathH5(getwd())
   addStraitments(opts = optsH5,  mcY = "mcInd",
                  addDownwardMargin = TRUE,
                  addUpwardMargin = TRUE,

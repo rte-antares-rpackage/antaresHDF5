@@ -41,7 +41,7 @@
 #'                evalDistricts = list(),
 #'                columnsToSelects = c("H. STOR", " MISC. DTG", "NODU", "NP COST"))
 #' }
-#' 
+#' @export
 addStraitments <- function(opts,
                            mcY = c("mcInd", "mcAll"),
                            addDownwardMargin = FALSE,
@@ -113,7 +113,12 @@ addStraitments <- function(opts,
     myOut <- .readDataEndAddColumn(opts, select = select, mcYears = X, timeStep = timeStep,
                                    evalAreas = evalAreas, evalLinks = evalLinks,
                                    evalClusters = evalClusters, evalDistricts = evalDistricts,
-                                   columnsToSelects = columnsToSelects)
+                                   columnsToSelects = columnsToSelects, allStraitments = allStraitments,
+                                   writeAreas = writeAreas,
+                                   writeLinks = writeLinks,
+                                   writeClusters = writeClusters,
+                                   writeDistricts = writeDistricts,
+                                   columnsToAdd = columnsToAdd)
     outList <- names(myOut)
     outToWrite <- sapply(outList, function(HH){
       as.matrix(myOut[[HH]])
@@ -183,7 +188,11 @@ addStraitments <- function(opts,
 
 .readDataEndAddColumn <- function(opts, select, mcYears, timeStep, 
                                   evalAreas, evalLinks,
-                                  evalClusters, evalDistricts, columnsToSelects){
+                                  evalClusters, evalDistricts, columnsToSelects, allStraitments,
+                                  writeAreas,
+                                  writeLinks,
+                                  writeClusters,
+                                  writeDistricts, columnsToAdd){
   res <- readAntares(opts = opts, select = c(select,columnsToSelects), mcYears = mcYears, timeStep = timeStep)
   for(i in 1:length(res)){
     res[[i]] <- res[[i]][, .SD, .SDcols = names(res[[i]])[!names(res[[i]])%in%select]]

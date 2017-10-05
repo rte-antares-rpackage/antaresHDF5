@@ -71,5 +71,4 @@ addStraitments(opts = opts,  mcY = "mcInd",
                evalDistricts = list(),
                columnsToSelects = c("H. STOR", " MISC. DTG", "NODU", "NP COST"))
 }
-
 }
