@@ -3,7 +3,6 @@
 library(testthat)
 library(data.table)
 library(antaresRead)
-library(rhdf5)
 library(pipeR)
 library(stringr)
 library(antaresHdf5)

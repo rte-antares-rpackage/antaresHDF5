@@ -1,5 +1,8 @@
+
+is.installed <- function(mypkg) is.element(mypkg, utils::installed.packages()[,1])
+
 .onLoad <- function(libname, pkgname){
-  if(!require(rhdf5)){
+  if(!is.installed("rhdf5")){
     stop("This package require 'rhdf5' (>= 2.21.2) package.
     This is a bioconductor package. You can install it with :
     source('https://bioconductor.org/biocLite.R')
