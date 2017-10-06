@@ -1,6 +1,7 @@
 context("h5ReadAntares")
 
 
+
 alias <- showAliases()$name
 alias <- as.character(alias)
 ##Data for test
@@ -8,11 +9,16 @@ zipPath <- system.file("testdata.zip", package = "antaresHdf5")
 unzip(zipPath)
 # setSimulationPath("testdata/test_case")
 opts <- setSimulationPath("testdata/test_case")
-
 writeAntaresH5(misc = TRUE, thermalAvailabilities = TRUE,
                hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
                linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE)
+unlink(path, force = TRUE)
 
+writeAntaresH5(misc = TRUE, thermalAvailabilities = TRUE,
+               hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
+               linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE, writeAllSimulations = TRUE)
+
+path <- "20170315-1140eco-test.h5"
 timeStep <-  c("hourly", "daily", "weekly",
                "monthly", "annual")
 
@@ -49,7 +55,7 @@ compareValue <- function(A, B, res = NULL){
 #
 #
 #
-path <- "20170315-1140eco-test.h5"
+
 
 sapply(pkgEnvH5$allCompute, function(X){
   test_that(paste0("Select : ", X, " timeStep : "),{
@@ -96,16 +102,16 @@ for(i in alias){
 }
 
 
-# #Test remove
-# for(i in alias){
-#   var <- strsplit(as.character(showAliases(i)$select[1]), ",")[[1]]
-#   for(j in var)
-#   {
-#   minus <- paste0("-", j)
-#   paramComparaison[[paste(i,minus)]] <- list(select = c(i, minus))
-#   }
-# }
-# 
+#Test remove
+for(i in alias){
+  var <- strsplit(as.character(showAliases(i)$select[1]), ",")[[1]]
+  for(j in var)
+  {
+  minus <- paste0("-", j)
+  paramComparaison[[paste(i,minus)]] <- list(select = c(i, minus))
+  }
+}
+
 sapply("hourly", function(Z){
   sapply(names(paramComparaison), function(X){
     test_that(paste(X, Z), {
@@ -169,18 +175,34 @@ test_that("processing", {
 
 test_that("h5ReadBindingConstraints", {
   optsH5 <- setSimulationPathH5(getwd(), path)
-  h5ReadBindingConstraints(optsH5)
+  re1 <- h5ReadBindingConstraints(optsH5)
+  re2 <- antaresRead::readBindingConstraints(opts)
+  for(i in 1:length(re1)){
+    re1[[i]]$values <- data.frame(re1[[i]]$values )
+    re2[[i]]$values <- data.frame(re2[[i]]$values )
+    
+  }
+  expect_true(identical(re1, re2))
 })
   
  
 test_that("h5ReadLayout", {
   optsH5 <- setSimulationPathH5(getwd(), path)
-  h5ReadLayout(optsH5)
+  re1 <- h5ReadLayout(optsH5)
+  re2 <- antaresRead::readLayout(opts)
+  
+  for(i in 1:length(re1)){
+    re1[[i]] <- data.frame(re1[[i]])
+    re2[[i]] <- data.frame(re2[[i]])
+  }
+  expect_true(identical(re1, re2))
 })
 
 test_that("h5ReadClusterDesc", {
   optsH5 <- setSimulationPathH5(getwd(), path)
-  h5ReadClusterDesc(optsH5)
+  re1 <- data.frame(h5ReadClusterDesc(optsH5))
+  re2 <- data.frame(antaresRead::readClusterDesc(opts))
+  expect_true(identical(re1, re2))
 })
 
  
