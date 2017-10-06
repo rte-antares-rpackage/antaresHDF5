@@ -1,7 +1,5 @@
 context("read inputs")
 
-
-
 test_that("h5ReadBindingConstraints", {
   optsH5 <- setSimulationPathH5(tpDir, h5fil)
   re1 <- h5ReadBindingConstraints(optsH5)
