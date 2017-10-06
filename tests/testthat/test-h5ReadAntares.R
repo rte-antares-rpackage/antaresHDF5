@@ -15,8 +15,6 @@ context("h5ReadAntares")
 timeStep <-  c("hourly", "daily", "weekly",
                "monthly", "annual")
 
-
-
 optsH5 <- setSimulationPathH5(tpDir)
 optsH5 <- setSimulationPathH5(tpDir, 1)
 
@@ -56,13 +54,17 @@ compareValue <- function(A, B, res = NULL){
 
 sapply(pkgEnvH5$allCompute, function(X){
   test_that(paste0("Select : ", X, " timeStep : "),{
-    param1 <- list(path = path, areas = "a", mcYears = 1, select = X)
-    param2 <- list(path = path, areas = "a", mcYears = 1)
+    print(pathF)
+    param1 <- list(path = pathF, areas = "a", mcYears = 1, select = X)
+    param2 <- list(path = pathF, areas = "a", mcYears = 1)
     param2[[X]] <- TRUE
     testthat::expect_true(identical(do.call(h5ReadAntares, param1),
                                     do.call(h5ReadAntares, param2)))
   })
 })
+
+
+
 
 ##Test
 paramComparaison <- list(
@@ -121,7 +123,7 @@ sapply("hourly", function(Z){
       param2$perf <- FALSE
 
       ##End silent
-      param2$path <- path
+      param2$path <- pathF
       DF1 <- do.call(readAntares, param1)
       DF2 <- do.call(h5ReadAntares, param2)
       if(!is(DF1, "antaresDataList"))
@@ -176,17 +178,17 @@ test_that("h5ReadBindingConstraints", {
   for(i in 1:length(re1)){
     re1[[i]]$values <- data.frame(re1[[i]]$values )
     re2[[i]]$values <- data.frame(re2[[i]]$values )
-    
+
   }
   expect_true(identical(re1, re2))
 })
-  
- 
+
+
 test_that("h5ReadLayout", {
   optsH5 <- setSimulationPathH5(tpDir, h5fil)
   re1 <- h5ReadLayout(optsH5)
   re2 <- antaresRead::readLayout(opts)
-  
+
   for(i in 1:length(re1)){
     re1[[i]] <- data.frame(re1[[i]])
     re2[[i]] <- data.frame(re2[[i]])
@@ -201,7 +203,7 @@ test_that("h5ReadClusterDesc", {
   expect_true(identical(re1, re2))
 })
 
- 
+
 
 
 
