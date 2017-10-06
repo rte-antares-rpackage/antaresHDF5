@@ -52,6 +52,7 @@ for(i in alias){
 #Test remove
 for(i in alias){
   var <- strsplit(as.character(silentf(i)$select[1]), ",")[[1]]
+  var <- gsub("^ ", "",var) 
   for(j in var)
   {
   minus <- paste0("-", j)
@@ -97,5 +98,5 @@ sapply("hourly", function(Z){
     })
     options(warn = oldw)
   })
-})
+})%>%invisible()
 
