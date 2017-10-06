@@ -9,16 +9,15 @@ zipPath <- system.file("testdata.zip", package = "antaresHdf5")
 unzip(zipPath)
 # setSimulationPath("testdata/test_case")
 opts <- setSimulationPath("testdata/test_case")
-writeAntaresH5(misc = TRUE, thermalAvailabilities = TRUE,
-               hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
-               linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE)
+writeAntaresH5(timeSteps = "annual")
+path <- "20170315-1140eco-test.h5"
 unlink(path, force = TRUE)
 
 writeAntaresH5(misc = TRUE, thermalAvailabilities = TRUE,
                hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
                linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE, writeAllSimulations = TRUE)
 
-path <- "20170315-1140eco-test.h5"
+
 timeStep <-  c("hourly", "daily", "weekly",
                "monthly", "annual")
 
