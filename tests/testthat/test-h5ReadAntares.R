@@ -1,56 +1,5 @@
 context("h5ReadAntares")
 
-# alias <- showAliases()$name
-# alias <- as.character(alias)
-# ##Data for test
-# zipPath <- system.file("testdata.zip", package = "antaresHdf5")
-# unzip(zipPath)
-# # setSimulationPath("testdata/test_case")
-# opts <- setSimulationPath("testdata/test_case")
-# writeAntaresH5(misc = TRUE, thermalAvailabilities = TRUE,
-#                hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
-#                linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE)
-# 
-# path <- "20170315-1140eco-test.h5"
-timeStep <-  c("hourly", "daily", "weekly",
-               "monthly", "annual")
-
-optsH5 <- setSimulationPathH5(tpDir)
-optsH5 <- setSimulationPathH5(tpDir, 1)
-
-
-
-compareValue <- function(A, B, res = NULL){
-  if(class(A)[3] == "list"){
-    res <- c(res, sapply(c("areas", "links", "cluster", "districts"), function(x){
-      if(!is.null(A[[x]]))
-      {
-        compareValue(A[[x]], B[[x]], res = res)}}))
-
-  }else{
-    res <- c(res,sapply(names(A), function(X){
-      if(identical(A[[X]], B[[X]])){
-        TRUE
-      }else{
-        if(identical(as.numeric(A[[X]]), as.numeric(B[[X]])))
-        {TRUE}else{
-          identical(as.character(A[[X]]), as.character(B[[X]]))
-        }
-      }
-    }))
-  }
-
-}
-##End data for test
-
-
-# writeAntaresH5(writeAllSimulations = TRUE, nbCores = 2)
-# testthat::expect_true(file.exists(paste0(list.files(paste0(opts$studyPath, "/output")), ".h5")))
-# file.remove(paste0(list.files(paste0(opts$studyPath, "/output")), ".h5"))
-#
-#
-#
-
 
 sapply(pkgEnvH5$allCompute, function(X){
   test_that(paste0("Select : ", X, " timeStep : "),{
@@ -171,46 +120,6 @@ test_that("processing", {
 })
 
 
-test_that("h5ReadBindingConstraints", {
-  optsH5 <- setSimulationPathH5(tpDir, h5fil)
-  re1 <- h5ReadBindingConstraints(optsH5)
-  re2 <- antaresRead::readBindingConstraints(opts)
-  for(i in 1:length(re1)){
-    re1[[i]]$values <- data.frame(re1[[i]]$values )
-    re2[[i]]$values <- data.frame(re2[[i]]$values )
-
-  }
-  expect_true(identical(re1, re2))
-})
 
 
-test_that("h5ReadLayout", {
-  optsH5 <- setSimulationPathH5(tpDir, h5fil)
-  re1 <- h5ReadLayout(optsH5)
-  re2 <- antaresRead::readLayout(opts)
-
-  for(i in 1:length(re1)){
-    re1[[i]] <- data.frame(re1[[i]])
-    re2[[i]] <- data.frame(re2[[i]])
-  }
-  expect_true(identical(re1, re2))
-})
-
-test_that("h5ReadClusterDesc", {
-  optsH5 <- setSimulationPathH5(tpDir, h5fil)
-  re1 <- data.frame(h5ReadClusterDesc(optsH5))
-  re2 <- data.frame(antaresRead::readClusterDesc(opts))
-  expect_true(identical(re1, re2))
-})
-
-
-
-
-
-
-h5createFile("testnodata.h5")
-h5createGroup("testnodata.h5", "hourly")
-DF1 <-  h5ReadAntares("testnodata.h5", areas = "all", links = "all", clusters = "all", districts = "all")
-H5close()
-unlink("testnodata.h5")
 
