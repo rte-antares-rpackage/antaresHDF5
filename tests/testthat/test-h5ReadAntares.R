@@ -3,7 +3,6 @@ context("h5ReadAntares")
 
 sapply(pkgEnvH5$allCompute, function(X){
   test_that(paste0("Select : ", X, " timeStep : "),{
-    print(pathF)
     param1 <- list(path = pathF, areas = "a", mcYears = 1, select = X)
     param2 <- list(path = pathF, areas = "a", mcYears = 1)
     param2[[X]] <- TRUE
@@ -52,7 +51,7 @@ for(i in alias){
 
 #Test remove
 for(i in alias){
-  var <- strsplit(as.character(showAliases(i)$select[1]), ",")[[1]]
+  var <- strsplit(as.character(silentf(i)$select[1]), ",")[[1]]
   for(j in var)
   {
   minus <- paste0("-", j)
@@ -62,6 +61,9 @@ for(i in alias){
 
 sapply("hourly", function(Z){
   sapply(names(paramComparaison), function(X){
+    oldw <- getOption("warn")
+    options(warn = -1)
+    
     test_that(paste(X, Z), {
       param1 <- paramComparaison[[X]]
       param1$timeStep <- Z
@@ -93,33 +95,7 @@ sapply("hourly", function(Z){
       }
       expect_true(all(unlist(compareValue( DF1,DF2))))
     })
+    options(warn = oldw)
   })
 })
-
-
-
-test_that("processing", {
-  optsH5 <- setSimulationPathH5(tpDir, h5fil)
-  addStraitments(opts = optsH5,  mcY = "mcInd",
-                 addDownwardMargin = TRUE,
-                 addUpwardMargin = TRUE,
-                 addExportAndImport = TRUE,
-                 addLoadFactorLink = TRUE,
-                 externalDependency = TRUE,
-                 loadFactor = TRUE,
-                 modulation = TRUE,
-                 netLoadRamp = TRUE,
-                 surplus = TRUE,
-                 surplusClusters = TRUE,
-                 evalAreas = list(Tota = "`H. STOR` + `MISC. DTG`",
-                                  Tota2 = "NODU + `NP COST` + 1"),
-                 evalLinks = list(),
-                 evalClusters = list(),
-                 evalDistricts = list(),
-                 columnsToSelects = c("H. STOR", " MISC. DTG", "NODU", "NP COST"))
-})
-
-
-
-
 

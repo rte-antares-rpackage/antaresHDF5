@@ -16,7 +16,17 @@ if (sourcedir != "") {
                  linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE)
   path <- "20170315-1140eco-test.h5"
   h5fil <- path
-  alias <- showAliases()$name
+  
+  
+  
+  deprintize<-function(f){
+    return(function(...) {capture.output(w<-f(...));return(w);});
+  }
+  
+  
+  silentf <- deprintize(showAliases)
+  
+  alias <- silentf()$name
   alias <- as.character(alias)
   
   
@@ -46,7 +56,7 @@ if (sourcedir != "") {
   timeStep <-  c("hourly", "daily", "weekly",
                  "monthly", "annual")
   
-  
+  assign("silentf", silentf, envir = globalenv())
   assign("tpDir", tpDir, envir = globalenv())
   assign("pathF", paste0(tpDir, "/", path), envir = globalenv())
   assign("h5fil", h5fil, envir = globalenv())
