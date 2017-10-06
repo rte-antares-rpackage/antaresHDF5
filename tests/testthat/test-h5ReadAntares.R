@@ -1,22 +1,24 @@
 context("h5ReadAntares")
 
-
-
-alias <- showAliases()$name
-alias <- as.character(alias)
-##Data for test
-zipPath <- system.file("testdata.zip", package = "antaresHdf5")
-unzip(zipPath)
-# setSimulationPath("testdata/test_case")
-opts <- setSimulationPath("testdata/test_case")
-writeAntaresH5(misc = TRUE, thermalAvailabilities = TRUE,
-               hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
-               linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE)
-
-path <- "20170315-1140eco-test.h5"
+# alias <- showAliases()$name
+# alias <- as.character(alias)
+# ##Data for test
+# zipPath <- system.file("testdata.zip", package = "antaresHdf5")
+# unzip(zipPath)
+# # setSimulationPath("testdata/test_case")
+# opts <- setSimulationPath("testdata/test_case")
+# writeAntaresH5(misc = TRUE, thermalAvailabilities = TRUE,
+#                hydroStorage = TRUE, hydroStorageMaxPower = TRUE, reserve = TRUE,
+#                linkCapacity = TRUE,mustRun = TRUE, thermalModulation = TRUE)
+# 
+# path <- "20170315-1140eco-test.h5"
 timeStep <-  c("hourly", "daily", "weekly",
                "monthly", "annual")
 
+
+
+optsH5 <- setSimulationPathH5(tpDir)
+optsH5 <- setSimulationPathH5(tpDir, 1)
 
 
 
@@ -146,8 +148,7 @@ sapply("hourly", function(Z){
 
 
 test_that("processing", {
-  
-  optsH5 <- setSimulationPathH5(getwd(), path)
+  optsH5 <- setSimulationPathH5(tpDir, h5fil)
   addStraitments(opts = optsH5,  mcY = "mcInd",
                  addDownwardMargin = TRUE,
                  addUpwardMargin = TRUE,
@@ -169,7 +170,7 @@ test_that("processing", {
 
 
 test_that("h5ReadBindingConstraints", {
-  optsH5 <- setSimulationPathH5(getwd(), path)
+  optsH5 <- setSimulationPathH5(tpDir, h5fil)
   re1 <- h5ReadBindingConstraints(optsH5)
   re2 <- antaresRead::readBindingConstraints(opts)
   for(i in 1:length(re1)){
@@ -182,7 +183,7 @@ test_that("h5ReadBindingConstraints", {
   
  
 test_that("h5ReadLayout", {
-  optsH5 <- setSimulationPathH5(getwd(), path)
+  optsH5 <- setSimulationPathH5(tpDir, h5fil)
   re1 <- h5ReadLayout(optsH5)
   re2 <- antaresRead::readLayout(opts)
   
@@ -194,7 +195,7 @@ test_that("h5ReadLayout", {
 })
 
 test_that("h5ReadClusterDesc", {
-  optsH5 <- setSimulationPathH5(getwd(), path)
+  optsH5 <- setSimulationPathH5(tpDir, h5fil)
   re1 <- data.frame(h5ReadClusterDesc(optsH5))
   re2 <- data.frame(antaresRead::readClusterDesc(opts))
   expect_true(identical(re1, re2))
@@ -203,9 +204,7 @@ test_that("h5ReadClusterDesc", {
  
 
 
-H5close()
-unlink(path, force = TRUE)
-unlink("testdata", recursive = TRUE)
+
 
 h5createFile("testnodata.h5")
 h5createGroup("testnodata.h5", "hourly")
