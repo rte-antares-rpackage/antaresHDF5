@@ -80,6 +80,20 @@ test_that("Show perf", {
   expect_true(all(unlist(compareValue( DF1,DF2))))
 })
 
+test_that("Show perf multi request", {
+  param1 <- list(areas = "all", links = "all")
+  param2 <- param1
+  
+  ##Silent
+  param1$showProgress <- FALSE
+  param2$perf <- TRUE
+  
+  ##End silent
+  param2$path <- pathF
+  DF1 <- do.call(readAntares, param1)
+  DF2 <- do.call(h5ReadAntares, param2)
+  expect_true(all(unlist(compareValue( DF1,DF2))))
+})
 
 
 
