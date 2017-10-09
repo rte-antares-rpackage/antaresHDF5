@@ -10,10 +10,10 @@ writeAntaresH5(path = tptpDir,
 
 })
 unlink(tptpDir, recursive = TRUE)
-# dir.create(tptpDir)
-# 
-# test_that("write more than one studies multi thread", {
-#   writeAntaresH5(path = tptpDir,
-#                  timeSteps = "annual", nbCores = 2, writeAllSimulations = TRUE)
-# })
-# unlink(tptpDir, recursive = TRUE)
+
+dir.create(tptpDir)
+test_that("write more than one studies multi thread", {
+  writeAntaresH5(path = tptpDir,
+                 timeSteps = "annual", writeAllSimulations = TRUE, nbCores = 2, opts = optsG)
+})
+unlink(tptpDir, recursive = TRUE)

@@ -100,7 +100,7 @@ writeAntaresH5 <- function(path = getwd(), timeSteps = c("hourly", "daily", "wee
     clusterEvalQ(cl, {
       library(antaresHdf5)
     })
-    clusterExport(cl, c("studyPath",
+    clusterExport(cl, c("path","opts","studyPath",
                         "timeSteps",
                         "writeMcAll",
                         "compress",
