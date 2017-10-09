@@ -18,8 +18,6 @@
 #' @param evalLinks \code{list}, list of operation to evaluate in links data
 #' @param evalClusters \code{list}, list of operation to evaluate in clusters data
 #' @param evalDistricts \code{list}, list of operation to evaluate in districts data
-#' @param columnsToSelects \code{character} culomns required by evalAreas, evalLinks
-#' evalClusters & evalDistricts
 #' 
 #' @examples
 #' \dontrun{
@@ -35,11 +33,11 @@
 #'                surplus = TRUE,
 #'                surplusClusters = TRUE,
 #'                evalAreas = list(Tota = "`H. STOR` + `MISC. DTG`",
-#'                                 Tota2 = "NODU + `NP COST` + 1"),
+#'                                 Tota2 = "`NODU` + `NP COST` + 1"),
 #'                evalLinks = list(),
 #'                evalClusters = list(),
-#'                evalDistricts = list(),
-#'                columnsToSelects = c("H. STOR", " MISC. DTG", "NODU", "NP COST"))
+#'                evalDistricts = list()
+#'                )
 #' }
 #' @export
 addStraitments <- function(opts,
@@ -57,8 +55,7 @@ addStraitments <- function(opts,
                            evalAreas = list(),
                            evalLinks = list(),
                            evalClusters = list(),
-                           evalDistricts = list(),
-                           columnsToSelects = NULL){
+                           evalDistricts = list()){
   
   # addDownwardMargin = TRUE
   # addUpwardMargin = TRUE
@@ -85,13 +82,18 @@ addStraitments <- function(opts,
     surplusClusters = surplusClusters)
   
   columnsToAdd <- .getNewColumnsName(allStraitments)
-  writeAreas <- ifelse(is.null(columnsToAdd$areas), FALSE, TRUE)
-  writeLinks <- ifelse(is.null(columnsToAdd$links), FALSE, TRUE)
-  writeClusters <- ifelse(is.null(columnsToAdd$clusters), FALSE, TRUE)
-  writeDistricts <- ifelse(is.null(columnsToAdd$districts), FALSE, TRUE)
+  writeAreas <- ifelse(is.null(columnsToAdd$areas) & length(evalAreas) == 0, FALSE, TRUE)
+  writeLinks <- ifelse(is.null(columnsToAdd$links) & length(evalLinks) == 0, FALSE, TRUE)
+  writeClusters <- ifelse(is.null(columnsToAdd$clusters) & length(evalClusters) == 0, FALSE, TRUE)
+  writeDistricts <- ifelse(is.null(columnsToAdd$districts) & length(evalDistricts) == 0, FALSE, TRUE)
   
   select <- .getSelectalias(allStraitments)
   
+  columnsToSelects <- unique(unlist(lapply(list(evalAreas,evalLinks,evalClusters,  evalDistricts ), function(Z){
+    lapply(Z, function(X){
+      strsplit(X, "`")
+    })
+  })))
   
   #select <- c(select, columnsToSelects)
   ##Load first Mcyear
@@ -122,7 +124,12 @@ addStraitments <- function(opts,
     outList <- names(myOut)
     outToWrite <- sapply(outList, function(HH){
       as.matrix(myOut[[HH]])
-    })
+    }, simplify = FALSE)
+    if(is.null(X)){
+      writeStruct <- TRUE
+    }else{
+      writeStruct <- X == mcYear[1]
+    }
     
     
     .writeAllTables(timeStep = timeStep,
@@ -133,7 +140,7 @@ addStraitments <- function(opts,
                     links = writeLinks,
                     clusters = writeClusters,
                     districts = writeDistricts,
-                    mcYear = X, writeStruct = X == mcYear[1])
+                    mcYear = X, writeStruct = writeStruct)
   }, simplify = FALSE)
   
   
@@ -192,10 +199,12 @@ addStraitments <- function(opts,
                                   writeClusters,
                                   writeDistricts, columnsToAdd){
   res <- readAntares(opts = opts, select = c(select,columnsToSelects), mcYears = mcYears, timeStep = timeStep)
+  res <- as.antaresDataList(res)
   for(i in 1:length(res)){
     res[[i]] <- res[[i]][, .SD, .SDcols = names(res[[i]])[!names(res[[i]])%in%select]]
   }
   res <- .calcNewColumns(res, allStraitments, timeStep = timeStep)
+  
   if(writeAreas){
     if(length(evalAreas) > 0)
     {
@@ -237,7 +246,6 @@ addStraitments <- function(opts,
   if(writeStruct)
   {
     oldStruct <-  paste0(GP, "/structure/reCalcVar")
-    
     did <- H5Dopen(fid, oldStruct)
     structVarAdd <- H5Dread(did )
     H5Dclose(did)
@@ -245,11 +253,27 @@ addStraitments <- function(opts,
     #h5write(structVarAdd, path, oldStruct)
     h5writeDataset(obj = structVarAdd,  fid, oldStruct)
   }
+  oldStruct <-  paste0(GP, "/structure/reCalcVar")
+  did <- H5Dopen(fid, oldStruct)
+  allVarAdd <- H5Dread(did )
+  
+  
+  oldStruct <-  paste0(GP, "/structure/variable")
+  did <- H5Dopen(fid, oldStruct)
+  allnorm <- H5Dread(did )
+  allVarAdd <- c(allnorm, allVarAdd)
+  indexVar <- sapply(namesVariable, function(X){
+    which(allVarAdd == X)
+  })
+  
   
   actualDim <- .getDim(fid, datatype)
   indexToWrite <- .getIndexToWrite(actualDim, nbVarToWrite, mcYear)
   dimtowrite <- unlist(lapply(indexToWrite, length))
-  arrayToWrite <- array(newdata, dimtowrite)
+  indexToWrite[[2]] <- indexVar
+  print(indexToWrite)
+  arrayToWrite <- array(newdata, dimtowrite[c(1,3,2,4)])
+  arrayToWrite <- aperm(arrayToWrite, c(1,3,2,4))
   newDim <- actualDim
   newDim[2] <- newDim[2] + dimtowrite[2]
   h5set_extent(fid, datatype, c(newDim))
