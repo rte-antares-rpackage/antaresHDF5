@@ -65,12 +65,14 @@ writeAntaresH5 <- function(path = getwd(), timeSteps = c("hourly", "daily", "wee
                            newCols = TRUE
 ){
 
-  simName <- unlist(strsplit(opts$simPath, "/"))
-  simName <- simName[length(simName)]
-  path <- paste0(path, "/", simName, ".h5")
+
 
 
   if(!writeAllSimulations){
+    simName <- unlist(strsplit(opts$simPath, "/"))
+    simName <- simName[length(simName)]
+    path <- paste0(path, "/", simName, ".h5")
+    
     .writeAntaresH5Fun(path = path,
                        timeSteps = timeSteps,
                        opts = opts,
@@ -119,7 +121,10 @@ writeAntaresH5 <- function(path = getwd(), timeSteps = c("hourly", "daily", "wee
 
     parSapplyLB(cl, studieSToWrite, function(X){
       opts <- setSimulationPath(studyPath, X)
-      .writeAntaresH5Fun(path = NULL,
+      if(!is.null(path)){
+        pathStud <- paste0(path, "/", opts$studyName, ".h5")
+      }
+      .writeAntaresH5Fun(path = pathStud,
                          timeSteps = timeSteps,
                          opts = opts,
                          writeMcAll = writeMcAll,
@@ -145,7 +150,11 @@ writeAntaresH5 <- function(path = getwd(), timeSteps = c("hourly", "daily", "wee
     }else{
       sapply(studieSToWrite, function(X){
         opts <- setSimulationPath(studyPath, X)
-        .writeAntaresH5Fun(path = NULL,
+        if(!is.null(path)){
+          pathStud <- paste0(path, "/", opts$studyName, ".h5")
+        }
+        
+        .writeAntaresH5Fun(path = pathStud,
                            timeSteps = timeSteps,
                            opts = opts,
                            writeMcAll = writeMcAll,
