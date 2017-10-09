@@ -65,6 +65,21 @@ sapply(names(paramComparaison), function(Z){
   })
 })
 
+test_that("Show perf", {
+  param1 <- list(areas = "all")
+  param2 <- param1
+  
+  ##Silent
+  param1$showProgress <- FALSE
+  param2$perf <- TRUE
+  
+  ##End silent
+  param2$path <- pathF
+  DF1 <- do.call(readAntares, param1)
+  DF2 <- do.call(h5ReadAntares, param2)
+  expect_true(all(unlist(compareValue( DF1,DF2))))
+})
+
 
 
 
@@ -80,8 +95,8 @@ for(i in alias){
   var <- gsub("^ ", "",var) 
   for(j in var)
   {
-  minus <- paste0("-", j)
-  paramComparaison[[paste(i,minus)]] <- list(select = c(i, minus))
+    minus <- paste0("-", j)
+    paramComparaison[[paste(i,minus)]] <- list(select = c(i, minus))
   }
 }
 
@@ -94,11 +109,11 @@ sapply("hourly", function(Z){
       param1 <- paramComparaison[[X]]
       param1$timeStep <- Z
       param2 <- param1
-
+      
       ##Silent
       param1$showProgress <- FALSE
       param2$perf <- FALSE
-
+      
       ##End silent
       param2$path <- pathF
       DF1 <- do.call(readAntares, param1)
