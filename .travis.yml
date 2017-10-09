@@ -13,6 +13,9 @@ r_github_packages:
  - rte-antares-rpackage/antaresProcessing
 
 
+before_install:
+- Rscript -e 'c(physical = parallel::detectCores(logical = FALSE), logical = parallel::detectCores())'
+
 r_packages:
   - covr
 
