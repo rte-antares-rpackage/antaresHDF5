@@ -1,13 +1,13 @@
 context("Write h5")
  
-# tptpDir <- paste0(tpDir, "/tpDir")
-# dir.create(tptpDir)
-# 
-# test_that("write more than one studies mono thread", {
-# writeAntaresH5(path = tptpDir, 
-#                timeSteps = "annual", nbCores = 1)
-#   
-# })
+tptpDir <- paste0(tpDir, "/tpDir")
+dir.create(tptpDir)
+
+test_that("write more than one studies mono thread", {
+writeAntaresH5(path = tptpDir,
+               timeSteps = "annual", writeAllSimulations = TRUE, nbCores = 1)
+
+})
 # unlink(tptpDir, recursive = TRUE)
 # dir.create(tptpDir)
 # 
