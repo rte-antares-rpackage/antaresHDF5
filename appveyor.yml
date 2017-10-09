@@ -20,6 +20,8 @@ build_script:
   - travis-tool.sh install_bioc rhdf5
   - ./travis-tool.sh install_github rte-antares-rpackage/antaresRead@develop
   - ./travis-tool.sh install_github rte-antares-rpackage/antaresProcessing
+  - Rscript -e "c(physical = parallel::detectCores(logical = FALSE), logical = parallel::detectCores())"
+  - echo Current directory=%CD%
 
 test_script:
   - travis-tool.sh run_tests
