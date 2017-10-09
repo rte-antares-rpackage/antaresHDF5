@@ -42,7 +42,7 @@ setSimulationPathH5 <- function(path, simulation = NULL){
     }
 
     path <- paste0(path, "/", simulation)
-  } else if(!file.exists(path) & grepl(".h5$", path)){
+  } else if(!file.exists(path) & !grepl(".h5$", path)){
     stop("Invalid path argument. File not found. Must be a .h5 file or a repertory with .h5 file(s)")
   } else if(file.exists(path) & !grepl(".h5$", path)){
     stop("Invalid path argument. Must be a .h5 file or a repertory with .h5 file(s)")
