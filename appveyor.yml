@@ -18,15 +18,8 @@ build_script:
   - travis-tool.sh install_deps
   - travis-tool.sh install_bioc zlibbioc
   - travis-tool.sh install_bioc rhdf5
-
-
-r: bioc-devel
-
-r_github_packages:
- - hadley/devtools#1263
- - rte-antares-rpackage/antaresRead@develop
- - rte-antares-rpackage/antaresProcessing
-
+  - ./travis-tool.sh install_github rte-antares-rpackage/antaresRead@develop
+  - ./travis-tool.sh install_github rte-antares-rpackage/antaresProcessing
 
 test_script:
   - travis-tool.sh run_tests
