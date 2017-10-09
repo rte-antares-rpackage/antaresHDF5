@@ -40,8 +40,33 @@ paramComparaison <- list(
   allData = list(areas = "all", links = "all", clusters = "all", districts = "all"),
   allDataMc1 = list(areas = "all", links = "all", clusters = "all", districts = "all", mcYears = 1),
   allDataMc2 = list(areas = "all", links = "all", clusters = "all", districts = "all", mcYears = 2),
-  allDataMcAll = list(areas = "all", links = "all", clusters = "all", districts = "all", mcYears = "all")
+  allDataMcAll = list(areas = "all", links = "all", clusters = "all", districts = "all", mcYears = "all"),
+  hourly = list(areas = "all", links = "all", clusters = "all", districts = "all", timeStep = "hourly"),
+  daily = list(areas = "all", links = "all", clusters = "all", districts = "all", timeStep = "daily"),
+  weekly = list(areas = "all", links = "all", clusters = "all", districts = "all", timeStep = "weekly"),
+  monthly = list(areas = "all", links = "all", clusters = "all", districts = "all", timeStep = "monthly"),
+  annual = list(areas = "all", links = "all", clusters = "all", districts = "all", timeStep = "annual")
 )
+
+sapply(names(paramComparaison), function(Z){
+  test_that(paste( Z), {
+    param1 <- paramComparaison[[Z]]
+    param2 <- param1
+    
+    ##Silent
+    param1$showProgress <- FALSE
+    param2$perf <- FALSE
+    
+    ##End silent
+    param2$path <- pathF
+    DF1 <- do.call(readAntares, param1)
+    DF2 <- do.call(h5ReadAntares, param2)
+    expect_true(all(unlist(compareValue( DF1,DF2))))
+  })
+})
+
+
+
 
 #Test alias request
 for(i in alias){
