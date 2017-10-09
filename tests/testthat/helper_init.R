@@ -64,7 +64,7 @@ if (sourcedir != "") {
   assign("compareValue", compareValue, envir = globalenv())
   assign("timeStep", timeStep, envir = globalenv())
   
-
+  assign("optsG", opts, envir = globalenv())
   
   
 }
