@@ -57,17 +57,6 @@ addStraitments <- function(opts,
                            evalClusters = list(),
                            evalDistricts = list()){
   
-  # addDownwardMargin = TRUE
-  # addUpwardMargin = TRUE
-  # addExportAndImport = TRUE
-  # addLoadFactorLink = TRUE
-  # externalDependency = TRUE
-  # loadFactor = TRUE
-  # modulation = TRUE
-  # netLoadRamp = TRUE
-  # surplus = TRUE
-  # surplusClusters = TRUE
-  # surplusSectors = TRUE
   mcY <- match.arg(mcY)
   allStraitments <- list(
     addDownwardMargin = addDownwardMargin,
@@ -95,7 +84,6 @@ addStraitments <- function(opts,
     })
   })))
   
-  #select <- c(select, columnsToSelects)
   ##Load first Mcyear
   
   if(mcY == "mcInd")
@@ -249,7 +237,15 @@ addStraitments <- function(opts,
     did <- H5Dopen(fid, oldStruct)
     structVarAdd <- H5Dread(did )
     H5Dclose(did)
+    if(sum(namesVariable %in% structVarAdd) > 0 )
+    {
+      cat("Somes columns already exists in h5 file, they will be overwrite")
+      namesVariable <- namesVariable[!namesVariable %in% structVarAdd]
+      
+    }
+    if(length(namesVariable) > 0){
     structVarAdd[which(structVarAdd == "")[1:nbVarToWrite]] <- namesVariable
+    }
     #h5write(structVarAdd, path, oldStruct)
     h5writeDataset(obj = structVarAdd,  fid, oldStruct)
   }
@@ -262,7 +258,7 @@ addStraitments <- function(opts,
   did <- H5Dopen(fid, oldStruct)
   allnorm <- H5Dread(did )
   allVarAdd <- c(allnorm, allVarAdd)
-  indexVar <- sapply(namesVariable, function(X){
+  indexVar <- sapply(colnames(newdata), function(X){
     which(allVarAdd == X)
   })
   
@@ -271,7 +267,6 @@ addStraitments <- function(opts,
   indexToWrite <- .getIndexToWrite(actualDim, nbVarToWrite, mcYear)
   dimtowrite <- unlist(lapply(indexToWrite, length))
   indexToWrite[[2]] <- indexVar
-  print(indexToWrite)
   arrayToWrite <- array(newdata, dimtowrite[c(1,3,2,4)])
   arrayToWrite <- aperm(arrayToWrite, c(1,3,2,4))
   newDim <- actualDim
