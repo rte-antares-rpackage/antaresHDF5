@@ -9,8 +9,7 @@ addStraitments(opts, mcY = c("mcInd", "mcAll"), addDownwardMargin = FALSE,
   addLoadFactorLink = FALSE, externalDependency = FALSE,
   loadFactor = FALSE, modulation = FALSE, netLoadRamp = FALSE,
   surplus = FALSE, surplusClusters = FALSE, evalAreas = list(),
-  evalLinks = list(), evalClusters = list(), evalDistricts = list(),
-  columnsToSelects = NULL)
+  evalLinks = list(), evalClusters = list(), evalDistricts = list())
 }
 \arguments{
 \item{opts}{\code{simOptions} obtain wich [antaresRead]{setSimulationPath}}
@@ -44,9 +43,6 @@ addStraitments(opts, mcY = c("mcInd", "mcAll"), addDownwardMargin = FALSE,
 \item{evalClusters}{\code{list}, list of operation to evaluate in clusters data}
 
 \item{evalDistricts}{\code{list}, list of operation to evaluate in districts data}
-
-\item{columnsToSelects}{\code{character} culomns required by evalAreas, evalLinks
-evalClusters & evalDistricts}
 }
 \description{
 In this version only hourly data can be enriched.
@@ -65,10 +61,10 @@ addStraitments(opts = opts,  mcY = "mcInd",
                surplus = TRUE,
                surplusClusters = TRUE,
                evalAreas = list(Tota = "`H. STOR` + `MISC. DTG`",
-                                Tota2 = "NODU + `NP COST` + 1"),
+                                Tota2 = "`NODU` + `NP COST` + 1"),
                evalLinks = list(),
                evalClusters = list(),
-               evalDistricts = list(),
-               columnsToSelects = c("H. STOR", " MISC. DTG", "NODU", "NP COST"))
+               evalDistricts = list()
+               )
 }
 }
