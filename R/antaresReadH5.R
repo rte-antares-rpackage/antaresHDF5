@@ -335,12 +335,12 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 .optimH5Read <- function(fid, index = NULL, GP){
   did <- H5Dopen(fid,  GP)
   if(is.null(index)){
-    return(.External("_H5Dread", did@ID, NULL, NULL,
+    return(.Call("_H5Dread", did@ID, NULL, NULL,
                  NULL, FALSE, 0L, FALSE , PACKAGE = "rhdf5"))
   }else{
 
     h5spaceFile <- H5Dget_space(did)
-    maxSize <- .External("_H5Sget_simple_extent_dims", h5spaceFile@ID, PACKAGE = "rhdf5")$size
+    maxSize <- .Call("_H5Sget_simple_extent_dims", h5spaceFile@ID, PACKAGE = "rhdf5")$size
     len <- length(maxSize)
     K <-  sapply(len:1, function(X){
       if(is.null(index[[len-X + 1]])){
@@ -349,10 +349,10 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
     )
     size <- unlist(lapply(K,length))
     h5spaceMem = H5Screate_simple(size)
-    sid <- .External("_H5Screate_simple", as.double(size), as.double(size), PACKAGE = "rhdf5")
+    sid <- .Call("_H5Screate_simple", as.double(size), as.double(size), PACKAGE = "rhdf5")
     W <- H5Screate_simple(H5Sselect_index(h5spaceFile, as.list(K)))@ID
 
-    .External("_H5Dread", did@ID, h5spaceFile@ID, W,
+    .Call("_H5Dread", did@ID, h5spaceFile@ID, W,
           NULL, FALSE, 0L , FALSE, PACKAGE = "rhdf5")
   }
 
