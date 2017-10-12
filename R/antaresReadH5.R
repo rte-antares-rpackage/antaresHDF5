@@ -273,7 +273,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
     if(perf){
       TotalTime <-Sys.time() - Beg
       cat(paste0("Time for loading : ", round(TotalTime, 3), "\n"))
-      objectS <- object.size(listOut)/1024^2
+      objectS <- utils::object.size(listOut)/1024^2
       cat(paste0("Size of object loaded : ", round(objectS, 1), "Mo\n"))
       cat(paste0("Mo/s loaded : ",round(as.numeric(objectS)/ as.numeric(TotalTime),1), "\n"))
       dtaloded <- sum(unlist(lapply(listOut, function(X)prod(dim(X)))))
@@ -287,7 +287,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
     if(perf){
       TotalTime <-Sys.time() - Beg
       cat(paste0("Time for loading : ", round(TotalTime, 3), "\n"))
-      objectS <- object.size(listOut)/1024^2
+      objectS <- utils::object.size(listOut)/1024^2
       cat(paste0("Size of object loaded : ", round(objectS, 1), "Mo\n"))
       cat(paste0("Mo/s loaded : ",round(as.numeric(objectS)/ as.numeric(TotalTime),1), "\n"))
       dtaloded <- sum(unlist(lapply(listOut, function(X)prod(dim(X)))))
@@ -335,12 +335,12 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
 .optimH5Read <- function(fid, index = NULL, GP){
   did <- H5Dopen(fid,  GP)
   if(is.null(index)){
-    return(.Call("_H5Dread", did@ID, NULL, NULL,
+    return(.External("_H5Dread", did@ID, NULL, NULL,
                  NULL, FALSE, 0L, FALSE , PACKAGE = "rhdf5"))
   }else{
 
     h5spaceFile <- H5Dget_space(did)
-    maxSize <- .Call("_H5Sget_simple_extent_dims", h5spaceFile@ID, PACKAGE = "rhdf5")$size
+    maxSize <- .External("_H5Sget_simple_extent_dims", h5spaceFile@ID, PACKAGE = "rhdf5")$size
     len <- length(maxSize)
     K <-  sapply(len:1, function(X){
       if(is.null(index[[len-X + 1]])){
@@ -349,10 +349,10 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
     )
     size <- unlist(lapply(K,length))
     h5spaceMem = H5Screate_simple(size)
-    sid <- .Call("_H5Screate_simple", as.double(size), as.double(size), PACKAGE = "rhdf5")
+    sid <- .External("_H5Screate_simple", as.double(size), as.double(size), PACKAGE = "rhdf5")
     W <- H5Screate_simple(H5Sselect_index(h5spaceFile, as.list(K)))@ID
 
-    .Call("_H5Dread", did@ID, h5spaceFile@ID, W,
+    .External("_H5Dread", did@ID, h5spaceFile@ID, W,
           NULL, FALSE, 0L , FALSE, PACKAGE = "rhdf5")
   }
 
@@ -679,7 +679,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
       clusters <- .formatArray(data = clusters, struct = struct, nameColumns = "area", mcType = mcType)
 
       compname <- as.factor(struct$compname)
-      clusters[, cluster:= rep(rep(compname, each = dimclusters[1]), dimclusters[4])]
+      clusters[, "cluster" := rep(rep(compname, each = dimclusters[1]), dimclusters[4])]
       tim <- getAllDateInfoFromDate(fid, GP)
 
       #Add time
@@ -714,7 +714,7 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
   data[, c(nameColumns[1]):= rep(rep(dataName, each = dimData[1]), dimData[4])]
   if(mcType == "mcInd")
   {
-    data[, mcYear := rep(struct$mcyLoad, each = dimData[1] * dimData[3])]
+    data[, "mcYear" := rep(struct$mcyLoad, each = dimData[1] * dimData[3])]
   }
   data
 }

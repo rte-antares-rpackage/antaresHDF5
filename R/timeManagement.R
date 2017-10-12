@@ -52,7 +52,8 @@ getAllDateInfoFromDate <- function(fid, group){
     datetime_data$month <- as.factor(toupper(format(timCop, format = "%b")))
     return(datetime_data)
   }
-
+  idate <- NULL
+  itime <- NULL
   class(datetime_data$idate) <- c("IDate", "Date")
   class(datetime_data$itime) <- c("ITime")
   # recuperation de la locale actuelle du pc
@@ -107,8 +108,8 @@ getAllDateInfoFromDate <- function(fid, group){
   #Merge
   datetime_data <- merge(datetime_data, uniqueDate)
   datetime_data <- merge(datetime_data, uniqueTime, by = "itime")
-  datetime_data[, idate := NULL]
-  datetime_data[, itime := NULL]
+  datetime_data[, "idate" := NULL]
+  datetime_data[, "itime" := NULL]
   setkey(datetime_data, "time")
   Sys.setlocale("LC_TIME", current_locale)
   datetime_data

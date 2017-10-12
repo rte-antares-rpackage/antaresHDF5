@@ -16,9 +16,9 @@ library(plyr)
   GP <- allGroup[VV]
   infoReq <- expandRequest[VV,]
 
-  dfLoc <- .Call("_H5Dopen", h5loc, GP, NULL, PACKAGE = "rhdf5")
+  dfLoc <- .External("_H5Dopen", h5loc, GP, NULL, PACKAGE = "rhdf5")
   h5group = new("H5IdComponent", ID = dfLoc)
-  out <- .Call("_H5Dread", h5group@ID, NULL, NULL, NULL,
+  out <- .External("_H5Dread", h5group@ID, NULL, NULL, NULL,
                TRUE, TRUE, FALSE, PACKAGE = "rhdf5")
 
   out <- as.data.table.matrix.fast(out)

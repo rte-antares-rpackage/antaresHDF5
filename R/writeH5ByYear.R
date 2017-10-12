@@ -288,16 +288,16 @@ writeAntaresH5 <- function(path = getwd(), timeSteps = c("hourly", "daily", "wee
       #Remove useless data
       sapply(1:length(res), function(i){
         if("day" %in% names(res[[i]])){
-          res[[i]][, day := NULL]
+          res[[i]][, "day" := NULL]
         }
         if("month" %in% names(res[[i]])){
-          res[[i]][, month := NULL]
+          res[[i]][, "month" := NULL]
         }
         if("hour" %in% names(res[[i]])){
-          res[[i]][, hour := NULL]
+          res[[i]][, "hour" := NULL]
         }
         if("time" %in% names(res[[i]])){
-          res[[i]][, time := NULL]
+          res[[i]][, "time" := NULL]
         }
       }) %>>% invisible()
       gc()
@@ -306,7 +306,7 @@ writeAntaresH5 <- function(path = getwd(), timeSteps = c("hourly", "daily", "wee
       if(is.null(mcY)){
 
         lapply(res, function(X){
-          X[, mcYear := "mcAll"]
+          X[, "mcYear" := "mcAll"]
 
         })
       }

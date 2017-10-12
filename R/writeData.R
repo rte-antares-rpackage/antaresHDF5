@@ -69,7 +69,7 @@ writeDataType <- function(data,
   data <- data[[type]]
   if(type == "clusters"){
     data$cluster <- paste0(data$area, "/", data$cluster)
-    data[,area := NULL]
+    data[,"area" := NULL]
   }
 
 

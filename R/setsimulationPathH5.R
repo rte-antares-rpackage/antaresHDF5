@@ -23,7 +23,7 @@ setSimulationPathH5 <- function(path, simulation = NULL){
         for (i in 1:length(avaliableFile)) {
           cat(sprintf("   %s - %s\n", i, avaliableFile[i]))
         }
-        simulation <- type.convert(scan(what = character(), nmax = 1), as.is = TRUE)
+        simulation <- utils::type.convert(scan(what = character(), nmax = 1), as.is = TRUE)
       }
     }
 
