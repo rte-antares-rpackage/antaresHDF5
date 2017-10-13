@@ -25,12 +25,12 @@ test_that("processing calc by user", {
   calcData <- readAntares(areas = "all", mcYears = "all", select = c("H. STOR" , "MISC. DTG",
                                                                    "NODU" , "NP COST",
                                                                    "Tota", "Tota2"), opts = optsH5)
-  
+
   calcData[,verif1 := `H. STOR` + `MISC. DTG`]
   calcData[,verif2 := `NODU` + `NP COST` + 1]
   expect_true(max(calcData$Tota-calcData$verif1) == 0)
   expect_true(max(calcData$Tota2-calcData$verif2) == 0)
-  
+
 })
 
 
@@ -41,10 +41,10 @@ UpwardMargin_out <- readAntares(areas = "all", mcYears = "all",select = "Out_add
 UpwardMargin_recalc <- readAntares(areas = "all", mcYears = "all",select = "upwardMargin")
 addUpwardMargin(UpwardMargin_recalc)
 
-expect_true(identical(UpwardMargin_out$interconnectedUpwardMargin, 
+expect_true(identical(UpwardMargin_out$interconnectedUpwardMargin,
                       UpwardMargin_recalc$areas$interconnectedUpwardMargin))
 
-expect_true(identical(UpwardMargin_out$isolatedUpwardMargin, 
+expect_true(identical(UpwardMargin_out$isolatedUpwardMargin,
                       UpwardMargin_recalc$areas$isolatedUpwardMargin))
 
 })

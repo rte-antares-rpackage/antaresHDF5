@@ -9,7 +9,8 @@ addStraitments(opts, mcY = c("mcInd", "mcAll"), addDownwardMargin = FALSE,
   addLoadFactorLink = FALSE, externalDependency = FALSE,
   loadFactor = FALSE, modulation = FALSE, netLoadRamp = FALSE,
   surplus = FALSE, surplusClusters = FALSE, evalAreas = list(),
-  evalLinks = list(), evalClusters = list(), evalDistricts = list())
+  evalLinks = list(), evalClusters = list(), evalDistricts = list(),
+  nThreads = 1)
 }
 \arguments{
 \item{opts}{\code{simOptions} obtain wich [antaresRead]{setSimulationPath}}
@@ -43,6 +44,8 @@ addStraitments(opts, mcY = c("mcInd", "mcAll"), addDownwardMargin = FALSE,
 \item{evalClusters}{\code{list}, list of operation to evaluate in clusters data}
 
 \item{evalDistricts}{\code{list}, list of operation to evaluate in districts data}
+
+\item{nThreads}{\code{numeric}, nThreads to use}
 }
 \description{
 In this version only hourly data can be enriched.

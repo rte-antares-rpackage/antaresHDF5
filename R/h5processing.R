@@ -18,6 +18,7 @@
 #' @param evalLinks \code{list}, list of operation to evaluate in links data
 #' @param evalClusters \code{list}, list of operation to evaluate in clusters data
 #' @param evalDistricts \code{list}, list of operation to evaluate in districts data
+#' @param nThreads \code{numeric}, nThreads to use
 #' 
 #' @examples
 #' \dontrun{
@@ -55,7 +56,7 @@ addStraitments <- function(opts,
                            evalAreas = list(),
                            evalLinks = list(),
                            evalClusters = list(),
-                           evalDistricts = list()){
+                           evalDistricts = list(), nThreads = 1){
   
   mcY <- match.arg(mcY)
   allStraitments <- list(
@@ -96,27 +97,95 @@ addStraitments <- function(opts,
   }
   timeStep <- "hourly"
   
-  outToWrite <- sapply(mcYear, function(X){
-    if(X == "mcAll"){
+  
+  if(mcYear[1] != 'mcAll')
+  {
+    by = nThreads
+    print(mcYear)
+    mcYear_L <- vector("list", floor((max(mcYear)-1)/by) + 1 )
+    for(i in 1:length(mcYear))
+    {
+      mcYear_L[[floor((i-1)/by) + 1]] <- c(mcYear_L[[floor((i-1)/by) + 1]], mcYear[i])
+    }
+    mcYear <- mcYear_L
+  }else{
+    mcYear <- list(mcYear)
+  }
+  
+  if(length(mcYear[[1]]) > 1){
+    cl <- makeCluster(length(mcYear[[1]]))
+    Parallel = TRUE
+    
+    clusterExport(cl, c("opts"))
+    clusterEvalQ(cl = cl, {
+      require(antaresHdf5)
+      antaresHdf5:::.setAlliasH5()
+      opts <- antaresRead::setSimulationPath(opts$h5path)
+    })
+    
+  }else{
+    Parallel = FALSE
+  }
+  
+  outToWrite <- lapply(mcYear, function(X){
+    if(X[1] == "mcAll"){
       X <- NULL
     }
-    myOut <- .readDataEndAddColumn(opts, select = select, mcYears = X, timeStep = timeStep,
-                                   evalAreas = evalAreas, evalLinks = evalLinks,
-                                   evalClusters = evalClusters, evalDistricts = evalDistricts,
-                                   columnsToSelects = columnsToSelects, allStraitments = allStraitments,
-                                   writeAreas = writeAreas,
-                                   writeLinks = writeLinks,
-                                   writeClusters = writeClusters,
-                                   writeDistricts = writeDistricts,
-                                   columnsToAdd = columnsToAdd)
+    
+    if(!Parallel)
+    {
+      myOut <- .readDataEndAddColumn(opts, select = select, mcYears = X, timeStep = timeStep,
+                                     evalAreas = evalAreas, evalLinks = evalLinks,
+                                     evalClusters = evalClusters, evalDistricts = evalDistricts,
+                                     columnsToSelects = columnsToSelects, allStraitments = allStraitments,
+                                     writeAreas = writeAreas,
+                                     writeLinks = writeLinks,
+                                     writeClusters = writeClusters,
+                                     writeDistricts = writeDistricts,
+                                     columnsToAdd = columnsToAdd)
+    }else{
+      print(select)
+      clusterExport(cl, c("opts", "select", "X",  "timeStep",
+                          "evalAreas", "evalLinks",
+                          "evalClusters", "evalDistricts",
+                          "columnsToSelects","allStraitments",
+                          "writeAreas",
+                          "writeLinks",
+                          "writeClusters",
+                          "writeDistricts",
+                          "columnsToAdd"), envir = environment())
+      myOut <- parSapply(cl, X, function(Y){
+        .readDataEndAddColumn(opts, select = select, mcYears = Y, timeStep = timeStep,
+                              evalAreas = evalAreas, evalLinks = evalLinks,
+                              evalClusters = evalClusters, evalDistricts = evalDistricts,
+                              columnsToSelects = columnsToSelects, allStraitments = allStraitments,
+                              writeAreas = writeAreas,
+                              writeLinks = writeLinks,
+                              writeClusters = writeClusters,
+                              writeDistricts = writeDistricts,
+                              columnsToAdd = columnsToAdd)
+      }, simplify = FALSE)
+      
+      
+      namS <- names(myOut[[1]])
+      myOut <- sapply(1:length(myOut[[1]]), function(V){
+        rbindlist(sapply(1:length(myOut), function(W){
+          myOut[[W]][[V]]
+        }, simplify = FALSE))
+      }, simplify = FALSE)
+      names(myOut) <- namS
+      
+    }
     outList <- names(myOut)
     outToWrite <- sapply(outList, function(HH){
       as.matrix(myOut[[HH]])
     }, simplify = FALSE)
+    
+    
     if(is.null(X)){
       writeStruct <- TRUE
     }else{
-      writeStruct <- X == mcYear[1]
+      writeStruct <- unique(X == mcYear[[1]])
     }
     
     
@@ -129,7 +198,11 @@ addStraitments <- function(opts,
                     clusters = writeClusters,
                     districts = writeDistricts,
                     mcYear = X, writeStruct = writeStruct)
-  }, simplify = FALSE)
+    
+    
+    
+  })
+  if(Parallel)stopCluster(cl)
   
   
   ##Add control on straitments to define all this objects
@@ -174,7 +247,7 @@ addStraitments <- function(opts,
 }
 
 .getIndexToWrite <- function(dim, nbVarToWrite, mcYear = NULL){
-  d4 <- ifelse(is.null(mcYear), 1:dim[4], mcYear)
+  d4 <- if(is.null(mcYear)){1:dim[4]}else{mcYear}
   list(1:dim[1], (dim[2] + 1) : (dim[2] + nbVarToWrite), 1:dim[3], d4)
 }
 
@@ -199,6 +272,8 @@ addStraitments <- function(opts,
       res$areas[, names(evalAreas) := lapply(evalAreas, function(X){eval(parse(text = X))})]
     }
     res$areas <- res$areas[, .SD, .SDcols = c(columnsToAdd$areas, names(evalAreas))]
+  }else{
+    res$areas <- NULL
   }
   if(writeLinks){
     if(length(evalLinks) > 0)
@@ -206,6 +281,8 @@ addStraitments <- function(opts,
       res$areas[, names(evalLinks) := lapply(evalLinks, function(X){eval(parse(text = X))})]
     }
     res$links <- res$links[, .SD, .SDcols = c(columnsToAdd$links, names(evalLinks))]
+  }else{
+    res$links <- NULL
   }
   if(writeClusters){
     if(length(evalClusters) > 0)
@@ -213,6 +290,8 @@ addStraitments <- function(opts,
       res$areas[, names(evalClusters) := lapply(evalClusters, function(X){eval(parse(text = X))})]
     }
     res$clusters <- res$clusters[, .SD, .SDcols = c(columnsToAdd$clusters,names(evalClusters))]
+  }else{
+    res$clusters <- NULL
   }
   if(writeDistricts){
     if(length(evalDistricts) > 0)
@@ -220,6 +299,8 @@ addStraitments <- function(opts,
       res$areas[, names(evalDistricts) := lapply(evalDistricts, function(X){eval(parse(text = X))})]
     }
     res$districts <- res$districts[, .SD, .SDcols = c(columnsToAdd$districts, names(evalDistricts))]
+  }else{
+    res$districts <- NULL
   }
   res
 }
@@ -227,7 +308,7 @@ addStraitments <- function(opts,
 
 .writeNewColumns <- function(fid, newdata, GP, mcYear = NULL, writeStruct = FALSE)
 {
-
+  
   nbVarToWrite <- ncol(newdata)
   namesVariable <- colnames(newdata)
   datatype <- paste0(GP, "/data")
@@ -244,7 +325,7 @@ addStraitments <- function(opts,
       
     }
     if(length(namesVariable) > 0){
-    structVarAdd[which(structVarAdd == "")[1:nbVarToWrite]] <- namesVariable
+      structVarAdd[which(structVarAdd == "")[1:nbVarToWrite]] <- namesVariable
     }
     #h5write(structVarAdd, path, oldStruct)
     h5writeDataset(obj = structVarAdd,  fid, oldStruct)
@@ -267,11 +348,31 @@ addStraitments <- function(opts,
   indexToWrite <- .getIndexToWrite(actualDim, nbVarToWrite, mcYear)
   dimtowrite <- unlist(lapply(indexToWrite, length))
   indexToWrite[[2]] <- indexVar
-  arrayToWrite <- array(newdata, dimtowrite[c(1,3,2,4)])
-  arrayToWrite <- aperm(arrayToWrite, c(1,3,2,4))
+  
+  
+  
+  arrayToWrite <- array(newdata, dimtowrite[c(1,3,4,2)])
+  # dim(arrayToWrite)
+  arrayToWrite <- aperm(arrayToWrite, c(1,4,2,3))
+  # dim(arrayToWrite)
+  # newdata[1:2,]
+  # 
+  # 
+  # newdata[1:2 + 8736,]
+  # 
+  # 
+  #  arrayToWrite[1:2,,1,1]
+  #  arrayToWrite[1:2,,2,1]
+  # 
+  # dim(arrayToWrite)
+  # 
+  
   newDim <- actualDim
   newDim[2] <- newDim[2] + dimtowrite[2]
-  h5set_extent(fid, datatype, c(newDim))
+  if(writeStruct && length(namesVariable)>0)
+  {
+    h5set_extent(fid, datatype, c(newDim))
+  }
   h5writeDataset.array(obj = arrayToWrite, fid, datatype, index = indexToWrite)
   H5close()
 }
