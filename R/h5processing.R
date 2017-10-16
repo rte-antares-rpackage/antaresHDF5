@@ -188,6 +188,12 @@ addStraitments <- function(opts,
     }
     
     
+    writeAreas <- "areas" %in% names(outToWrite)
+    writeLinks <- "links" %in% names(outToWrite)
+    writeClusters <- "clusters" %in% names(outToWrite)
+    writeDistricts <- "districts" %in% names(outToWrite)
+    
+    
     .writeAllTables(timeStep = timeStep,
                     mcY = mcY,
                     path = opts$h5path,
@@ -258,17 +264,42 @@ addStraitments <- function(opts,
                                   writeLinks,
                                   writeClusters,
                                   writeDistricts, columnsToAdd){
-  res <- readAntares(opts = opts, select = c(select,columnsToSelects), mcYears = mcYears, timeStep = timeStep)
+  
+  if(writeAreas){
+    ar <- "all"
+  }else{
+    ar <- NULL
+  }
+  if(writeLinks){
+    ln <- "all"
+  }else{
+    ln <- NULL
+  }
+  if(writeClusters){
+    clu <- "all"
+  }else{
+    clu <- NULL
+  }
+  if(writeDistricts){
+    dr <- "all"
+  }else{
+    dr <- NULL
+  }
+  res <- readAntares(areas = ar, 
+                     links = ln,
+                     clusters = clu,
+                     districts = dr,
+                     opts = opts, select = c(select,columnsToSelects), mcYears = mcYears, timeStep = timeStep)
   res <- as.antaresDataList(res)
   nrowRes <- lapply(res, nrow)
   
   
-  for(i in 1:length(res)){
-    res[[i]] <- res[[i]][, .SD, .SDcols = names(res[[i]])[!names(res[[i]])%in%select]]
-  }
+  # for(i in 1:length(res)){
+  #   res[[i]] <- res[[i]][, .SD, .SDcols = names(res[[i]])[!names(res[[i]])%in%select]]
+  # }
   res <- .calcNewColumns(res, allStraitments, timeStep = timeStep)
   
-  if(writeAreas){
+  if(writeAreas && "areas" %in% names(res)){
     if(length(evalAreas) > 0)
     {
       res$areas[, names(evalAreas) := lapply(evalAreas, function(X){eval(parse(text = X))})]
@@ -277,28 +308,28 @@ addStraitments <- function(opts,
   }else{
     res$areas <- NULL
   }
-  if(writeLinks){
+  if(writeLinks && "links" %in% names(res)){
     if(length(evalLinks) > 0)
     {
-      res$areas[, names(evalLinks) := lapply(evalLinks, function(X){eval(parse(text = X))})]
+      res$links[, names(evalLinks) := lapply(evalLinks, function(X){eval(parse(text = X))})]
     }
     res$links <- res$links[, .SD, .SDcols = c(columnsToAdd$links, names(evalLinks))]
   }else{
     res$links <- NULL
   }
-  if(writeClusters){
+  if(writeClusters && "clusters" %in% names(res)){
     if(length(evalClusters) > 0)
     {
-      res$areas[, names(evalClusters) := lapply(evalClusters, function(X){eval(parse(text = X))})]
+      res$clusters[, names(evalClusters) := lapply(evalClusters, function(X){eval(parse(text = X))})]
     }
     res$clusters <- res$clusters[, .SD, .SDcols = c(columnsToAdd$clusters,names(evalClusters))]
   }else{
     res$clusters <- NULL
   }
-  if(writeDistricts){
+  if(writeDistricts && "districts" %in% names(res)){
     if(length(evalDistricts) > 0)
     {
-      res$areas[, names(evalDistricts) := lapply(evalDistricts, function(X){eval(parse(text = X))})]
+      res$districts[, names(evalDistricts) := lapply(evalDistricts, function(X){eval(parse(text = X))})]
     }
     res$districts <- res$districts[, .SD, .SDcols = c(columnsToAdd$districts, names(evalDistricts))]
   }else{
@@ -361,6 +392,24 @@ addStraitments <- function(opts,
       
       #h5write(structVarAdd, path, oldStruct)
       h5writeDataset(obj = structVarAdd,  fid, oldStruct)
+      
+
+      if(grepl("areas", GP))
+      {
+        attributes <- .loadAttributes(fid, "hourly")
+        attributes$opts$variables$areas <- unique(c(attributes$opts$variables$areas, namesVariable))
+        .writeAttributes(path = NULL, timeStep =  "hourly", fid = fid, attributes = attributes)
+        
+      }
+      
+      if(grepl("links", GP))
+      {
+        attributes <- .loadAttributes(fid, "hourly")
+        attributes$opts$variables$links <- unique(c(attributes$opts$variables$links, namesVariable))
+        .writeAttributes(path = NULL, timeStep =  "hourly", fid = fid, attributes = attributes)
+        
+      }
+      
     }
   }
   

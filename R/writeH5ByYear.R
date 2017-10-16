@@ -258,7 +258,7 @@ writeAntaresH5 <- function(path = getwd(), timeSteps = c("hourly", "daily", "wee
 
       if(writeStructure & !mcAll){
 
-        attrib <- attributes(res)
+      
         # Create group
         H5close()
         h5createGroup(path, timeStep)
@@ -267,9 +267,9 @@ writeAntaresH5 <- function(path = getwd(), timeSteps = c("hourly", "daily", "wee
         writeTime(res, path, timeStep)
         H5close()
         #Write attributes
-        s <- serialize(attrib, NULL, ascii = TRUE)
-        h5write(rawToChar(s), path, paste0(timeStep, "/attrib"))
-
+        .writeAttributes(res = res, path = path, timeStep = timeStep)
+        
+  
 
         ###Write inputs
         h5createGroup(path, paste0(timeStep, "/inputs"))
