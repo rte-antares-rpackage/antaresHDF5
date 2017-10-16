@@ -101,7 +101,6 @@ addStraitments <- function(opts,
   if(mcYear[1] != 'mcAll')
   {
     by = nThreads
-    print(mcYear)
     mcYear_L <- vector("list", floor((max(mcYear)-1)/by) + 1 )
     for(i in 1:length(mcYear))
     {
@@ -144,7 +143,6 @@ addStraitments <- function(opts,
                                      writeDistricts = writeDistricts,
                                      columnsToAdd = columnsToAdd)
     }else{
-      print(select)
       clusterExport(cl, c("opts", "select", "X",  "timeStep",
                           "evalAreas", "evalLinks",
                           "evalClusters", "evalDistricts",
@@ -176,6 +174,7 @@ addStraitments <- function(opts,
       names(myOut) <- namS
       
     }
+    
     outList <- names(myOut)
     outToWrite <- sapply(outList, function(HH){
       as.matrix(myOut[[HH]])
@@ -261,6 +260,9 @@ addStraitments <- function(opts,
                                   writeDistricts, columnsToAdd){
   res <- readAntares(opts = opts, select = c(select,columnsToSelects), mcYears = mcYears, timeStep = timeStep)
   res <- as.antaresDataList(res)
+  nrowRes <- lapply(res, nrow)
+  
+  
   for(i in 1:length(res)){
     res[[i]] <- res[[i]][, .SD, .SDcols = names(res[[i]])[!names(res[[i]])%in%select]]
   }
@@ -302,6 +304,36 @@ addStraitments <- function(opts,
   }else{
     res$districts <- NULL
   }
+  
+  
+  ###Controle data write
+  lapply(res, function(X){
+    classColumns <- unlist(lapply(X, class))
+    wolumnstoTransform <- which(classColumns == "logical")
+    if(length(wolumnstoTransform) > 0){
+      X[,names(wolumnstoTransform) := lapply(X = .SD, as.numeric), .SDcols = wolumnstoTransform]
+      if(mcYears[1] == opts$mcYears[1])
+      {
+        cat(paste0("Some boolean column(s) found, they will be transform to numeric (TRUE : 1, FALSE : 0)"))
+      }
+    }
+  })
+  
+  lapply(res, function(GG){
+    if(!all(unlist(lapply(GG, class)) %in% c("numeric", "integer"))){
+      concerCol <- names(unlist(lapply(GG, class)))[
+        !unlist(lapply(GG, class)) %in% c("numeric", "integer")]
+      stop("Somes columns (", paste0(concerCol, collapse = ";") ,") are not numeric, integer or logical they can't be write in h5")
+    }
+  })
+  
+  nrwNrowRes <- lapply(res, nrow)
+  for(i in names(nrwNrowRes)){
+    if(nrowRes[[i]] != nrwNrowRes[[i]]){
+      stop("New file have a diffrent number of row than request file, columns can't be add to h5 file")
+    }
+  }
+  
   res
 }
 
@@ -325,11 +357,15 @@ addStraitments <- function(opts,
       
     }
     if(length(namesVariable) > 0){
-      structVarAdd[which(structVarAdd == "")[1:nbVarToWrite]] <- namesVariable
+      structVarAdd[which(structVarAdd == "")][1:length(namesVariable)] <- namesVariable
+      
+      #h5write(structVarAdd, path, oldStruct)
+      h5writeDataset(obj = structVarAdd,  fid, oldStruct)
     }
-    #h5write(structVarAdd, path, oldStruct)
-    h5writeDataset(obj = structVarAdd,  fid, oldStruct)
   }
+  
+  
+  
   oldStruct <-  paste0(GP, "/structure/reCalcVar")
   did <- H5Dopen(fid, oldStruct)
   allVarAdd <- H5Dread(did )
