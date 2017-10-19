@@ -11,16 +11,16 @@ Description: Use h5 files for antares.
 License: GPL (>= 2) | file LICENSE
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.4.0)
+Depends: R (>= 3.4.0),
+  antaresRead (>= 1.1.5),
+  antaresProcessing (>=  0.11.0)
 Imports:
   data.table (>= 1.10.4),
-  antaresRead (>= 1.1.5),
   pipeR,
   stringr,
   testthat,
   plyr,
   parallel,
-  antaresProcessing (>=  0.11.0),
   rhdf5 (>= 2.21.2)
 Suggests: 
   covr
