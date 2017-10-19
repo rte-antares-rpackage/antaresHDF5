@@ -446,18 +446,6 @@ addStraitments <- function(opts,
   arrayToWrite <- array(newdata, dimtowrite[c(1,3,4,2)])
   # dim(arrayToWrite)
   arrayToWrite <- aperm(arrayToWrite, c(1,4,2,3))
-  # dim(arrayToWrite)
-  # newdata[1:2,]
-  # 
-  # 
-  # newdata[1:2 + 8736,]
-  # 
-  # 
-  #  arrayToWrite[1:2,,1,1]
-  #  arrayToWrite[1:2,,2,1]
-  # 
-  # dim(arrayToWrite)
-  # 
   
   newDim <- actualDim
   newDim[2] <- newDim[2] + dimtowrite[2]
