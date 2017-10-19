@@ -1,6 +1,6 @@
 tpDir <- tempdir()
 sourcedir <-  system.file("testdata", package = "antaresHdf5")
-
+library(antaresRead)
 if (sourcedir != "") {
   if (Sys.info()['sysname'] == "Windows") {
     unzip(file.path(sourcedir, "testdata.zip"), exdir = tpDir)
@@ -24,7 +24,7 @@ if (sourcedir != "") {
   }
   
   
-  silentf <- deprintize(showAliases)
+  silentf <- deprintize(antaresRead::showAliases)
   
   alias <- silentf()$name
   alias <- as.character(alias)

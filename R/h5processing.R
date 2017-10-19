@@ -289,7 +289,8 @@ addStraitments <- function(opts,
                      links = ln,
                      clusters = clu,
                      districts = dr,
-                     opts = opts, select = c(select,columnsToSelects), mcYears = mcYears, timeStep = timeStep)
+                     opts = opts, select = c(select,columnsToSelects),
+                     mcYears = mcYears, timeStep = timeStep)
   res <- as.antaresDataList(res)
   nrowRes <- lapply(res, nrow)
   
@@ -304,7 +305,10 @@ addStraitments <- function(opts,
     {
       res$areas[, names(evalAreas) := lapply(evalAreas, function(X){eval(parse(text = X))})]
     }
-    res$areas <- res$areas[, .SD, .SDcols = c(columnsToAdd$areas, names(evalAreas))]
+    
+    cAdd <- c(columnsToAdd$areas, names(evalAreas))
+    
+    res$areas <- res$areas[, .SD, .SDcols = cAdd[cAdd%in%names(res$areas)]]
   }else{
     res$areas <- NULL
   }
@@ -313,7 +317,8 @@ addStraitments <- function(opts,
     {
       res$links[, names(evalLinks) := lapply(evalLinks, function(X){eval(parse(text = X))})]
     }
-    res$links <- res$links[, .SD, .SDcols = c(columnsToAdd$links, names(evalLinks))]
+    cAdd <- c(columnsToAdd$links, names(evalLinks))
+    res$links <- res$links[, .SD, .SDcols = cAdd[cAdd%in%names(res$links)]]
   }else{
     res$links <- NULL
   }
@@ -322,7 +327,8 @@ addStraitments <- function(opts,
     {
       res$clusters[, names(evalClusters) := lapply(evalClusters, function(X){eval(parse(text = X))})]
     }
-    res$clusters <- res$clusters[, .SD, .SDcols = c(columnsToAdd$clusters,names(evalClusters))]
+    cAdd <- c(columnsToAdd$clusters,names(evalClusters))
+    res$clusters <- res$clusters[, .SD, .SDcols =  cAdd[cAdd%in%names(res$clusters)]]
   }else{
     res$clusters <- NULL
   }
@@ -331,7 +337,8 @@ addStraitments <- function(opts,
     {
       res$districts[, names(evalDistricts) := lapply(evalDistricts, function(X){eval(parse(text = X))})]
     }
-    res$districts <- res$districts[, .SD, .SDcols = c(columnsToAdd$districts, names(evalDistricts))]
+    cAdd <- c(columnsToAdd$links, names(evalAreas))
+    res$districts <- res$districts[, .SD, .SDcols =  cAdd[cAdd%in%names(res$districts)]]
   }else{
     res$districts <- NULL
   }
@@ -394,21 +401,21 @@ addStraitments <- function(opts,
       h5writeDataset(obj = structVarAdd,  fid, oldStruct)
       
 
-      if(grepl("areas", GP))
-      {
-        attributes <- .loadAttributes(fid, "hourly")
-        attributes$opts$variables$areas <- unique(c(attributes$opts$variables$areas, namesVariable))
-        .writeAttributes(path = NULL, timeStep =  "hourly", fid = fid, attributes = attributes)
-        
-      }
-      
-      if(grepl("links", GP))
-      {
-        attributes <- .loadAttributes(fid, "hourly")
-        attributes$opts$variables$links <- unique(c(attributes$opts$variables$links, namesVariable))
-        .writeAttributes(path = NULL, timeStep =  "hourly", fid = fid, attributes = attributes)
-        
-      }
+      # if(grepl("areas", GP))
+      # {
+      #   attributes <- .loadAttributes(fid, "hourly")
+      #   attributes$opts$variables$areas <- unique(c(attributes$opts$variables$areas, namesVariable))
+      #   .writeAttributes(path = NULL, timeStep =  "hourly", fid = fid, attributes = attributes)
+      #   
+      # }
+      # 
+      # if(grepl("links", GP))
+      # {
+      #   attributes <- .loadAttributes(fid, "hourly")
+      #   attributes$opts$variables$links <- unique(c(attributes$opts$variables$links, namesVariable))
+      #   .writeAttributes(path = NULL, timeStep =  "hourly", fid = fid, attributes = attributes)
+      #   
+      # }
       
     }
   }
@@ -491,6 +498,8 @@ addStraitments <- function(opts,
 
 
 .calcNewColumns <- function(res, allStraitments, timeStep){
+  oldw <- getOption("warn")
+  options(warn = -1)
   if(allStraitments$addDownwardMargin){
     try({
       res <- addDownwardMargin(res)
@@ -503,6 +512,9 @@ addStraitments <- function(opts,
   }
   if(allStraitments$addExportAndImport){
     try({
+      res$links$loadFactor <- NULL
+      res$areas$export <- NULL
+      res$areas$import <- NULL
       res <- addExportAndImport(res)
     })
   }
@@ -513,6 +525,8 @@ addStraitments <- function(opts,
   }
   if(allStraitments$externalDependency){
     try({
+      res$areas[,"netLoadRamp" := NULL]
+      res$areas[,"netLoad" := NULL]
       res <- addNetLoad(res)
     })
     try({
@@ -560,6 +574,7 @@ addStraitments <- function(opts,
       res$clusters <- merge(res$clusters, surplusClusters, by = idC)
     })
   }
+  options(warn = oldw)
   res
 }
 

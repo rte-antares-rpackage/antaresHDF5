@@ -1,6 +1,7 @@
 
 
 test_that("processing, write results", {
+  antaresHdf5:::.setAlliasH5()
   optsH5 <- setSimulationPathH5(tpDir, h5fil)
   addStraitments(opts = optsH5,  mcY = "mcInd",
                  addDownwardMargin = TRUE,
@@ -36,7 +37,8 @@ test_that("processing calc by user", {
 
 test_that("processing calc by straitements", {
 
-UpwardMargin_out <- readAntares(areas = "all", mcYears = "all",select = "Out_addUpwardMargin")
+UpwardMargin_out <- readAntares(areas = "all", mcYears = "all",
+                                select = "Out_addUpwardMargin")
 
 UpwardMargin_recalc <- readAntares(areas = "all", mcYears = "all",select = "upwardMargin")
 addUpwardMargin(UpwardMargin_recalc)

@@ -267,7 +267,12 @@ writeAntaresH5 <- function(path = getwd(), timeSteps = c("hourly", "daily", "wee
         writeTime(res, path, timeStep)
         H5close()
         #Write attributes
-        .writeAttributes(res = res, path = path, timeStep = timeStep)
+        
+        attrib <- attributes(res)
+        s <- serialize(attrib, NULL, ascii = TRUE)
+        h5write(rawToChar(s), path, paste0(timeStep, "/attrib"))
+        
+        # .writeAttributes(res = res, path = path, timeStep = timeStep)
         
   
 
