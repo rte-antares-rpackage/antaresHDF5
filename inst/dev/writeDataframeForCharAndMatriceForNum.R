@@ -1,5 +1,0 @@
-h5createFile("write_full_datatable.h5")
-h5write(chaR, "write_full_datatable.h5","B")
-h5write(nuM, "write_full_datatable.h5","C")
-H5close()
-file.remove("write_full_datatable.h5")
