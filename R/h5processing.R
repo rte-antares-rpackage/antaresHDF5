@@ -65,9 +65,9 @@ addStraitments <- function(opts,
                            evalDistricts = list(), nThreads = 1){
   .setAlliasH5()
   
-  if(!isH5Opts(opts){
+  if(!isH5Opts(opts)){
     stop("opts not refear to an h5 file")
-  })
+  }
   mcY <- match.arg(mcY)
   allStraitments <- list(
     addDownwardMargin = addDownwardMargin,

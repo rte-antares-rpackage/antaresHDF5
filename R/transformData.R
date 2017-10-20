@@ -8,7 +8,7 @@
 #'
 #' @import data.table antaresRead
 #'
-#'
+#' @noRd
 transformH5 <- function(data,
                         areasKey = c("area"),
                         linksKey = c("link"),
