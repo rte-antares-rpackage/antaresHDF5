@@ -2,18 +2,3 @@
 % Please edit documentation in R/readInputs.R
 \name{h5ReadClusterDesc}
 \alias{h5ReadClusterDesc}
-\title{Read areas layout}
-\usage{
-h5ReadClusterDesc(opts)
-}
-\arguments{
-\item{opts}{\link[antaresRead]{readBindingConstraints}}
-}
-\description{
-This function reads in the input files of an antares study the current areas
-layout, ie. the position of the areas It may be useful for plotting the
-network.
-
-Be aware that the layout is read in the input files so they may have
-changed since a simulation has been run \link[antaresRead]{readBindingConstraints}.
-}

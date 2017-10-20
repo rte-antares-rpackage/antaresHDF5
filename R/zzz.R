@@ -6,14 +6,12 @@ is.installed <- function(mypkg) is.element(mypkg, utils::installed.packages()[,1
     stop("This package require 'rhdf5' (>= 2.20.0) package.
     This is a bioconductor package. You can install it with :
     source('https://bioconductor.org/biocLite.R')
-    BiocInstaller::useDevel() # for latest version
     biocLite('rhdf5')")
   } else if(utils::packageVersion("rhdf5") < '2.20.0'){
     stop("This package require 'rhdf5' (>= 2.20.0) package.
     The installed version is older than expected.
     This is a bioconductor package. You can install it with :
     source('https://bioconductor.org/biocLite.R')
-    BiocInstaller::useDevel() # for latest version
     biocLite('rhdf5')")
   }
 }
@@ -194,4 +192,6 @@ pkgEnvAntareasH5$processDispo <- data.frame(
                                      ))
 
 pkgEnvH5 <- antaresRead:::pkgEnv
-
+integerVariable <- as.character(unique(pkgEnvH5$formatName$Name[which(pkgEnvH5$formatName$digits == 0)]))
+integerVariable <- unlist(apply(expand.grid(integerVariable, c("", "_std", "_min", "_max")), 1,
+                         function(X){paste0(X, collapse = "")}))

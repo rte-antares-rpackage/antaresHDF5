@@ -2,13 +2,3 @@
 % Please edit documentation in R/readInputs.R
 \name{h5ReadBindingConstraints}
 \alias{h5ReadBindingConstraints}
-\title{Read binding constraints}
-\usage{
-h5ReadBindingConstraints(opts)
-}
-\arguments{
-\item{opts}{\link[antaresRead]{readBindingConstraints}}
-}
-\description{
-This function reads the binding constraints of an Antares project \link[antaresRead]{readBindingConstraints}.
-}

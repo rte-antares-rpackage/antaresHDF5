@@ -718,6 +718,12 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
   {
     data[, "mcYear" := rep(struct$mcyLoad, each = dimData[1] * dimData[3])]
   }
+  integerVariableS <- integerVariable[integerVariable%in%names(data)]
+  if(length(integerVariableS)){
+    ordervar <- names(data)[ match(integerVariableS, names(data))]
+    data[,c(ordervar) := lapply(.SD, as.integer), .SDcols = ordervar]
+  }
+  
   data
 }
 

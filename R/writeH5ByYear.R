@@ -122,9 +122,9 @@ writeAntaresH5 <- function(path = getwd(), timeSteps = c("hourly", "daily", "wee
     parSapplyLB(cl, studieSToWrite, function(X){
       opts <- setSimulationPath(studyPath, X)
       if(!is.null(path)){
-        pathStud <- paste0(path, "/", opts$studyName, ".h5")
+        pathStud <- paste0(path, "/", X, ".h5")
       }
-      .writeAntaresH5Fun(path = pathStud,
+      antaresHdf5:::.writeAntaresH5Fun(path = pathStud,
                          timeSteps = timeSteps,
                          opts = opts,
                          writeMcAll = writeMcAll,
@@ -145,6 +145,7 @@ writeAntaresH5 <- function(path = getwd(), timeSteps = c("hourly", "daily", "wee
 
 
     })
+    
     stopCluster(cl)
 
     }else{

@@ -2,14 +2,3 @@
 % Please edit documentation in R/readInputs.R
 \name{h5ReadLayout}
 \alias{h5ReadLayout}
-\title{Import clusters description}
-\usage{
-h5ReadLayout(opts)
-}
-\arguments{
-\item{opts}{\link[antaresRead]{readBindingConstraints}}
-}
-\description{
-This function reads in the input files of an antares study the
-characteristics of each cluster \link[antaresRead]{readBindingConstraints}.
-}
