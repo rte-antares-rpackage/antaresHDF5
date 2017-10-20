@@ -2,14 +2,16 @@
 % Please edit documentation in R/readInputs.R
 \name{h5ReadLayout}
 \alias{h5ReadLayout}
-\title{Import clusters description}
+\title{Import areas layout}
 \usage{
 h5ReadLayout(opts)
 }
 \arguments{
-\item{opts}{\link[antaresRead]{readBindingConstraints}}
+\item{opts}{\code{list} of simulation parameters returned by the function \link[antaresRead]{setSimulationPath}.}
 }
 \description{
-This function reads in the input files of an antares study the
-characteristics of each cluster \link[antaresRead]{readBindingConstraints}.
+This function imports the position of the areas from an h5 file. It may be useful for plotting the
+network see also \link[antaresRead]{readLayout}.
+
+Be aware that the layout is read in the input files so they may have changed since a simulation has been run.
 }
