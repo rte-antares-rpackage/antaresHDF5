@@ -20,7 +20,7 @@
 #' @param production \code{character}, see \link[antaresRead]{removeVirtualAreas}
 #' @param reassignCosts \code{boolean}, see \link[antaresRead]{removeVirtualAreas}
 #' @param newCols \code{boolean}, see \link[antaresRead]{removeVirtualAreas}
-#' @param overwrite \code{boolan}, overwrite old file
+#' @param overwrite \code{boolean}, overwrite old file
 #'
 #' @examples
 #' \dontrun{
