@@ -135,7 +135,7 @@ writeAntaresH5 <- function(path = getwd(), timeSteps = c("hourly", "daily", "wee
         file.remove(path)
       }
       
-      antaresHdf5:::.writeAntaresH5Fun(path = pathStud,
+      .writeAntaresH5Fun(path = pathStud,
                          timeSteps = timeSteps,
                          opts = opts,
                          writeMcAll = writeMcAll,
