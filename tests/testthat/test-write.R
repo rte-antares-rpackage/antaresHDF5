@@ -11,6 +11,12 @@ writeAntaresH5(path = tptpDir,
 })
 unlink(tptpDir, recursive = TRUE)
 
+test_that("Bad path", {
+  expect_error( writeAntaresH5('badPath'), "Folder badPath not found.")
+ 
+})
+
+
 # dir.create(tptpDir)
 # test_that("write more than one studies multi thread", {
 #   writeAntaresH5(path = tptpDir,

@@ -66,7 +66,9 @@ writeAntaresH5 <- function(path = getwd(), timeSteps = c("hourly", "daily", "wee
 ){
 
 
-
+  if(!dir.exists(path)){
+    stop(paste0("Folder ", path, " not found."))
+  }
 
   if(!writeAllSimulations){
     simName <- unlist(strsplit(opts$simPath, "/"))
