@@ -104,6 +104,7 @@ getAllDateInfoFromDate <- function(fid, group){
     uniqueTime[, c("hour") := as.factor(substring(as.character(itime), 1, 5))]
 
   }
+  uniqueDate$month <- factor(uniqueDate$month , levels(uniqueDate$month)[order(levels(uniqueDate$month))])
 
   #Merge
   datetime_data <- merge(datetime_data, uniqueDate)
