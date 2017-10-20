@@ -31,6 +31,10 @@ h5ReadAntares <- function(path, areas = NULL, links = NULL, clusters = NULL,
                           timeStep = "hourly", select = NULL, showProgress = TRUE,
                           simplify = TRUE, perf = FALSE){
 
+  if(!file.exists(path)){
+    stop(paste0("File ", path, " not exist."))
+  }
+  
   if(perf){
     Beg <- Sys.time()
   }

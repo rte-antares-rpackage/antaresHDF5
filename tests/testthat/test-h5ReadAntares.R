@@ -154,3 +154,7 @@ sapply("hourly", function(Z){
   })
 })%>%invisible()
 
+test_that("Bad path", {
+  expect_error( h5ReadAntares("toto"), "File toto not exist.")
+  
+})
