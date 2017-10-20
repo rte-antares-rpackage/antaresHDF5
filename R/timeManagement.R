@@ -80,24 +80,24 @@ getAllDateInfoFromDate <- function(fid, group){
     datetime_data$time <- as.Date(datetime_data$time)
   }
 
-  # mthList <- c("APR",
-  #              "AUG",
-  #              "DEC",
-  #              "FEB",
-  #              "JAN",
-  #              "JUL",
-  #              "JUN",
-  #              "MAR",
-  #              "MAY",
-  #              "NOV",
-  #              "OCT",
-  #              "SEP")
-  #
-  # toAdd <- mthList[!mthList %in% levels(uniqueDate$month)]
-  # if(length(toAdd)>0)
-  # {
-  #   levels(uniqueDate$month) <- c(levels(uniqueDate$month), toAdd)
-  # }
+  mthList <- c("APR",
+               "AUG",
+               "DEC",
+               "FEB",
+               "JAN",
+               "JUL",
+               "JUN",
+               "MAR",
+               "MAY",
+               "NOV",
+               "OCT",
+               "SEP")
+
+  toAdd <- mthList[!mthList %in% levels(uniqueDate$month)]
+  if(length(toAdd)>0)
+  {
+    levels(uniqueDate$month) <- c(levels(uniqueDate$month), toAdd)
+  }
 
   if(group == "hourly")
   {
