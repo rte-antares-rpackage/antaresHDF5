@@ -21,7 +21,7 @@ Imports:
   testthat,
   plyr,
   parallel,
-  rhdf5 (>= 2.21.2)
+  rhdf5 (>= 2.20.0)
 Suggests: 
   covr
 RoxygenNote: 6.0.1
