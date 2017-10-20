@@ -20,6 +20,7 @@
 #' @param production \code{character}, see \link[antaresRead]{removeVirtualAreas}
 #' @param reassignCosts \code{boolean}, see \link[antaresRead]{removeVirtualAreas}
 #' @param newCols \code{boolean}, see \link[antaresRead]{removeVirtualAreas}
+#' @param overwrite \code{boolan}, overwrite old file
 #'
 #' @examples
 #' \dontrun{
@@ -62,7 +63,7 @@ writeAntaresH5 <- function(path = getwd(), timeSteps = c("hourly", "daily", "wee
                            storageFlexibility = NULL,
                            production = NULL,
                            reassignCosts = FALSE,
-                           newCols = TRUE
+                           newCols = TRUE, overwrite = FALSE
 ){
 
 
@@ -74,7 +75,9 @@ writeAntaresH5 <- function(path = getwd(), timeSteps = c("hourly", "daily", "wee
     simName <- unlist(strsplit(opts$simPath, "/"))
     simName <- simName[length(simName)]
     path <- paste0(path, "/", simName, ".h5")
-    
+    if(overwrite & file.exists(path)){
+      file.remove(path)
+    }
     .writeAntaresH5Fun(path = path,
                        timeSteps = timeSteps,
                        opts = opts,
@@ -118,7 +121,8 @@ writeAntaresH5 <- function(path = getwd(), timeSteps = c("hourly", "daily", "wee
                         "storageFlexibility",
                         "production",
                         "reassignCosts",
-                        "newCols"
+                        "newCols",
+                        "overwrite"
                         ), envir = environment())
 
     parSapplyLB(cl, studieSToWrite, function(X){
@@ -126,6 +130,11 @@ writeAntaresH5 <- function(path = getwd(), timeSteps = c("hourly", "daily", "wee
       if(!is.null(path)){
         pathStud <- paste0(path, "/", X, ".h5")
       }
+      
+      if(overwrite & file.exists(path)){
+        file.remove(path)
+      }
+      
       antaresHdf5:::.writeAntaresH5Fun(path = pathStud,
                          timeSteps = timeSteps,
                          opts = opts,
@@ -156,7 +165,9 @@ writeAntaresH5 <- function(path = getwd(), timeSteps = c("hourly", "daily", "wee
         if(!is.null(path)){
           pathStud <- paste0(path, "/", opts$studyName, ".h5")
         }
-        
+        if(overwrite & file.exists(path)){
+          file.remove(path)
+        }
         .writeAntaresH5Fun(path = pathStud,
                            timeSteps = timeSteps,
                            opts = opts,
