@@ -25,3 +25,4 @@ Imports:
 Suggests: 
   covr
 RoxygenNote: 6.0.1
+biocViews: Infrastructure, DataImport

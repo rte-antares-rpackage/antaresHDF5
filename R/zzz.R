@@ -6,14 +6,12 @@ is.installed <- function(mypkg) is.element(mypkg, utils::installed.packages()[,1
     stop("This package require 'rhdf5' (>= 2.20.0) package.
     This is a bioconductor package. You can install it with :
     source('https://bioconductor.org/biocLite.R')
-    BiocInstaller::useDevel() # for latest version
     biocLite('rhdf5')")
   } else if(utils::packageVersion("rhdf5") < '2.20.0'){
     stop("This package require 'rhdf5' (>= 2.20.0) package.
     The installed version is older than expected.
     This is a bioconductor package. You can install it with :
     source('https://bioconductor.org/biocLite.R')
-    BiocInstaller::useDevel() # for latest version
     biocLite('rhdf5')")
   }
 }
