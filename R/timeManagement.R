@@ -3,7 +3,7 @@
 #' @param data \code{antaresDataList} see \link{readAntares}
 #' @param timeStep \code{character} timeStep
 #'
-#'
+#' @noRd
 getTime <- function(data, timeStep){
   time <- unique(data[[1]]$time)
   current_locale <- Sys.getlocale(category = "LC_TIME")
@@ -27,7 +27,7 @@ getTime <- function(data, timeStep){
 #' @param fid \code{H5IdComponent} id of h5 file open which \link[rhdf5]{H5Fopen}
 #' @param group \code{group} group where time are stocked
 #'
-#'
+#' @noRd
 getAllDateInfoFromDate <- function(fid, group){
   # affectation des classes
 
