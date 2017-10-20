@@ -39,6 +39,12 @@
 #'                evalClusters = list(),
 #'                evalDistricts = list()
 #'                )
+#'                
+#' #After write of new columns, new aliases are avialable in antaresRead.You can use
+#' #showAliases() to see them. Prifix Out_ is used to distinguish them.
+#' showAliases("Out_surplusClusters")
+#' readAntares(opts = opts, select = "Out_surplusClusters")
+#' 
 #' }
 #' @export
 addStraitments <- function(opts,
@@ -57,7 +63,7 @@ addStraitments <- function(opts,
                            evalLinks = list(),
                            evalClusters = list(),
                            evalDistricts = list(), nThreads = 1){
-  
+  .setAlliasH5()
   mcY <- match.arg(mcY)
   allStraitments <- list(
     addDownwardMargin = addDownwardMargin,
@@ -118,7 +124,7 @@ addStraitments <- function(opts,
     clusterExport(cl, c("opts"))
     clusterEvalQ(cl = cl, {
       require(antaresHdf5)
-      antaresHdf5:::.setAlliasH5()
+      .setAlliasH5()
       opts <- antaresRead::setSimulationPath(opts$h5path)
     })
     
