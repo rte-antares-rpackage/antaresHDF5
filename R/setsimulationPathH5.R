@@ -57,6 +57,14 @@ setSimulationPathH5 <- function(path, simulation = NULL){
 #'
 #' @param path \code{character} path of h5 file
 #'
+#'
+#' @examples
+#' \dontrun{
+#'
+#' pathh5<-"C:/Users/MyUser/myStudyAntares.h5"
+#' getOptionsH5(pathh5)
+#'}
+#'
 #' @export
 getOptionsH5 <- function(path){
   fid <- H5Fopen(path)

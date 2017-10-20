@@ -12,3 +12,11 @@ getOptionsH5(path)
 \description{
 Get simulation path for h5 file
 }
+\examples{
+\dontrun{
+
+pathh5<-"C:/Users/MyUser/myStudyAntares.h5"
+getOptionsH5(pathh5)
+}
+
+}
