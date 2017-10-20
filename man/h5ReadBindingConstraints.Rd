@@ -2,13 +2,3 @@
 % Please edit documentation in R/readInputs.R
 \name{h5ReadBindingConstraints}
 \alias{h5ReadBindingConstraints}
-\title{Import binding constraints}
-\usage{
-h5ReadBindingConstraints(opts)
-}
-\arguments{
-\item{opts}{\code{list} of simulation parameters returned by the function \link[antaresRead]{setSimulationPath}.}
-}
-\description{
-This function imports the binding constraints of an Antares project form an h5 file see also \link[antaresRead]{readBindingConstraints}.
-}

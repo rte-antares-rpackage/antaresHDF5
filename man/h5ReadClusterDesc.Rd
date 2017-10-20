@@ -2,15 +2,3 @@
 % Please edit documentation in R/readInputs.R
 \name{h5ReadClusterDesc}
 \alias{h5ReadClusterDesc}
-\title{Import cluster description}
-\usage{
-h5ReadClusterDesc(opts)
-}
-\arguments{
-\item{opts}{\code{list} of simulation parameters returned by the function \link[antaresRead]{setSimulationPath}.}
-}
-\description{
-This function imports the characteristics of each cluster from an h5 file see also \link[antaresRead]{readClusterDesc}.
-
-Be aware that clusters descriptions are read in the input files so they may have changed since a simulation has been run.
-}
